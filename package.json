@@ -28,9 +28,7 @@
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "postinstall": "cd durable_objects && npm install",
-    "start": "npx wrangler pages dev --kv IMAGES -- npx react-scripts start",
-    "start2": "npx wrangler pages dev  --do DLOWNLOAD_COUNTER=DownloadCounter --kv IMAGES -- npx react-scripts start",
+    "start": "npx react-scripts start",
     "build": "react-scripts build",
     "test": "CI=true react-scripts test",
     "eject": "react-scripts eject",
