@@ -1,0 +1,178 @@
+@use '../../global/_variables.scss' as vars;
+
+.certTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 108px;
+  letter-spacing: 0.02em;
+}
+
+.certSubTitle {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 60px;
+  letter-spacing: 0.02em;
+}
+
+.certTagline {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 42px;
+  letter-spacing: 0.02em;
+
+  color: #989898;
+
+  padding-top: 50px;
+}
+
+.infoBox {
+  //background: linear-gradient(114.11deg, rgba(116, 235, 213, 0.75) -7.36%, rgba(159, 172, 230, 0.75) 101.34%);
+  background: vars.$certupGradient;
+  border-radius: 50px;
+  margin-top: 180px;
+  padding: 20px;
+}
+
+@media (min-width: 992px) {
+  .infoBox {
+    margin: 180px 200px 0px 200px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .infoBox {
+    margin: 180px 50px 0px 50px;
+  }
+}
+
+.infoTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 84px;
+  letter-spacing: 0.02em;
+
+  text-align: center;
+  padding-top: 45px;
+  padding-bottom: 70px;
+}
+
+.infoLeftLabel {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 42px;
+
+  color: #313131;
+}
+
+.infoTopLabel {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 42px;
+
+  text-align: left;
+
+  color: #313131;
+}
+
+.infoBody {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 165%;
+  height: 200px;
+
+  color: #545454;
+
+  //p stuff
+  display: block;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  margin-bottom: 1rem;
+}
+
+.labelCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+$gradient1: #efedff;
+//$gradient1: #FFF;
+$gradient2: #90ff4b;
+
+$gradient3: #85f0ff;
+$gradient4: #8f7dff;
+
+$gradient5: #fbda61;
+$gradient6: #ff5acd;
+
+hr.info1,
+hr.info2,
+hr.info3 {
+  width: 86px;
+  height: 4px !important;
+  margin: 10px 0px 18px 15px;
+  opacity: 0.75;
+}
+hr.info1 {
+  background: linear-gradient(135deg, $gradient1, $gradient2);
+}
+
+hr.info2 {
+  background: linear-gradient(135deg, $gradient3, $gradient4);
+  /*border: 3px solid linear-gradient(to right, $gradient1, $gradient2) border-box;*/
+}
+
+hr.info3 {
+  background: linear-gradient(135deg, $gradient5, $gradient6);
+  /*border: 3px solid linear-gradient(to right, $gradient1, $gradient2) border-box;*/
+}
+
+.createBox {
+  background: #232528;
+  border-radius: 50px;
+  padding-bottom: 75px !important;
+  padding-top: 40px !important;
+  margin-top: 140px;
+}
+
+.createTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 108px;
+
+  letter-spacing: 0.02em;
+
+  color: #ffffff;
+  text-align: center;
+}
+
+.createSubTitle {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 36px;
+
+  letter-spacing: 0.02em;
+
+  color: #cbcbcb;
+  text-align: center;
+  margin-top: 16px !important;
+  margin-bottom: 35px !important;
+}

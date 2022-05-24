@@ -24,13 +24,14 @@
   },
   "plugins": ["react", "jsx-a11y", "@typescript-eslint"],
   "rules": {
-    "react-hooks/exhaustive-deps": "error",
-    "no-var": "error",
-    "brace-style": "error",
-    "prefer-template": "error",
-    "radix": "error",
-    "space-before-blocks": "error",
-    "import/prefer-default-export": "off"
+    "react-hooks/exhaustive-deps": "warn",
+    "no-var": "warn",
+    "brace-style": "warn",
+    "prefer-template": "warn",
+    "radix": "warn",
+    "space-before-blocks": "warn",
+    "import/prefer-default-export": "off",
+    "prettier/prettier": "warn"
   },
   "overrides": [
     {

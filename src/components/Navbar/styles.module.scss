@@ -1,0 +1,21 @@
+@use '../../global/_variables.scss' as vars;
+
+a {
+  color: #000000 !important;
+  text-decoration: none !important;
+}
+
+.navItem {
+  margin-right: 90px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 30px;
+
+  color: #000000 !important;
+}
+
+.navbarContainer {
+  border-bottom: 1px solid #676767;
+  height: 135px;
+}

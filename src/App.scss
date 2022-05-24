@@ -1,0 +1,20 @@
+/* The following line can be included in a src/App.scss */
+@import './global/_mixins.scss';
+
+@import '~bootstrap/scss/bootstrap';
+
+@include font-face(Poppins, '../assets/fonts/Poppins/Poppins-Regular', null, null, otf);
+@include font-face(Catamaran, '../assets/fonts/Catamaran/Catamaran-Regular', null, null, ttf);
+
+/*
+@font-face {
+    font-family: 'Poppins';
+    src: url(assets/fonts/Poppins/Poppins-Black.otf) format('opentype'),
+         url(assets/fonts/Poppins/Poppins-BlackItalic.otf) format('opentype') font-italic ,
+         url(assets/fonts/Poppins/Poppins-Bold.otf) format('opentype') font-weight-bold,
+         url(assets/fonts/Poppins/Poppins-BoldItalic.otf) format('opentype') font-italic font-weight-bold;
+}
+*/
+body {
+  font-family: 'Poppins' !important;
+}

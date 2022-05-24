@@ -1,25 +1,43 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ItemProvider } from './contexts';
-import { Home, Error } from './pages/';
+import { ItemProvider, WalletProvider } from './contexts';
+import { Home, Error, About, Clients } from './pages/';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import './App.scss';
+import Guide from './pages/Guide';
+import Issuers from './pages/Issuers';
 
 function App() {
   return (
-    <ItemProvider>
+    <WalletProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        theme="colored"
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <BrowserRouter>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <div>
-                <p>Learn React</p>
-                <Home />
-              </div>
-            }
-          />
-          <Route path="*" element={<Error />} />
+          <Route path="/" element={<Home />} />
+          {!parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
+            <>
+              <Route path="/about" element={<About />} />
+              <Route path="/clients" element={<Clients />} />
+              <Route path="/guide" element={<Guide />} />
+              <Route path="/issuers" element={<Issuers />} />
+              <Route path="*" element={<Error />} />
+            </>
+          ) : null}
         </Routes>
       </BrowserRouter>
-    </ItemProvider>
+    </WalletProvider>
   );
 }
 

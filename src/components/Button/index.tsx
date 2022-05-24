@@ -5,16 +5,16 @@ import styles from './styles.module.scss';
 
 interface Props {
   children: ReactNode;
+  disabled?: boolean;
 }
 
-export default function Button({ children }: Props): ReactElement {
+export default function Button({ children, disabled = false }: Props): ReactElement {
   const { Items } = useItem();
   console.log(Items);
 
   return (
-    <div>
-      <h3 className={styles.Header}>Test Button</h3>
-      <button>{children}</button>
-    </div>
+    <button disabled={disabled} className={styles.certupBtn}>
+      {children}
+    </button>
   );
 }

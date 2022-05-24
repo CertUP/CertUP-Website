@@ -1,3 +1,16 @@
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+$gradient1-op: #9094ffad;
+$gradient2-op: #55f4c5ad;
+$gradient3-op: #a659f3ad;
+// $certupGradient: linear-gradient(135deg, $gradient1-op, $gradient2-op, $gradient3-op);
+$certupBtnGradient: linear-gradient(120deg, $gradient1, $gradient2 65%, $gradient3);
+
+$mainGradient1: rgb(116, 235, 213, 75%);
+$mainGradient2: rgb(144, 148, 255, 75%);
+$certupGradient: linear-gradient(135deg, $mainGradient1, $mainGradient2);
+
 // General Colors
 $body-bg: #0000;
 $text-color: #0000;
