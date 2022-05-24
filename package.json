@@ -28,7 +28,9 @@
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "postinstall": "cd durable_objects && npm install",
+    "start": "npx wrangler pages dev --kv IMAGES -- npx react-scripts start",
+    "start2": "npx wrangler pages dev  --do DLOWNLOAD_COUNTER=DownloadCounter --kv IMAGES -- npx react-scripts start",
     "build": "react-scripts build",
     "test": "CI=true react-scripts test",
     "eject": "react-scripts eject",
@@ -59,7 +61,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.0",
     "lint-staged": "^12.1.2",
-    "prettier": "2.5.1"
+    "prettier": "2.5.1",
+    "wrangler": "^0.0.0-c73a3c4"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [

@@ -1,0 +1,13 @@
+{
+  "name": "durable_objects",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "module": "./src/downloadCounter.mjs",
+  "scripts": {
+    "publish": "npx wrangler publish"
+  },
+  "devDependencies": {
+    "@cloudflare/wrangler": "^1.19.12"
+  }
+}
