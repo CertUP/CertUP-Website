@@ -1,0 +1,74 @@
+Last quarter was the first official on-chain funding period for Secret Network's development committee. The vote passed while a minority of the community voted 'NO,' citing the following concerns: High salaries and unnecessary 3 person, 30 person-hour/week structure. The committee met its most critical goals of completing seven high-value CCRs and returning a high ROI to the community from the mentorship of 3 new community developers. We hope the community feels more confident in the agile pod structure that the committee proposed last quarter and will suggest this quarter. 
+
+CCRs 
+
+Last Quarter Accomplishments:
+
+As part of last quarter's discretionary spending, the dev committee met its goal of completing 7 CCRs. 
+
+
+Blocks
+Completed
+Fund Forwarding Contract
+Fund Forwarding Contract (Frontend)
+NFT Authorization
+NFT Authorization (Frontend)
+SCRT-ETH Bridge Examples
+Secret Factory Contracts
+SNIP3 Fixed Multisig
+
+ Near Completion:
+SNIP3 Flex Multisig
+Automatic Contract Verifier
+SNIP-721A Upgradable NFTs
+
+Next Quarter Goals:
+
+The committee has scoped seven additional CCRs that are expected to be completed during Q2. 
+
+A new category of CCRs will be developed, called widgets. The previous CCRs will now be referred to as blocks. Both Widgets and Blocks will continue to be maintained as CCRs. Blocks were strongly focussed on enabling devs to rapidly piece together smart contracts from templates. In contrast, widgets are Web Components designed to allow frontend devs to quickly display on-chain information on their websites. Unfortunately, Secret Network has a reputation for having clunky UI compared to other chains. We hope that focusing on upgrading community resources in this area will improve the user experience.
+
+
+Widgets
+Q2 Todo
+On-chain Treasury Balance Viewer
+On-chain Committee Invoicing
+Includes a new smart contract for invoicing
+On-chain Committee Payments
+Includes a new smart contract for payments from a treasury
+
+
+We will also be increasing the maximum bounty for CCR contributions to $4000 per completed CCR to make bounty completion a more attractive project for community developers. With an estimated 7 CCRs at this rate, funding for this program will be $28,000.
+
+
+Mentorship Program
+
+Last Quarter
+The mentorship program saw the successful graduation of three new community members. The committee would like to congratulate Sandman, Kent, and Kromsten. These members were entirely new to Secret and leveraged the mentorship program to get upskilled in the network. All three have gone on to contribute further, original work for Secret, which is the most we could ask for. Thanks again to the core mentors, Danny, Lumi, and Xiph! Special shout out to Sandman, who went on to receive funding for his on-chain proposal of a peer-to-peer lending platform, Cover.
+
+Next Quarter Goals:
+With multiple Luna devs migrating to our ecosystem, we want to continue our fast-track developer education through the mentorship program. At the same time, we've learned from last quarter's mentors that less than 6 hours per week is typically needed per mentor-mentee. So we will also be lowering the amount of funding we are asking for to only 3 hours per week. While last quarter we asked for $58,500, this quarter we will only need $29,250 for the mentorship program.
+
+This quarter's new goal for the dev committee is to begin building web3 products for the committee itself. Eventually, these tools will be parameterized and easy to consume by the other committees. These will serve as proof of concepts for other businesses that are interested in leveraging the power of permissionless blockchains with secure data encryption capabilities but are not sure where to begin. 
+
+
+
+
+
+
+Funding Totals:
+
+Dev Lead Pay:
+Gino - $150/hr @ 10hrs/week - 13 weeks = $19,500 
+Lumi - $150/hr @ 10hrs/week - 13 weeks = $19,500
+Xiph - $150/hr @ 10hrs/week - 13 weeks = $19,500
+
+Mentorship Program:
+5 mentors - 150$/hr @3hrs/week = $29,250
+
+CCR Bounties:
+7 estimated repos at a maximum of $4000 per repo = $28,000
+
+Total ask +10% buffer = $127,325
+
+This is a $23,705 reduction from the last quarter's budget of $151,030.

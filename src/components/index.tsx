@@ -1,3 +1,3 @@
-export { default as Button } from './Button';
-export { default as ButtonDark } from './ButtonDark';
+export { default as CUButton } from './CUButton';
+export { default as CUButtonDark } from './CUButtonDark';
 export { default as Spacer } from './Spacer';

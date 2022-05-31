@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
-import Button from '../Button';
+import CUButton from '../CUButton';
 import styles from './styles.module.scss';
 
 import logo from '../../assets/logo.png';
@@ -19,7 +19,7 @@ export default function Footer() {
               <Image src={logo} fluid={true} style={{ width: '50%' }} />
             </div>
             <br />
-            <Button disabled={true}>Coming Soon</Button>
+            <CUButton disabled={true}>Coming Soon</CUButton>
           </Col>
           <Col md={8}>
             <Row style={{ paddingTop: '75px' }}>

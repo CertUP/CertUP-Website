@@ -8,7 +8,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function Button({ children, disabled = false }: Props): ReactElement {
+export default function CUButtonDark({ children, disabled = false }: Props): ReactElement {
   const { Items } = useItem();
   console.log(Items);
 

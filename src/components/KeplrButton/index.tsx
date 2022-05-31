@@ -10,8 +10,9 @@ import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
+import getLoginPermit, { LoginToken } from '../../utils/loginPermit';
 
-interface KeplrWindow extends Window {
+export interface KeplrWindow extends Window {
   keplr: any;
   getEnigmaUtils(_: string): EncryptionUtils;
   getOfflineSigner(): Wallet;
@@ -19,6 +20,20 @@ interface KeplrWindow extends Window {
   enable(_: string): Function;
   getAccounts(): Function;
 }
+
+// declare interface Date {
+//   addHours(h: number): Date;
+// }
+
+// Date.prototype.addHours = function(h: number) {
+//   this.setTime(this.getTime() + (h*60*60*1000));
+//   return this;
+// }
+
+const addHours = (date: Date, hours: number): Date => {
+  date.setTime(date.getTime() + hours * 60 * 60 * 1000);
+  return date;
+};
 
 declare let window: KeplrWindow;
 
@@ -58,10 +73,11 @@ export default function KeplrButton(): ReactElement {
         encryptionUtils: window.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
       });
 
-      //setSecretJs((_) => secretjs);
-      //setIsSigner((_) => true);
-      //setAcctAddr((_) => myAddress);
-      updateClient(secretjs, keplrOfflineSigner, myAddress);
+      const issueDate = new Date();
+      const expDate = addHours(new Date(), 12);
+      const token: LoginToken = await getLoginPermit(myAddress, issueDate, expDate);
+
+      updateClient(secretjs, keplrOfflineSigner, myAddress, token);
       setLoading(false);
     } catch (error) {
       setLoading(false);

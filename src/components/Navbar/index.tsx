@@ -3,7 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from '../Button';
+import Button from '../CUButton';
 import KeplrButton from '../KeplrButton';
 
 import styles from './styles.module.scss';

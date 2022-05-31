@@ -3,7 +3,7 @@ import { useItem } from '../../contexts';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from '../Button';
+import CUButton from '../CUButton';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 import CertUpNavbar from '../Navbar';
