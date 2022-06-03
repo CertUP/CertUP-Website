@@ -12,6 +12,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import styles from './styles.module.scss';
 import ProjectTile from '../ProjectTile';
 import { Project } from '../../interfaces';
+import CUButton from '../CUButton';
 
 interface Props {
   setProject: (project: Project) => void;
@@ -48,7 +49,7 @@ export default function ProjectList({ setProject }: Props) {
           <span className={styles.aboutTitle}>For Issuers</span>
 
           <Col xs={'auto'}>
-            <Button onClick={() => setProject(new Project())}>New Certificate</Button>
+            <CUButton onClick={() => setProject(new Project())}>New Certificate</CUButton>
           </Col>
         </Row>
       </Container>

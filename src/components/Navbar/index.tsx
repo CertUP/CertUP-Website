@@ -33,7 +33,9 @@ export default function CertUpNavbar() {
               <Link to="/about">
                 <Navbar.Text className={styles.navItem}>About</Navbar.Text>
               </Link>
-              <Navbar.Text className={styles.navItem}>For Issuers</Navbar.Text>
+              <Link to="/issuers">
+                <Navbar.Text className={styles.navItem}>For Issuers</Navbar.Text>
+              </Link>
               <Navbar.Text className={styles.navItem}>Access Certificate</Navbar.Text>
               <Link to="/clients">
                 <Navbar.Text className={styles.navItem}>Clients</Navbar.Text>
