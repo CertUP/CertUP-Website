@@ -142,7 +142,7 @@ export default function Home() {
               <span className={styles.createTitle}>Create Certificate</span>
             </Row>
             <Row>
-              <span className={styles.createSubTitle}>Learn and share lessons with gratitude.</span>
+              <span className={styles.createSubTitle}>Certify and verify securely.</span>
             </Row>
             <Row className="justify-content-center">
               <Col xs="auto">
