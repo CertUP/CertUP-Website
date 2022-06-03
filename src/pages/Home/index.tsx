@@ -46,20 +46,22 @@ export default function Home() {
         <Container fluid>
           <div className={styles.infoBox}>
             <Row>
-              <span className={styles.infoTitle}>SNIP721 v.s. ETH</span>
+              <span className={styles.infoTitle}>
+                SecretNFT’s &nbsp;<span className={styles.infoTitleVs}>vs.</span>&nbsp; Ethereum
+              </span>
             </Row>
 
             <Row>
-              <Col xs={3} md={2} className={styles.labelCol}>
+              <Col xs={4} md={2} className={styles.labelCol}>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Private</span>
+                  <span className={styles.infoLeftLabel}>Secret NFT</span>
                 </Row>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Public</span>
+                  <span className={styles.infoLeftLabel}>Ethereum</span>
                 </Row>
               </Col>
 
-              <Col xs={9} md={3} className={styles.infoCol}>
+              <Col xs={8} md={3} className={styles.infoCol}>
                 <Row>
                   <span className={styles.infoTopLabel}>Secure Creation</span>
                   <hr className={styles.info1} />
@@ -81,16 +83,16 @@ export default function Home() {
                 </Row>
               </Col>
 
-              <Col xs={3} className={`${styles.labelCol} d-flex d-md-none`}>
+              <Col xs={4} className={`${styles.labelCol} d-flex d-md-none`}>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Private</span>
+                  <span className={styles.infoLeftLabel}>Secret NFT</span>
                 </Row>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Public</span>
+                  <span className={styles.infoLeftLabel}>Ethereum</span>
                 </Row>
               </Col>
 
-              <Col xs={9} md={3} className={styles.infoCol}>
+              <Col xs={8} md={3} className={styles.infoCol}>
                 <Row>
                   <span className={styles.infoTopLabel}>Superior Control</span>
                   <hr className={styles.info2} />
@@ -107,15 +109,15 @@ export default function Home() {
                 </Row>
               </Col>
 
-              <Col xs={3} className={`${styles.labelCol} d-flex d-md-none`}>
+              <Col xs={4} className={`${styles.labelCol} d-flex d-md-none`}>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Private</span>
+                  <span className={styles.infoLeftLabel}>Secret NFT</span>
                 </Row>
                 <Row>
-                  <span className={styles.infoLeftLabel}>Public</span>
+                  <span className={styles.infoLeftLabel}>Ethereum</span>
                 </Row>
               </Col>
-              <Col xs={9} md={4} className={styles.infoCol} style={{ paddingRight: '50px' }}>
+              <Col xs={8} md={4} className={styles.infoCol} style={{ paddingRight: '50px' }}>
                 <Row>
                   <span className={styles.infoTopLabel}>Happier Users</span>
                   <hr className={styles.info3} />
