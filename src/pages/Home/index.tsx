@@ -70,7 +70,7 @@ export default function Home() {
                 </Row>
                 <Row>
                   <div className={styles.infoBody}>
-                    When made, everyone can see all the info posted inside the NFT.
+                    Once created, everyone can see all the info posted inside the NFT.
                     <ul>
                       <li>Personal info.</li>
                       <li>Birthdays.</li>
@@ -101,7 +101,7 @@ export default function Home() {
                 </Row>
                 <Row>
                   <p className={styles.infoBody}>
-                    Once data id published on a public blockchain, the issuer and recipient can
+                    Once data is published on a public blockchain, the issuer and recipient can
                     never take it down or otherwise hide it. They’ve lost control of their data.
                   </p>
                 </Row>
