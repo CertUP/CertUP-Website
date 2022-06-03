@@ -8106,10 +8106,10 @@ react-scripts@5.0.0:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-toastify@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-8.2.0.tgz#ef7d56bdfdc6272ca6b228368ab564721c3a3244"
-  integrity sha512-Pg2Ju7NngAamarFvLwqrFomJ57u/Ay6i6zfLurt/qPynWkAkOthu6vxfqYpJCyNhHRhR4hu7+bySSeWWJu6PAg==
+react-toastify@^9.0.0-rc-2:
+  version "9.0.0-rc-2"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-9.0.0-rc-2.tgz#1a85dd8bb97871189ba8c17fef3090965e90c44f"
+  integrity sha512-ErWO+aINQ05zkZIqUxwGQjjhdW6649ANYgFiHY4ecZ8n8eYEhZTSKP0rp1lKEkDT9i4ZhMGrwnOWPk4wfkJsOQ==
   dependencies:
     clsx "^1.1.1"
 

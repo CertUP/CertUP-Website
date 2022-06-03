@@ -24,22 +24,41 @@ const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString
 
 interface formProps {
   pid?: string;
+  projectInfo?: Project;
+  backHandler: () => void;
 }
 
-export default function ProjectForm({ pid }: formProps) {
+export default function ProjectForm({ pid, projectInfo, backHandler }: formProps) {
+  console.log('PINFO', projectInfo);
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
-  const [projectName, setProjectName] = useState<string>('');
-  const [pubDesc, setPubDesc] = useState<string>('');
-  const [privDesc, setPrivDesc] = useState<string>('');
-  const [issuer, setIssuer] = useState<string>('');
+  const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
+  const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
+  const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
+  const [issuer, setIssuer] = useState<string>(projectInfo?.issuer || '');
   const [validated, setValidated] = useState(false);
-  const [issueDate, setIssueDate] = useState(new Date());
-  const [participants, setParticipants] = useState<Participant[]>([
-    new Participant(),
-    new Participant(),
-  ]);
+  const [issueDate, setIssueDate] = useState(projectInfo?.issue_date);
+  const [participants, setParticipants] = useState<Participant[]>(
+    projectInfo?.participants || [new Participant(), new Participant()],
+  );
 
-  const projectId = useRef<string | undefined>(pid);
+  function BackButton() {
+    return (
+      <span
+        role="button"
+        tabIndex={0}
+        style={{ cursor: 'pointer' }}
+        onClick={() => backHandler()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') backHandler();
+        }}
+      >
+        ← Go Back
+      </span>
+    );
+  }
+
+  const projectId = useRef<string | undefined>(projectInfo?._id || pid);
+  console.log('projectID', projectId.current);
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -114,10 +133,8 @@ export default function ProjectForm({ pid }: formProps) {
   };
 
   const deleteParticipant = async (index: number) => {
-    console.log(index, participants);
     const newAry = [...participants];
     newAry.splice(index, 1);
-    console.log('new', newAry);
     setParticipants(newAry);
   };
 
@@ -129,6 +146,7 @@ export default function ProjectForm({ pid }: formProps) {
         participant.name = value || '';
         break;
       case 'surname':
+        console.log('surname', value);
         participant.surname = value || '';
         break;
       case 'dob':
@@ -150,7 +168,7 @@ export default function ProjectForm({ pid }: formProps) {
       </Container>
       <Spacer height={50} />
       <Container>
-        <span>← Go Back</span>
+        <BackButton />
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
           <Row className="mb-3">
             <Form.Group as={Col} md="4" controlId="validationCustom01">
@@ -197,7 +215,6 @@ export default function ProjectForm({ pid }: formProps) {
                   {!index ? <Form.Label>Birth Date</Form.Label> : null}
                   <DatePicker
                     selected={participants[index].dob}
-                    //onChange={(date: Date) => setIssueDate(date)}
                     onChange={(date: Date) => changeParticipant(index, 'dob', undefined, date)}
                   />
                 </Form.Group>
@@ -219,7 +236,9 @@ export default function ProjectForm({ pid }: formProps) {
                     tabIndex={0}
                     style={{ cursor: 'pointer' }}
                     onClick={() => deleteParticipant(index)}
-                    onKeyDown={() => deleteParticipant(index)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') deleteParticipant(index);
+                    }}
                   >
                     <img src={trashImg} alt="trash" />
                     <span>Delete</span>
@@ -240,7 +259,8 @@ export default function ProjectForm({ pid }: formProps) {
               <Form.Control
                 required
                 as="textarea"
-                //value={participants[index].name}
+                value={pubDesc}
+                onChange={(e) => setPubDesc(e.target.value)}
                 type="text"
                 placeholder="This description will be visible to the public."
               />
@@ -252,7 +272,8 @@ export default function ProjectForm({ pid }: formProps) {
               <Form.Control
                 required
                 as="textarea"
-                //value={participants[index].name}
+                value={privDesc}
+                onChange={(e) => setPrivDesc(e.target.value)}
                 type="text"
                 placeholder="This description will only be visible to the recipient and any third-parties authorized by the recipient."
               />
@@ -268,7 +289,7 @@ export default function ProjectForm({ pid }: formProps) {
             </Form.Group>
           </Row>
           <Row>PREVIEW</Row>
-          <span>← Go Back</span>
+          <BackButton />
           <Row style={{ marginBottom: '10px' }}>
             <Col md="3">
               <CUButton disabled={false} large={false} fill={true} onClick={handleSave}>

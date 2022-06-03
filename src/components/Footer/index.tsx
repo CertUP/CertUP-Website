@@ -5,7 +5,7 @@ import Image from 'react-bootstrap/Image';
 import CUButton from '../CUButton';
 import styles from './styles.module.scss';
 
-import logo from '../../assets/logo.png';
+import logo from '../../assets/certup-logo.svg';
 import secretlogo from '../../assets/secret-logo.svg';
 import { Link } from 'react-router-dom';
 

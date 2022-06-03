@@ -13,12 +13,33 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
+import { Project } from '../../interfaces';
 
 export default function Issuers() {
-  const [showProject, setShowProject] = useState(true);
-  const { Client, ClientIsSigner, Wallet, Address } = useWallet();
+  const [showProject, setShowProject] = useState(false);
+  const [projectInfo, setProjectInfo] = useState<Project | undefined>();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
 
-  if (!Wallet || !Address)
+  const setProject = (project: Project) => {
+    //convert issue date string from DB into Date
+    if (project.issue_date) project.issue_date = new Date(project.issue_date);
+
+    // convert participant dob strings from DB to Date
+    for (let i = 0; i < project.participants.length; i++) {
+      if (project.participants[i].dob)
+        project.participants[i].dob = new Date(project.participants[i].dob || '');
+    }
+
+    setProjectInfo(project);
+    setShowProject(true);
+  };
+
+  const showList = () => {
+    setProjectInfo(undefined);
+    setShowProject(false);
+  };
+
+  if (!Wallet || !Address || !LoginToken)
     return (
       <>
         <Layout>
@@ -41,7 +62,11 @@ export default function Issuers() {
     <>
       <Layout>
         <Spacer height={100} />
-        {showProject ? <ProjectForm /> : <ProjectList />}
+        {showProject ? (
+          <ProjectForm projectInfo={projectInfo} backHandler={showList} />
+        ) : (
+          <ProjectList setProject={setProject} />
+        )}
       </Layout>
     </>
   );

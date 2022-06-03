@@ -77,7 +77,7 @@ export default function KeplrButton(): ReactElement {
       const expDate = addHours(new Date(), 12);
       const token: LoginToken = await getLoginPermit(myAddress, issueDate, expDate);
 
-      updateClient(secretjs, keplrOfflineSigner, myAddress, token);
+      await updateClient(secretjs, keplrOfflineSigner, myAddress, token);
       setLoading(false);
     } catch (error) {
       setLoading(false);

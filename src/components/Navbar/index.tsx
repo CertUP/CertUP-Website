@@ -8,7 +8,7 @@ import KeplrButton from '../KeplrButton';
 
 import styles from './styles.module.scss';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/certup-logo.svg';
 
 export default function CertUpNavbar() {
   return (
@@ -39,11 +39,12 @@ export default function CertUpNavbar() {
                 <Navbar.Text className={styles.navItem}>Clients</Navbar.Text>
               </Link>
             </Navbar.Collapse>
+
+            <Navbar.Text>
+              <KeplrButton />
+            </Navbar.Text>
           </>
         ) : null}
-        <Navbar.Text>
-          <KeplrButton />
-        </Navbar.Text>
       </Container>
     </Navbar>
   );
