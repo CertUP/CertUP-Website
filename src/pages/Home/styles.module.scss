@@ -28,6 +28,41 @@
   padding-top: 50px;
 }
 
+.gsButtonRow {
+  padding-top: 60px;
+}
+
+@media (max-width: 768px) {
+  .certTitle {
+    font-size: 60px !important;
+  }
+
+  .certSubTitle {
+    font-size: 34px !important;
+  }
+
+  .certTagline {
+    font-size: 22px !important;
+    padding-top: 30px !important;
+  }
+
+  .gsButtonRow {
+    padding-top: 25px !important;
+  }
+
+  .lastColSpacer {
+    padding-top: 5vh;
+  }
+
+  .createTitle {
+    font-size: 60px !important;
+  }
+
+  .createSubTitle {
+    font-size: 20px !important;
+  }
+}
+
 .infoBox {
   //background: linear-gradient(114.11deg, rgba(116, 235, 213, 0.75) -7.36%, rgba(159, 172, 230, 0.75) 101.34%);
   background: vars.$certupGradient;

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   data-name="Layer 1"
+   width="2900"
+   height="1455.39"
+   viewBox="0 0 2900 1455.39"
+   version="1.1"
+   sodipodi:docname="certup-logo-space.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview16"
+     showgrid="false"
+     inkscape:zoom="0.10502842"
+     inkscape:cx="1352.015"
+     inkscape:cy="727.69501"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs9">
+    <style
+       id="style2">.cls-1{fill-rule:evenodd;fill:url(#New_Gradient_Swatch_8);}.cls-2{font-size:765.35px;fill:#46b6b5;font-family:Calibri;}</style>
+    <linearGradient
+       id="New_Gradient_Swatch_8"
+       x1="989.64001"
+       y1="200.81"
+       x2="316.39999"
+       y2="1366.89"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0,-1.3945312e-5)">
+      <stop
+         offset="0"
+         stop-color="#46b6b5"
+         id="stop4" />
+      <stop
+         offset="1"
+         stop-color="#5f92c4"
+         id="stop6" />
+    </linearGradient>
+  </defs>
+  <path
+     class="cls-1"
+     d="M 351.31,474.78 212.8,336.27 A 642.23,642.23 0 0 1 401.28,218.39 433.31,433.31 0 0 0 586.62,74.489985 L 641.83,-1.3945312e-5 697,74.469985 A 433.28,433.28 0 0 0 882.33,218.37 c 63.37,25.63 133.16,65.75 189.46,111.13 a 533.68,533.68 0 0 1 42.4,37.85 866.59,866.59 0 0 1 -118.55,38.3 c -58,14 -124.42,22.1 -167.2,2.43 C 673.46,336.82 486,359.06 351.31,474.78 Z M 307.8,517.6 169.38,379.18 a 641.7,641.7 0 0 0 -7.61,860.35 L 300.27,1101 C 158.12,932.45 160.63,683.33 307.8,517.6 Z m 686.6,686.6 c -47,-12.49 -101.49,-16.06 -151,7.82 -162.54,78.44 -361.29,58.91 -500.74,-67.09 L 204.41,1283.21 C 319,1390 472.82,1455.38 641.83,1455.39 c 160.74,0 322.94,-66.35 438.39,-165.37 q 17.74,-15.23 34,-31.44 c 0,0 -52.22,-36.41 -119.82,-54.38 z"
+     id="path11"
+     inkscape:connector-curvature="0"
+     style="fill:url(#New_Gradient_Swatch_8);fill-rule:evenodd" />
+  <text
+     class="cls-2"
+     id="text13"
+     style="font-size:765.34997559px;font-family:Calibri;fill:#46b6b5"
+     x="946.94"
+     y="1056.7">ertUP</text>
+</svg>

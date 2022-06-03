@@ -27,8 +27,8 @@ export default function Home() {
               <Row>
                 <span className={styles.certTagline}>for training courses, events and more!</span>
               </Row>
-              <Row style={{ paddingTop: '60px' }}>
-                <Col md={'auto'}>
+              <Row className={styles.gsButtonRow}>
+                <Col xs={'auto'}>
                   {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
                     <CUButton disabled={true}>Coming Soon</CUButton>
                   ) : (
@@ -115,7 +115,7 @@ export default function Home() {
                   <span className={styles.infoLeftLabel}>Public</span>
                 </Row>
               </Col>
-              <Col xs={9} md={4} className={styles.infoCol} style={{ paddingRight: '100px' }}>
+              <Col xs={9} md={4} className={styles.infoCol} style={{ paddingRight: '50px' }}>
                 <Row>
                   <span className={styles.infoTopLabel}>Happier Users</span>
                   <hr className={styles.info3} />
@@ -126,8 +126,9 @@ export default function Home() {
                   </p>
                 </Row>
                 <Row>
-                  <p className={styles.infoBody}>
-                    Certifiate owners data is viewable by the world, posing risks to their security.
+                  <p className={`${styles.infoBody} ${styles.lastColSpacer}`}>
+                    Certifiate owners data is viewable by the world, posing risks to their security
+                    and privacy.
                   </p>
                 </Row>
               </Col>
@@ -144,7 +145,7 @@ export default function Home() {
               <span className={styles.createSubTitle}>Learn and share lessons with gratitude.</span>
             </Row>
             <Row className="justify-content-center">
-              <Col md="auto">
+              <Col xs="auto">
                 {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
                   <CUButtonDark disabled={true}>Coming Soon</CUButtonDark>
                 ) : (

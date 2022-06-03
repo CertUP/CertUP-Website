@@ -5,7 +5,7 @@ import Image from 'react-bootstrap/Image';
 import CUButton from '../CUButton';
 import styles from './styles.module.scss';
 
-import logo from '../../assets/certup-logo.svg';
+import logo from '../../assets/certup-logo-space.min.svg';
 import secretlogo from '../../assets/secret-logo.svg';
 import { Link } from 'react-router-dom';
 
@@ -15,8 +15,8 @@ export default function Footer() {
       <Container>
         <Row>
           <Col md={4}>
-            <div style={{ paddingTop: '55px' }}>
-              <Image src={logo} fluid={true} style={{ width: '50%' }} />
+            <div style={{ paddingTop: '55px', width: '50%' }}>
+              <Image src={logo} fluid={true} />
             </div>
             <br />
             <CUButton disabled={true}>Coming Soon</CUButton>
