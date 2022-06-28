@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function ProjectTile({ projectIn, setProject }: Props) {
-  console.log(projectIn);
   return (
     <Col md="5">
       <Row>TODO Show Preview</Row>

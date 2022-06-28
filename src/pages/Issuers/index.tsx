@@ -11,14 +11,46 @@ import exampleCert from '../../assets/ExampleCert.svg';
 import { useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
 import { Project } from '../../interfaces';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
   const [projectInfo, setProjectInfo] = useState<Project | undefined>();
+  const [projectStep, setProjectStep] = useState();
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    processReturn();
+  }, []);
+
+  const processReturn = async () => {
+    if (location.state?.projectId) {
+      if (location.state?.step) setProjectStep(location.state?.step);
+
+      const project = await getProject(location.state?.projectId);
+      console.log('project', project);
+      setProject(project);
+    }
+  };
+
+  const getProject = async (projectId: string): Promise<Project> => {
+    console.log('running', LoginToken, Address);
+    const token = `Permit ${JSON.stringify(LoginToken)}`;
+    const url = new URL(`/projects/${projectId}`, process.env.REACT_APP_BACKEND);
+    const response = await axios.get(url.toString(), {
+      headers: {
+        Authorization: token,
+      },
+    });
+    console.log(response);
+    return response.data.data;
+  };
 
   const setProject = (project: Project) => {
     //convert issue date string from DB into Date
@@ -63,7 +95,7 @@ export default function Issuers() {
       <Layout>
         <Spacer height={100} />
         {showProject ? (
-          <ProjectForm projectInfo={projectInfo} backHandler={showList} />
+          <ProjectForm projectInfo={projectInfo} backHandler={showList} step={projectStep} />
         ) : (
           <ProjectList setProject={setProject} />
         )}

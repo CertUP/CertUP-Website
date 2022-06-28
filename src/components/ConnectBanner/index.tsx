@@ -15,7 +15,7 @@ export default function ConnectBanner() {
       </Row>
       <Row>
         <span className={styles.bannerSubtitle}>
-          To create certificated you must be connected with Keplr Wallet.
+          To create certificates you must be connected with Keplr Wallet.
         </span>
       </Row>
       <Row>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -19,19 +19,23 @@ import { useRef } from 'react';
 import axios from 'axios';
 import { useWallet } from '../../contexts';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { ProgressBar } from '../../components';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
 interface formProps {
   pid?: string;
   projectInfo?: Project;
+  step?: string;
   backHandler: () => void;
 }
 
-export default function ProjectForm({ pid, projectInfo, backHandler }: formProps) {
+export default function ProjectForm({ pid, projectInfo, step, backHandler }: formProps) {
   console.log('PINFO', projectInfo);
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
+  //const [projectId, setProjectId] = useState<string>(pid);
   const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
   const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
   const [issuer, setIssuer] = useState<string>(projectInfo?.issuer || '');
@@ -40,6 +44,34 @@ export default function ProjectForm({ pid, projectInfo, backHandler }: formProps
   const [participants, setParticipants] = useState<Participant[]>(
     projectInfo?.participants || [new Participant(), new Participant()],
   );
+
+  const navigate = useNavigate();
+
+  const getProject = (): Project => {
+    return new Project(
+      Address,
+      projectName,
+      pubDesc,
+      privDesc,
+      undefined,
+      issueDate,
+      issuer,
+      participants,
+    );
+  };
+
+  useEffect(() => {
+    if (!projectInfo) return;
+
+    switch (step) {
+      case 'generate':
+        navigate('/generate', { state: { project: getProject() } });
+        break;
+      default:
+        null;
+        break;
+    }
+  }, [step, projectInfo]);
 
   function BackButton() {
     return (
@@ -57,11 +89,34 @@ export default function ProjectForm({ pid, projectInfo, backHandler }: formProps
     );
   }
 
+  const scrtPayment = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    handleSave();
+    console.log('remain', RemainingCerts);
+    const project = new Project(
+      Address,
+      projectName,
+      pubDesc,
+      privDesc,
+      undefined,
+      issueDate,
+      issuer,
+      participants,
+    );
+    if (RemainingCerts >= participants.length)
+      navigate('/generate', { state: { project: project } });
+    else
+      navigate('/addCredit', {
+        state: { num_certificates: participants.length, projectId: projectId.current },
+      });
+  };
+
   const projectId = useRef<string | undefined>(projectInfo?._id || pid);
   console.log('projectID', projectId.current);
 
-  const handleSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
+  const handleSave = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if (e) e.preventDefault();
+
     if (!projectName) {
       toast.error("Please enter a 'Project Name'");
       return;
@@ -166,6 +221,7 @@ export default function ProjectForm({ pid, projectInfo, backHandler }: formProps
           <span className={styles.aboutTitle}>Create a Project</span>
         </Row>
       </Container>
+      <ProgressBar step={1} />
       <Spacer height={50} />
       <Container>
         <BackButton />
@@ -299,7 +355,7 @@ export default function ProjectForm({ pid, projectInfo, backHandler }: formProps
           </Row>
           <Row style={{ marginBottom: '10px' }}>
             <Col md="3">
-              <CUButton disabled={true} large={false} fill={true}>
+              <CUButton disabled={false} large={false} fill={true} onClick={scrtPayment}>
                 Pay with $SCRT
               </CUButton>
             </Col>

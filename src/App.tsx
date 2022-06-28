@@ -7,6 +7,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.scss';
 import Guide from './pages/Guide';
 import Issuers from './pages/Issuers';
+import AddCredit from './pages/AddCredit';
+import Mint from './pages/Mint';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
               <Route path="/clients" element={<Clients />} />
               <Route path="/guide" element={<Guide />} />
               <Route path="/issuers" element={<Issuers />} />
+              <Route path="/addCredit" element={<AddCredit />} />
+              <Route path="/generate" element={<Mint />} />
               <Route path="*" element={<Error />} />
             </>
           ) : null}

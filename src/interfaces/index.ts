@@ -23,12 +23,16 @@ export interface WalletContextState {
   Wallet: Wallet | undefined;
   Address: string;
   LoginToken: LoginToken | undefined;
+  QueryPermit: object | undefined;
+  RemainingCerts: number;
   updateClient: (
     client: SecretNetworkClient,
     wallet: Wallet,
     address: string,
     token: LoginToken,
+    permit: object,
   ) => void;
+  queryCredits: () => void;
 }
 
 // export interface Project {
@@ -89,11 +93,13 @@ export class Participant {
   // dob_y: number;
   dob: Date | undefined;
   cert_num: string;
+  claim_code: string | undefined;
 
-  constructor(name?: string, surname?: string, dob?: Date, certNum?: string) {
+  constructor(name?: string, surname?: string, dob?: Date, certNum?: string, claimCode?: string) {
     this.name = name || '';
     this.surname = surname || '';
     this.dob = dob;
     this.cert_num = certNum || '';
+    this.claim_code = claimCode;
   }
 }

@@ -10,7 +10,7 @@ import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
-import getLoginPermit, { LoginToken } from '../../utils/loginPermit';
+import getPermits, { LoginToken } from '../../utils/loginPermit';
 
 export interface KeplrWindow extends Window {
   keplr: any;
@@ -75,9 +75,13 @@ export default function KeplrButton(): ReactElement {
 
       const issueDate = new Date();
       const expDate = addHours(new Date(), 12);
-      const token: LoginToken = await getLoginPermit(myAddress, issueDate, expDate);
-
-      await updateClient(secretjs, keplrOfflineSigner, myAddress, token);
+      const { loginPermit: token, queryPermit: permit } = await getPermits(
+        myAddress,
+        issueDate,
+        expDate,
+      );
+      console.log('Permits', token, permit);
+      await updateClient(secretjs, keplrOfflineSigner, myAddress, token, permit);
       setLoading(false);
     } catch (error) {
       setLoading(false);

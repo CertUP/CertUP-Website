@@ -11,6 +11,7 @@ import styles from './styles.module.scss';
 import { Link } from 'react-router-dom';
 //import logo from '../../assets/certup-logo.svg';
 import logo from '../../assets/certup-logo-small.png';
+import Web3AuthButton from '../Web3AuthButton';
 
 export default function CertUpNavbar() {
   return (
@@ -48,6 +49,7 @@ export default function CertUpNavbar() {
 
             <Navbar.Text>
               <KeplrButton />
+              <Web3AuthButton />
             </Navbar.Text>
           </>
         ) : null}
