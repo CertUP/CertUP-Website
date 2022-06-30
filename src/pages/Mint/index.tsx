@@ -59,71 +59,160 @@ export default function Mint() {
     e.preventDefault();
     const toastRef = toast.loading('Transaction Processing...');
 
-    // const newData = [
-    //   {
-    //     name: 'John Smith',
-    //     date: new Date().toString(),
-    //     cert_type: 'test',
-    //     attributes: [
-    //       {
-    //         trait_type: 'test trait',
-    //         value: 'test value',
-    //       },
-    //     ],
-    //     priv_attributes: [
-    //       {
-    //         trait_type: 'priv trait',
-    //         value: 'priv value',
-    //       },
-    //     ],
-    //   },
-    // ];
+    let result;
 
-    const newData = project?.participants.map((participant) => {
-      return {
-        name: `${participant.name} ${participant.surname}`,
-        date: project.issue_date?.toLocaleDateString(),
-        cert_type: 'test',
-        attributes: [
-          {
-            trait_type: 'Description',
-            value: project.pub_description,
+    try {
+      const newData = project?.participants.map((participant) => {
+        return {
+          name: `${participant.name} ${participant.surname}`,
+          date: project.issue_date?.toLocaleDateString(),
+          cert_type: 'test',
+          pub_metadata: {
+            description: project.pub_description,
+            certificate: {
+              name: project.project_name,
+              issue_date: project.issue_date?.toISOString(),
+              cert_number: participant.cert_num.toString(),
+            },
+            recipient: {
+              first_name: participant.name,
+              last_name: participant.surname,
+              date_of_birth: participant.dob?.toISOString(),
+            },
+            issuing_organizations: [
+              {
+                name: 'Corporate Finance Institute',
+                url: 'https://cfi.org',
+              },
+            ],
+            issuing_individuals: [
+              {
+                name: project.issuer,
+                company: 'Corporate Finance Institute',
+                title: 'Director',
+              },
+            ],
+            inclusions: [
+              {
+                type: 'Course',
+                name: 'Introduction to Finance',
+                value: '89.4',
+              },
+              {
+                type: 'Instructor',
+                name: 'Jane Smith',
+              },
+            ],
+            attributes: [
+              {
+                trait_type: 'Certificate Number',
+                value: participant.cert_num.toString(),
+              },
+              {
+                trait_type: 'Certificate Name',
+                value: project.project_name,
+              },
+              {
+                trait_type: 'Issue Date',
+                value: project.issue_date?.toDateString(),
+              },
+            ],
           },
-        ],
-        priv_attributes: [
-          {
-            trait_type: 'Description',
-            value: project.priv_description,
-          },
-        ],
+          // priv_metadata: {
+          //   description: project.priv_description,
+          //   certificate: {
+          //     name: project.project_name,
+          //     issue_date: project.issue_date?.toISOString(),
+          //     cert_number: participant.cert_num.toString(),
+          //   },
+          //   recipient: {
+          //     first_name: participant.name,
+          //     last_name: participant.surname,
+          //     date_of_birth: participant.dob?.toISOString(),
+          //   },
+          //   issuing_organizations: [
+          //     {
+          //       name: 'Corporate Finance Institute',
+          //       url: 'https://cfi.org',
+          //     },
+          //   ],
+          //   issuing_individuals: [
+          //     {
+          //       name: project.issuer,
+          //       company: 'Corporate Finance Institute',
+          //       title: 'Director',
+          //     },
+          //   ],
+          //   inclusions: [
+          //     {
+          //       type: 'Course',
+          //       name: 'Introduction to Finance',
+          //       value: '89.4',
+          //     },
+          //     {
+          //       type: 'Instructor',
+          //       name: 'Jane Smith',
+          //     },
+          //   ],
+          //   attributes: [
+          //     {
+          //       trait_type: 'Certificate Number',
+          //       value: participant.cert_num.toString(),
+          //     },
+          //     {
+          //       trait_type: 'Certificate Name',
+          //       value: project.project_name,
+          //     },
+          //     {
+          //       trait_type: 'Issue Date',
+          //       value: project.issue_date?.toDateString(),
+          //     },
+          //   ],
+          // },
+        };
+      });
+
+      const mintMsg = {
+        pre_load: {
+          new_data: newData,
+        },
       };
-    });
 
-    const mintMsg = {
-      pre_load: {
-        new_data: newData,
-      },
-    };
+      //console.log(JSON.stringify(mintMsg, undefined, 2));
 
-    const result = await Client?.tx.compute.executeContract(
-      {
-        sender: Address,
-        contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
-        codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
-        msg: mintMsg,
-      },
-      {
-        gasLimit: 50_000,
-      },
-    );
-    console.log(result);
-    if (!result) throw new Error('Something went wrong');
-    if (result.code) throw new Error(result.rawLog);
+      result = await Client?.tx.compute.executeContract(
+        {
+          sender: Address,
+          contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
+          codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
+          msg: mintMsg,
+        },
+        {
+          gasLimit: 100_000,
+        },
+      );
+      console.log(result);
+      if (!result) throw new Error('Something went wrong');
+      if (result.code) throw new Error(result.rawLog);
 
-    toast.update(toastRef, { render: 'Success!', type: 'success', isLoading: false });
+      toast.update(toastRef, {
+        render: 'Success!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 5000,
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast.update(toastRef, {
+        render: error.toString(),
+        type: 'error',
+        isLoading: false,
+        autoClose: 5000,
+      });
+    }
 
-    //@ts-ignore
     const wasmLogs =
+      //@ts-ignore
       result.jsonLog[0].events.find((element) => element.type === 'wasm').attributes || [];
 
     //const project2: Project = structuredClone(project) as Project;
@@ -137,7 +226,7 @@ export default function Mint() {
 
       //@ts-ignore
       const claimCode = wasmLogs
-        .find((element) => element.key.includes(`${participant.name} ${participant.surname}`))
+        .find((element: any) => element.key.includes(`${participant.name} ${participant.surname}`))
         .value.trim();
       console.log(claimCode);
 

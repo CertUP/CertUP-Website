@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import { WalletContextState } from '../interfaces';
+import { PermitSignature, WalletContextState } from '../interfaces';
 import { SecretNetworkClient, Wallet } from 'secretjs';
 import { LoginToken, permissions, allowedTokens, permitName } from '../utils/loginPermit';
 
@@ -48,7 +48,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   const [LoginToken, setLoginToken] = useState<LoginToken | undefined>(
     contextDefaultValues.LoginToken,
   );
-  const [QueryPermit, setQueryPermit] = useState<object | undefined>(
+  const [QueryPermit, setQueryPermit] = useState<PermitSignature | undefined>(
     contextDefaultValues.QueryPermit,
   );
   const [RemainingCerts, setRemainingCerts] = useState<number>(contextDefaultValues.RemainingCerts);
@@ -58,7 +58,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     wallet: Wallet | undefined,
     address = '',
     token: LoginToken | undefined,
-    permit: object | undefined,
+    permit: PermitSignature | undefined,
   ) => {
     console.log('updating', token, permit);
     setClient(client);

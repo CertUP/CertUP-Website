@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react/display-name */
+import React, { forwardRef, useEffect, useState } from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -21,6 +22,9 @@ import { useWallet } from '../../contexts';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ProgressBar } from '../../components';
+import StepNumber from '../StepNumber';
+import MiniCircle from '../MiniCircle';
+import LogoDropzone from '../LogoDropzone';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
@@ -44,8 +48,43 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   const [participants, setParticipants] = useState<Participant[]>(
     projectInfo?.participants || [new Participant(), new Participant()],
   );
+  const [issuerLogo, setIssuerLogo] = useState();
 
   const navigate = useNavigate();
+
+  type ButtonProps = JSX.IntrinsicElements['button'];
+
+  const ExampleCustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
+    // eslint-disable-next-line react/prop-types
+    ({ value, onClick }, ref) => {
+      return (
+        <button
+          type="button"
+          style={{
+            width: '100%',
+            background: '#F2F2F2',
+            borderRadius: '38px',
+            //textAlign: 'left',
+            border: '1px solid #ced4da',
+            padding: '6px 12px',
+            lineHeight: '1.5',
+            height: '36px',
+          }}
+          onClick={onClick}
+          ref={ref}
+        >
+          {value}
+        </button>
+      );
+    },
+  );
+
+  // // eslint-disable-next-line react/prop-types
+  // const ExampleCustomInput =forwardRef(({ children, onClick }, ref) => (
+  //   <button className="example-custom-input" onClick={onClick} ref={ref}>
+  //     {children}
+  //   </button>
+  // ));
 
   const getProject = (): Project => {
     return new Project(
@@ -75,7 +114,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
 
   function BackButton() {
     return (
-      <span
+      <div
         role="button"
         tabIndex={0}
         style={{ cursor: 'pointer' }}
@@ -83,9 +122,11 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
         onKeyDown={(e) => {
           if (e.key === 'Enter') backHandler();
         }}
+        className="d-flex align-items-center"
       >
-        ← Go Back
-      </span>
+        <span className={styles.backArrow}>🠔</span>
+        <span className={styles.backFont}>Go Back</span>
+      </div>
     );
   }
 
@@ -183,7 +224,8 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     return null;
   };
 
-  const addParticipant = async () => {
+  const addParticipant = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
     setParticipants([...participants, new Participant()]);
   };
 
@@ -225,127 +267,250 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       <Spacer height={50} />
       <Container>
         <BackButton />
-        <Form noValidate validated={validated} onSubmit={handleSubmit}>
-          <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustom01">
-              <Form.Label>Project Name</Form.Label>
-              <Form.Control
-                required
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                type="text"
-                placeholder="My Project"
-              />
-            </Form.Group>
+        <div style={{ height: '3vh' }} />
+      </Container>
+      <Container>
+        <Form
+          noValidate
+          validated={validated}
+          onSubmit={handleSubmit}
+          className={styles.certupInputForm}
+        >
+          <Row className="mb-4">
+            <Col md={'auto'}>
+              <StepNumber>1</StepNumber>
+            </Col>
           </Row>
-          <Row>
-            <span>Participants</span>
-            <hr />
+
+          {/* \/ Project Name Section \/ */}
+
+          <Row className="mb-4">
+            <Col md={'auto'} className="text-center">
+              <MiniCircle />
+              <div className={styles.vr} />
+            </Col>
+            <Col style={{ paddingTop: '0vh' }}>
+              <Form.Group as={Col} md="4" controlId="validationCustom01">
+                <Form.Label className={styles.largeLabel}>Project Name</Form.Label>
+                <Form.Control
+                  required
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  type="text"
+                  placeholder="My Project"
+                  //className={styles.certupInput}
+                />
+              </Form.Group>
+            </Col>
           </Row>
-          {participants.map((item, index) => {
-            return (
-              <Row key={`participant-${index}`}>
-                <Form.Group as={Col} md="2" controlId="validationCustom02">
-                  {!index ? <Form.Label>Name</Form.Label> : null}
-                  <Form.Control
-                    required
-                    value={participants[index].name}
-                    onChange={(e) => changeParticipant(index, 'name', e.target.value)}
-                    type="text"
-                    placeholder="First name"
-                  />
-                </Form.Group>
 
-                <Form.Group as={Col} md="2" controlId="validationCustom02">
-                  {!index ? <Form.Label>Surname</Form.Label> : null}
-                  <Form.Control
-                    required
-                    value={participants[index].surname}
-                    onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
-                    type="text"
-                    placeholder="Last name"
-                  />
-                </Form.Group>
+          {/* \/ Participants Section \/ */}
 
-                <Form.Group as={Col} md="3" controlId="validationCustom02">
-                  {!index ? <Form.Label>Birth Date</Form.Label> : null}
-                  <DatePicker
-                    selected={participants[index].dob}
-                    onChange={(date: Date) => changeParticipant(index, 'dob', undefined, date)}
-                  />
-                </Form.Group>
-
-                <Form.Group as={Col} md="2" controlId="validationCustom02">
-                  {!index ? <Form.Label>Certificate Number</Form.Label> : null}
-                  <Form.Control
-                    required
-                    value={participants[index].cert_num}
-                    onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
-                    type="text"
-                    placeholder="123456"
-                  />
-                </Form.Group>
-
-                <Col md="auto">
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => deleteParticipant(index)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') deleteParticipant(index);
-                    }}
-                  >
-                    <img src={trashImg} alt="trash" />
-                    <span>Delete</span>
-                  </div>
+          <Row className="mb-4">
+            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+              <MiniCircle />
+              <div className={styles.vr} />
+            </Col>
+            <Col>
+              <Row>
+                <span className={`${styles.sectionTitle} mb-1`}>Participants</span>
+                <hr className={styles.formHr} />
+              </Row>
+              {/* Labels Row */}
+              <Row>
+                <Col md={3} className={styles.participantLabels}>
+                  Name
+                </Col>
+                <Col md={3} className={styles.participantLabels}>
+                  Surname
+                </Col>
+                <Col md={2} className={styles.participantLabels}>
+                  Birth Date
+                </Col>
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Number
                 </Col>
               </Row>
-            );
-          })}
+              {participants.map((item, index) => {
+                return (
+                  <Row key={`participant-${index}`} className="mb-2">
+                    <Form.Group as={Col} md="3" controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        value={participants[index].name}
+                        onChange={(e) => changeParticipant(index, 'name', e.target.value)}
+                        type="text"
+                        placeholder="First name"
+                      />
+                    </Form.Group>
 
-          <Button onClick={() => addParticipant()}>Add</Button>
-          <Row>
-            <span>Certificate Information (same on all certificates)</span>
-            <hr />
+                    <Form.Group as={Col} md="3" controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        value={participants[index].surname}
+                        onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
+                        type="text"
+                        placeholder="Last name"
+                      />
+                    </Form.Group>
+
+                    <Form.Group as={Col} md="2" controlId="validationCustom02">
+                      <DatePicker
+                        selected={participants[index].dob}
+                        onChange={(date: Date) => changeParticipant(index, 'dob', undefined, date)}
+                        customInput={<ExampleCustomInput />}
+                      />
+                    </Form.Group>
+
+                    <Form.Group as={Col} md="2" controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        value={participants[index].cert_num}
+                        onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
+                        type="text"
+                        placeholder="123456"
+                      />
+                    </Form.Group>
+
+                    <Col md="auto" className="d-flex align-items-center">
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => deleteParticipant(index)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') deleteParticipant(index);
+                        }}
+                      >
+                        <div>
+                          <img src={trashImg} alt="trash" />
+                          <span className="d-none d-lg-inline-block">Delete</span>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                );
+              })}
+              <button className={styles.addBtn} onClick={addParticipant}>
+                + Add
+              </button>
+            </Col>
           </Row>
-          <Row>
-            <Form.Group as={Col} md="12" controlId="validationCustom02">
-              <Form.Label>Public Certificate Description</Form.Label>
-              <Form.Control
-                required
-                as="textarea"
-                value={pubDesc}
-                onChange={(e) => setPubDesc(e.target.value)}
-                type="text"
-                placeholder="This description will be visible to the public."
-              />
-            </Form.Group>
+
+          {/* \/ Cert Info Section \/ */}
+
+          <Row className="mb-4">
+            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+              <MiniCircle />
+              <div className={styles.vr} />
+            </Col>
+            <Col>
+              <Row>
+                <span className={`${styles.sectionTitle} mb-1`}>
+                  Certificate Information (same on all certificates)
+                </span>
+                <hr className={styles.formHr} />
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Public Certificate Description
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="12" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      as="textarea"
+                      value={pubDesc}
+                      onChange={(e) => setPubDesc(e.target.value)}
+                      type="text"
+                      placeholder="This description will be visible to the public."
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Private Certificate Description
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="12" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      as="textarea"
+                      value={privDesc}
+                      onChange={(e) => setPrivDesc(e.target.value)}
+                      type="text"
+                      placeholder="This description will only be visible to the recipient and any third-parties authorized by the recipient."
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Template{' '}
+                </Col>
+                <Col></Col>
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Issuer Logo{' '}
+                </Col>
+                <Col>
+                  <LogoDropzone set={setIssuerLogo} />
+                </Col>
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Issuer Name{' '}
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={issuer}
+                      onChange={(e) => setIssuer(e.target.value)}
+                      type="text"
+                      placeholder="John Smith"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4">
+                <Col md={2} className={styles.participantLabels}>
+                  Issue Date{' '}
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="3" controlId="validationCustom02">
+                    <DatePicker
+                      selected={issueDate}
+                      onChange={(date: Date) => setIssueDate(date)}
+                      customInput={<ExampleCustomInput />}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Col>
           </Row>
-          <Row>
-            <Form.Group as={Col} md="12" controlId="validationCustom02">
-              <Form.Label>Private Certificate Description</Form.Label>
-              <Form.Control
-                required
-                as="textarea"
-                value={privDesc}
-                onChange={(e) => setPrivDesc(e.target.value)}
-                type="text"
-                placeholder="This description will only be visible to the recipient and any third-parties authorized by the recipient."
-              />
-            </Form.Group>
+
+          {/* \/ Preview Section \/ */}
+
+          <Row className="mb-2">
+            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+              <MiniCircle />
+              <div style={{ width: '65px' }}></div>
+            </Col>
+            <Col>
+              <Row>
+                <span className={`${styles.sectionTitle} mb-1`}>Preview</span>
+                <hr className={styles.formHr} />
+              </Row>
+            </Col>
           </Row>
-          <Row>Template</Row>
-          <Row>Issuer Logo</Row>
-          <Row>Issuer Name</Row>
-          <Row>
-            <Form.Group as={Col} md="2" controlId="validationCustom02">
-              <Form.Label>Issue Date</Form.Label>
-              <DatePicker selected={issueDate} onChange={(date: Date) => setIssueDate(date)} />
-            </Form.Group>
-          </Row>
-          <Row>PREVIEW</Row>
+          <Row className="mb-5">INSERT PREVIEW HERE</Row>
+
           <BackButton />
+          <Spacer height={40} />
+
           <Row style={{ marginBottom: '10px' }}>
             <Col md="3">
               <CUButton disabled={false} large={false} fill={true} onClick={handleSave}>

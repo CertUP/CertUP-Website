@@ -1,20 +1,22 @@
+import { Permission } from 'secretjs';
 import { KeplrWindow } from '../components/KeplrButton';
+import { PermitSignature } from '../interfaces';
 
 export const permitName = 'CertUP-Query-Permit';
-export const allowedTokens = [process.env.REACT_APP_CONTRACT_ADDR];
-export const permissions = ['owner'];
+export const allowedTokens: string[] = [process.env.REACT_APP_CONTRACT_ADDR as string];
+export const permissions: Permission[] = ['owner'];
 
 declare let window: KeplrWindow;
 
 export interface LoginToken {
-  permit: object;
+  permit: PermitSignature;
   issued: Date;
   expires: Date;
 }
 
 export interface GetPermitResponse {
   loginPermit: LoginToken;
-  queryPermit: object;
+  queryPermit: PermitSignature;
 }
 
 // export default async function getLoginPermit(

@@ -1,0 +1,74 @@
+{
+    "external_url": ,
+    "description": "Public or Private description",
+	"certificate": {
+		"name": "CFI Training Certificate",
+		"type" : "Certificate of Completion",
+		"issue_date": "",
+		"expire_date": "",
+		"cert_number": "123",
+	},
+	"recipient": {
+		"first_name": "David",
+		"middle_name": "Jackson",
+		"last_name": "Smith",
+		"date_of_birth": "how will we pass a date? Or will it just be a string?",
+		"id": "optional",
+	},
+    "issuing_organizations": [
+		{
+			"name": "Corporate Finance Institute",
+			"address": "optional company address",
+			"url": "optional company website",
+		},
+		{
+			...
+		}
+	],
+	"issuing_individuals": [
+		{
+			"name": "John Smith",
+			"company": "Corporate Finance Institute",
+			"title": "Director",
+		},
+		{
+			...
+		}
+	],
+	"idk what to call this one, its for instructors and classes n stuff": [
+		{
+			"type": "Course",
+			"name": "Introduction to Finance",
+			"value": "89.4"
+		},
+		{
+			"type": "Instructor",
+			"name": "Jane Smith",
+			"value": "optional"
+		}
+	],
+    "attributes": [ 
+        {
+            "display_type": "optional_display_format_for_numerical_traits",
+            "trait_type": "optional_name_of_the_trait",
+            "value": "trait value",
+            "max_value": "optional_max_value_for_numerical_traits"
+        },
+        {
+            "...": "...",
+        },
+    ],
+    "media": [
+        {
+            "file_type": "optional_file_type",
+            "extension": "pdf",
+            "authentication": {
+                "key": Decryption Key,
+                "user": 
+            },
+            "url": Image URL,
+        }
+    ],
+    "protected_attributes": [ "list", "of_attributes", "whose_types", "are_public", "but_values", "are_private" ],
+    "token_subtype": "certificate"
+}

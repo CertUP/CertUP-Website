@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ItemProvider, WalletProvider } from './contexts';
-import { Home, Error, About, Clients } from './pages/';
+import { Home, Error, About, Clients, Access } from './pages/';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -36,6 +36,7 @@ function App() {
               <Route path="/issuers" element={<Issuers />} />
               <Route path="/addCredit" element={<AddCredit />} />
               <Route path="/generate" element={<Mint />} />
+              <Route path="/access" element={<Access />} />
               <Route path="*" element={<Error />} />
             </>
           ) : null}
