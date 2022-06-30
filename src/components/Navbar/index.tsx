@@ -52,7 +52,7 @@ export default function CertUpNavbar() {
 
               <Navbar.Text>
                 <KeplrButton />
-                {/* <Web3AuthButton /> */}
+                <Web3AuthButton />
               </Navbar.Text>
             </>
           ) : null}

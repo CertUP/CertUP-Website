@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ReactElement, ReactNode, useState } from 'react';
+import { ReactElement, ReactNode, useState, useEffect } from 'react';
 import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
@@ -17,7 +17,7 @@ import { getErrorMessage, reportError } from '../../utils/helpers';
 import getPermits, { LoginToken } from '../../utils/loginPermit';
 
 const clientId =
-  'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU'; // get from https://dashboard.web3auth.io
+  'BKEPAeSD171HLib_Xzk3Ry3nbWG_5S59sL30y1u1XWV8rDOoJo7p3fey06gX3Zg1xnIP-9m_kzG1QRePd8dOPp8'; // get from https://dashboard.web3auth.io
 
 export interface KeplrWindow extends Window {
   keplr: any;
@@ -54,60 +54,22 @@ export default function Web3AuthButton(): ReactElement {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
 
-  //const [secretJs, setSecretJs] = useGlobalState('secretJs');
-  //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
-  //const [isSigner, setIsSigner] = useGlobalState('isSigner');
-
-  // const handleConnect = async () => {
-  //   try {
-  //     setLoading(true);
-  //     if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
-  //       toast.error('Keplr Extension Not Found');
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
-
-  //     const keplrOfflineSigner: Wallet = window.getOfflineSignerOnlyAmino(
-  //       process.env.REACT_APP_CHAIN_ID as string,
-  //     );
-  //     const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
-
-  //     const secretjs = await SecretNetworkClient.create({
-  //       grpcWebUrl: process.env.REACT_APP_GRPC_URL as string,
-  //       chainId: process.env.REACT_APP_CHAIN_ID as string,
-  //       wallet: keplrOfflineSigner,
-  //       walletAddress: myAddress,
-  //       encryptionUtils: window.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
-  //     });
-
-  //     const issueDate = new Date();
-  //     const expDate = addHours(new Date(), 12);
-  //     const { loginPermit: token, queryPermit: permit } = await getPermits(
-  //       myAddress,
-  //       issueDate,
-  //       expDate,
-  //     );
-  //     console.log('Permits', token, permit);
-  //     await updateClient(secretjs, keplrOfflineSigner, myAddress, token, permit);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setLoading(false);
-  //     reportError({ message: getErrorMessage(error) });
-  //   }
-  // };
-
-  const handleConnect2 = async () => {
+  const init = async () => {
     try {
-      const web3auth = new Web3Auth({
+      // const web3auth2 = new Web3Auth({
+      //   clientId,
+      //   chainConfig: {
+      //     chainNamespace: CHAIN_NAMESPACES.OTHER,
+      //   },
+      // });
+      const web3auth2 = new Web3Auth({
         clientId,
         chainConfig: {
           chainNamespace: CHAIN_NAMESPACES.OTHER,
-          chainId: process.env.REACT_APP_CHAIN_ID,
+          // chainId: '0x1',
+          // rpcTarget: 'https://rpc.ankr.com/eth', // This is the mainnet RPC we have added, please pass on your own endpoint while creating an app
         },
       });
-
       const openloginAdapter = new OpenloginAdapter({
         adapterSettings: {
           network: 'testnet',
@@ -115,59 +77,113 @@ export default function Web3AuthButton(): ReactElement {
             'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU',
           uxMode: 'popup',
         },
-
-        // chainConfig:{
-        //   //chainNamespace: web3auth.namespace,
-        //   blockExplorer: "https://secretnodes.com",
-        //   chainId: process.env.REACT_APP_CHAIN_ID as string,
-        //   displayName: "Secret testnet",
-        //   //rpcTarget: "https://api.devnet.solana.com",
-        //   ticker: "SCRT",
-        //   tickerName: "Secret",
-        // },
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.OTHER,
+          blockExplorer: 'https://secretnodes.com',
+          chainId: process.env.REACT_APP_CHAIN_ID as string,
+          displayName: 'Secret testnet',
+          rpcTarget: 'https://api.devnet.solana.com',
+          ticker: 'SCRT',
+          tickerName: 'Secret',
+        },
       });
       // it will add/update  the openloginAdapter in to web3auth class
-      // web3auth.configureAdapter(openloginAdapter);
+      web3auth2.configureAdapter(openloginAdapter);
+      await web3auth2.initModal();
+      setWeb3auth(web3auth2);
 
-      setWeb3auth(web3auth);
-
-      await web3auth.initModal();
-
-      const web3authProvider = await web3auth.connect();
-      setProvider(web3authProvider);
-
-      const user = await web3auth.getUserInfo();
-      console.log(user);
-
-      const privateKey = await web3auth?.provider?.request({
-        method: 'private_key',
-      });
-
-      console.log('PKey', privateKey);
-
-      const snWallet = new Wallet(privateKey as string);
-      console.log('Address', snWallet.address);
+      console.log('Web3Auth Initialized');
     } catch (error) {
       console.error(error);
     }
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  const login = async () => {
+    try {
+      if (!web3auth) {
+        console.log('web3auth not initialized yet');
+        return;
+      }
+      const web3authProvider = await web3auth.connect();
+      setProvider(web3authProvider);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getUserInfo = async () => {
+    if (!web3auth) {
+      console.log('web3auth not initialized yet');
+      return;
+    }
+    const user = await web3auth.getUserInfo();
+    console.log(user);
+  };
+
+  const getPrivKey = async () => {
+    if (!web3auth) {
+      console.log('web3auth not initialized yet');
+      return;
+    }
+    const privateKey = await web3auth.provider?.request({
+      method: 'private_key',
+    });
+
+    return privateKey;
+  };
+
+  const handleConnect2 = async () => {
+    if (!web3auth) {
+      console.log('web3auth not initialized yet');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      console.log('handling login');
+      await login();
+
+      console.log('getting user info');
+      await getUserInfo();
+
+      setLoading(false);
+
+      const privateKey = await getPrivKey();
+
+      const snWallet = new Wallet(privateKey as string);
+      console.log('Address', snWallet.address);
+
+      const client = await SecretNetworkClient.create({
+        grpcWebUrl: process.env.REACT_APP_GRPC_URL as string,
+        chainId: process.env.REACT_APP_CHAIN_ID as string,
+      });
+
+      //await updateClient(client, snWallet, snWallet.address, undefined, undefined);
+
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
   };
 
   //const { Items } = useItem();
   //console.log(Items);
   return loading ? (
     <button className={styles.keplrButton} style={{ cursor: 'wait' }}>
-      <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
-      <span>Connecting Keplr</span>
+      <span>Processing...</span>
     </button>
   ) : Address ? (
     <button className={styles.keplrButton} style={{ cursor: 'default' }}>
-      <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
       <span>{truncateAddress(Address)}</span>
     </button>
   ) : (
     <button className={styles.keplrButton} onClick={() => handleConnect2()}>
-      <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
-      <span>Login</span>
+      <span>Social Login</span>
     </button>
   );
 }
