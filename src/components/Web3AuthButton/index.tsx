@@ -14,7 +14,7 @@ import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
-import getPermits, { LoginToken } from '../../utils/loginPermit';
+import getPermits, { getPermits2, LoginToken } from '../../utils/loginPermit';
 
 const clientId =
   'BKEPAeSD171HLib_Xzk3Ry3nbWG_5S59sL30y1u1XWV8rDOoJo7p3fey06gX3Zg1xnIP-9m_kzG1QRePd8dOPp8'; // get from https://dashboard.web3auth.io
@@ -53,6 +53,7 @@ export default function Web3AuthButton(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+  const [initializing, setInitializing] = useState<boolean>(true);
 
   const init = async () => {
     try {
@@ -93,6 +94,7 @@ export default function Web3AuthButton(): ReactElement {
       setWeb3auth(web3auth2);
 
       console.log('Web3Auth Initialized');
+      setInitializing(false);
     } catch (error) {
       console.error(error);
     }
@@ -160,9 +162,20 @@ export default function Web3AuthButton(): ReactElement {
       const client = await SecretNetworkClient.create({
         grpcWebUrl: process.env.REACT_APP_GRPC_URL as string,
         chainId: process.env.REACT_APP_CHAIN_ID as string,
+        wallet: snWallet,
+        walletAddress: snWallet.address,
       });
+      const issueDate = new Date();
+      const expDate = addHours(new Date(), 12);
+      const { loginPermit: token, queryPermit: permit } = await getPermits2(
+        snWallet.address,
+        issueDate,
+        expDate,
+        snWallet,
+      );
+      console.log('Permits', token, permit);
 
-      //await updateClient(client, snWallet, snWallet.address, undefined, undefined);
+      await updateClient(client, snWallet, snWallet.address, token, permit);
 
       setLoading(false);
     } catch (error) {
@@ -173,9 +186,9 @@ export default function Web3AuthButton(): ReactElement {
 
   //const { Items } = useItem();
   //console.log(Items);
-  return loading ? (
+  return loading || initializing ? (
     <button className={styles.keplrButton} style={{ cursor: 'wait' }}>
-      <span>Processing...</span>
+      <span>{initializing ? 'Please wait...' : 'Processing...'}</span>
     </button>
   ) : Address ? (
     <button className={styles.keplrButton} style={{ cursor: 'default' }}>
