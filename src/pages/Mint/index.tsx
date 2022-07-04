@@ -18,11 +18,22 @@ import { Participant, Project } from '../../interfaces';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
-import { Tx } from 'secretjs';
+import { MsgExecuteContract, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
 import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
+import { SignDoc } from 'secretjs/dist/protobuf_stuff/cosmos/tx/v1beta1/tx';
+import { StdSignDoc } from 'secretjs/dist/wallet_amino';
+
+const getPaymentAddress = async () => {
+  const url = new URL('/payment', process.env.REACT_APP_BACKEND).toString();
+  const {
+    data: { payment_address },
+  } = await axios.get(url);
+  console.log({ payment_address });
+  return payment_address;
+};
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
@@ -179,6 +190,29 @@ export default function Mint() {
       };
 
       //console.log(JSON.stringify(mintMsg, undefined, 2));
+
+      const executeMsg = new MsgExecuteContract({
+        sender: Address,
+        contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
+        codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
+        msg: mintMsg,
+      });
+
+      const gas = 50000;
+
+      const full = {
+        chain_id: process.env.REACT_APP_CHAIN_ID as string,
+        account_number: '0', // Must be 0
+        sequence: '0', // Must be 0
+        fee: {
+          amount: [{ denom: 'uscrt', amount: (gas * 0.25).toString() }],
+          gas: gas.toString(),
+          payer: await getPaymentAddress(),
+          granter: await getPaymentAddress(),
+        },
+        msgs: [executeMsg],
+        memo: '', // Must be empty
+      };
 
       result = await Client?.tx.compute.executeContract(
         {

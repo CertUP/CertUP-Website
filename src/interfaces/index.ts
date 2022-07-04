@@ -26,12 +26,14 @@ export interface WalletContextState {
   LoginToken: LoginToken | undefined;
   QueryPermit: PermitSignature | undefined;
   RemainingCerts: number;
+  Keplr: boolean;
   updateClient: (
     client: SecretNetworkClient,
     wallet: Wallet,
     address: string,
     token: LoginToken,
     permit: PermitSignature,
+    keplr: boolean,
   ) => void;
   queryCredits: () => void;
 }

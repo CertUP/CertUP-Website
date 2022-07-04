@@ -29,8 +29,8 @@ export default function ProjectList({ setProject }: Props) {
   }, [Address]);
 
   const getProjects = async () => {
-    console.log('running', LoginToken, Address);
     const token = `Permit ${JSON.stringify(LoginToken)}`;
+    console.log('Projects Auth:', token);
     const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
     const response = await axios.get(url.toString(), {
       headers: {

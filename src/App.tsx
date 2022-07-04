@@ -9,6 +9,7 @@ import Guide from './pages/Guide';
 import Issuers from './pages/Issuers';
 import AddCredit from './pages/AddCredit';
 import Mint from './pages/Mint';
+import TestPayment from './pages/TestPayment';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
               <Route path="/guide" element={<Guide />} />
               <Route path="/issuers" element={<Issuers />} />
               <Route path="/addCredit" element={<AddCredit />} />
+              <Route path="/testPayment" element={<TestPayment />} />
               <Route path="/generate" element={<Mint />} />
               <Route path="/access" element={<Access />} />
               <Route path="*" element={<Error />} />

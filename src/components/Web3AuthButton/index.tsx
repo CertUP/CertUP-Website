@@ -138,6 +138,15 @@ export default function Web3AuthButton(): ReactElement {
     return privateKey;
   };
 
+  const logout = async () => {
+    if (!web3auth) {
+      console.log('web3auth not initialized yet');
+      return;
+    }
+    await web3auth.logout();
+    setProvider(null);
+  };
+
   const handleConnect2 = async () => {
     if (!web3auth) {
       console.log('web3auth not initialized yet');
@@ -165,8 +174,10 @@ export default function Web3AuthButton(): ReactElement {
         wallet: snWallet,
         walletAddress: snWallet.address,
       });
+
       const issueDate = new Date();
       const expDate = addHours(new Date(), 12);
+
       const { loginPermit: token, queryPermit: permit } = await getPermits2(
         snWallet.address,
         issueDate,
@@ -175,7 +186,7 @@ export default function Web3AuthButton(): ReactElement {
       );
       console.log('Permits', token, permit);
 
-      await updateClient(client, snWallet, snWallet.address, token, permit);
+      await updateClient(client, snWallet, snWallet.address, token, permit, false);
 
       setLoading(false);
     } catch (error) {
@@ -191,7 +202,7 @@ export default function Web3AuthButton(): ReactElement {
       <span>{initializing ? 'Please wait...' : 'Processing...'}</span>
     </button>
   ) : Address ? (
-    <button className={styles.keplrButton} style={{ cursor: 'default' }}>
+    <button className={styles.keplrButton} style={{ cursor: 'pointer' }} onClick={() => logout()}>
       <span>{truncateAddress(Address)}</span>
     </button>
   ) : (

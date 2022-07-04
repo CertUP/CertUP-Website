@@ -24,6 +24,7 @@ const contextDefaultValues: WalletContextState = {
   LoginToken: undefined,
   QueryPermit: undefined,
   RemainingCerts: 0,
+  Keplr: true,
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
@@ -52,6 +53,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.QueryPermit,
   );
   const [RemainingCerts, setRemainingCerts] = useState<number>(contextDefaultValues.RemainingCerts);
+  const [Keplr, setKeplr] = useState<boolean>(contextDefaultValues.Keplr);
 
   const updateClient = (
     client: SecretNetworkClient | undefined,
@@ -59,6 +61,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     address = '',
     token: LoginToken | undefined,
     permit: PermitSignature | undefined,
+    keplr: boolean,
   ) => {
     console.log('updating', token, permit);
     setClient(client);
@@ -67,6 +70,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     setLoginToken(token);
     setQueryPermit(permit);
     setClientIsSigner(wallet ? true : false);
+    setKeplr(keplr);
   };
 
   useEffect(() => {
@@ -116,6 +120,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     LoginToken,
     QueryPermit,
     RemainingCerts,
+    Keplr,
     updateClient,
     queryCredits,
   };
