@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
+import Image from 'react-bootstrap/Image';
 import { Spacer } from '../../components';
 import DatePicker from 'react-datepicker';
 
@@ -25,6 +26,14 @@ import { ProgressBar } from '../../components';
 import StepNumber from '../StepNumber';
 import MiniCircle from '../MiniCircle';
 import LogoDropzone from '../LogoDropzone';
+import {
+  bufferToDataURI,
+  generateImage,
+  GenerateInput,
+  generateWithWait,
+} from '../../utils/backendHelper';
+import { Spinner } from 'react-bootstrap';
+import { sleep } from '../../utils/helpers';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
@@ -36,19 +45,25 @@ interface formProps {
 }
 
 export default function ProjectForm({ pid, projectInfo, step, backHandler }: formProps) {
-  console.log('PINFO', projectInfo);
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
   //const [projectId, setProjectId] = useState<string>(pid);
+  const [certType, setCertType] = useState<string>(projectInfo?.cert_type || '');
   const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
   const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
-  const [issuer, setIssuer] = useState<string>(projectInfo?.issuer || '');
+  const [signer, setSigner] = useState<string>(projectInfo?.signer || '');
   const [validated, setValidated] = useState(false);
   const [issueDate, setIssueDate] = useState(projectInfo?.issue_date);
+  const [expireDate, setExpireDate] = useState(projectInfo?.expire_date);
   const [participants, setParticipants] = useState<Participant[]>(
     projectInfo?.participants || [new Participant(), new Participant()],
   );
-  const [issuerLogo, setIssuerLogo] = useState();
+  const [companyName, setCompanyName] = useState<string>(projectInfo?.company_name || '');
+  const [companyLogo, setCompanyLogo] = useState<File>();
+  const [previewImage, setPreviewImage] = useState<string>();
+  const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
+
+  const rendering = useRef(false);
 
   const navigate = useNavigate();
 
@@ -79,13 +94,6 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     },
   );
 
-  // // eslint-disable-next-line react/prop-types
-  // const ExampleCustomInput =forwardRef(({ children, onClick }, ref) => (
-  //   <button className="example-custom-input" onClick={onClick} ref={ref}>
-  //     {children}
-  //   </button>
-  // ));
-
   const getProject = (): Project => {
     return new Project(
       Address,
@@ -94,7 +102,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       privDesc,
       undefined,
       issueDate,
-      issuer,
+      signer,
       participants,
     );
   };
@@ -111,6 +119,41 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
         break;
     }
   }, [step, projectInfo]);
+
+  useEffect(() => {
+    const run = async () => {
+      console.log('rendering preview');
+
+      setLoadingPreview(true);
+
+      const participant = participants[0];
+      const logoData = bufferToDataURI(
+        (await companyLogo?.arrayBuffer()) as ArrayBuffer,
+        companyLogo?.type as string,
+      );
+
+      const input: GenerateInput = {
+        logoData: logoData,
+        fullName: `${participant.name} ${participant.surname}`,
+        companyName: companyName,
+        issueDate: issueDate as Date,
+        expireDate: expireDate,
+        certType: certType,
+        signer: signer,
+      };
+
+      const preview = await generateWithWait('1', input);
+      if (!preview) {
+        console.log('skipping render');
+        return;
+      }
+      setPreviewImage(preview);
+      setLoadingPreview(false);
+      rendering.current = false;
+      console.log(certType);
+    };
+    run();
+  }, [issueDate, expireDate, participants[0], signer, companyLogo, companyName, certType]);
 
   function BackButton() {
     return (
@@ -141,7 +184,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       privDesc,
       undefined,
       issueDate,
-      issuer,
+      signer,
       participants,
     );
     if (RemainingCerts >= participants.length)
@@ -153,7 +196,6 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   };
 
   const projectId = useRef<string | undefined>(projectInfo?._id || pid);
-  console.log('projectID', projectId.current);
 
   const handleSave = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (e) e.preventDefault();
@@ -169,11 +211,14 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
         //_id: projectId.current,
         project_name: projectName,
         owner: Address,
+        cert_type: certType,
+        company_name: companyName,
         pub_description: pubDesc,
         priv_description: privDesc,
         template: 1,
         issue_date: issueDate,
-        issuer: issuer,
+        expire_date: expireDate,
+        signer: signer,
         participants: participants,
       };
 
@@ -411,6 +456,22 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                 </span>
                 <hr className={styles.formHr} />
               </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Type
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={certType}
+                      onChange={(e) => setCertType(e.target.value)}
+                      type="text"
+                      placeholder="Certificate of Completion"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
               <Row className="mb-4">
                 <Col md={2} className={styles.participantLabels}>
                   Public Certificate Description
@@ -445,45 +506,75 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-4">
+              <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
                   Template{' '}
                 </Col>
                 <Col></Col>
               </Row>
-              <Row className="mb-4">
+              <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Issuer Logo{' '}
-                </Col>
-                <Col>
-                  <LogoDropzone set={setIssuerLogo} />
-                </Col>
-              </Row>
-              <Row className="mb-4">
-                <Col md={2} className={styles.participantLabels}>
-                  Issuer Name{' '}
+                  Company Name
                 </Col>
                 <Col>
                   <Form.Group as={Col} md="6" controlId="validationCustom02">
                     <Form.Control
                       required
-                      value={issuer}
-                      onChange={(e) => setIssuer(e.target.value)}
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      type="text"
+                      placeholder="Corporate Finance Institute"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Company Logo
+                </Col>
+                <Col>
+                  <LogoDropzone set={setCompanyLogo} />
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Signer
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={signer}
+                      onChange={(e) => setSigner(e.target.value)}
                       type="text"
                       placeholder="John Smith"
                     />
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-4">
+              <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Issue Date{' '}
+                  Issue Date
                 </Col>
                 <Col>
                   <Form.Group as={Col} md="3" controlId="validationCustom02">
                     <DatePicker
                       selected={issueDate}
                       onChange={(date: Date) => setIssueDate(date)}
+                      customInput={<ExampleCustomInput />}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Expire Date{' '}
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="3" controlId="validationCustom02">
+                    <DatePicker
+                      selected={expireDate}
+                      onChange={(date: Date) => setExpireDate(date)}
                       customInput={<ExampleCustomInput />}
                     />
                   </Form.Group>
@@ -506,7 +597,18 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
               </Row>
             </Col>
           </Row>
-          <Row className="mb-5">INSERT PREVIEW HERE</Row>
+          <Row className="mb-5">
+            <Col>
+              <div className={styles.previewContainer}>
+                <Image src={previewImage} />
+                {loadingPreview ? (
+                  <div className={styles.previewLoading}>
+                    <Spinner animation="border" variant="info" />
+                  </div>
+                ) : null}
+              </div>
+            </Col>
+          </Row>
 
           <BackButton />
           <Spacer height={40} />

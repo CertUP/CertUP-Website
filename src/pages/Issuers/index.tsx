@@ -55,6 +55,7 @@ export default function Issuers() {
   const setProject = (project: Project) => {
     //convert issue date string from DB into Date
     if (project.issue_date) project.issue_date = new Date(project.issue_date);
+    if (project.expire_date) project.expire_date = new Date(project.expire_date);
 
     // convert participant dob strings from DB to Date
     for (let i = 0; i < project.participants.length; i++) {

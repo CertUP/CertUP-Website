@@ -87,7 +87,7 @@ export default function Mint() {
             ],
             issuing_individuals: [
               {
-                name: project.issuer,
+                name: project.signer,
                 company: 'Corporate Finance Institute',
                 title: 'Director',
               },
@@ -240,7 +240,7 @@ export default function Mint() {
       project?.priv_description,
       project?.template,
       project?.issue_date,
-      project?.issuer,
+      project?.signer,
       newParticipants,
     );
     setProject(newProject);

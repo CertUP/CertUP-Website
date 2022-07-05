@@ -55,6 +55,7 @@ export class Project {
   _id?: string;
   owner: string;
   project_name: string;
+  cert_type: string | undefined;
   pub_description: string;
   priv_description: string;
   template: number;
@@ -62,7 +63,9 @@ export class Project {
   // issue_m: number;
   // issue_y: number;
   issue_date: Date | undefined;
-  issuer: string;
+  expire_date: Date | undefined;
+  company_name: string | undefined;
+  signer: string;
   participants: Participant[];
 
   constructor(
@@ -72,7 +75,7 @@ export class Project {
     priv_description?: string,
     template?: number,
     issue_date?: Date,
-    issuer?: string,
+    signer?: string,
     participants?: Participant[],
   ) {
     this.owner = owner || '';
@@ -81,7 +84,7 @@ export class Project {
     this.priv_description = priv_description || '';
     this.template = template || 0;
     this.issue_date = issue_date;
-    this.issuer = issuer || '';
+    this.signer = signer || '';
     this.participants = participants || [new Participant(), new Participant()];
   }
 }
