@@ -10,6 +10,8 @@ import Button from 'react-bootstrap/Button';
 import Image from 'react-bootstrap/Image';
 import { Spacer } from '../../components';
 import DatePicker from 'react-datepicker';
+import ImagePicker, { PickImage } from '../ImagePicker';
+//import 'react-image-picker/dist/index.css';
 
 import styles from './styles.module.scss';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -27,13 +29,21 @@ import StepNumber from '../StepNumber';
 import MiniCircle from '../MiniCircle';
 import LogoDropzone from '../LogoDropzone';
 import {
+  dataURLtoFile,
   bufferToDataURI,
+  fileToBase64,
   generateImage,
   GenerateInput,
   generateWithWait,
 } from '../../utils/backendHelper';
 import { Spinner } from 'react-bootstrap';
 import { sleep } from '../../utils/helpers';
+
+import bg1 from '../../assets/bg1-thumb.jpg';
+import bg2 from '../../assets/bg2-thumb.jpg';
+import bg3 from '../../assets/bg3-thumb.jpg';
+
+const bgList = [bg1, bg2, bg3];
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
@@ -47,21 +57,34 @@ interface formProps {
 export default function ProjectForm({ pid, projectInfo, step, backHandler }: formProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
-  //const [projectId, setProjectId] = useState<string>(pid);
-  const [certType, setCertType] = useState<string>(projectInfo?.cert_type || '');
-  const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
-  const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
-  const [signer, setSigner] = useState<string>(projectInfo?.signer || '');
   const [validated, setValidated] = useState(false);
-  const [issueDate, setIssueDate] = useState(projectInfo?.issue_date);
-  const [expireDate, setExpireDate] = useState(projectInfo?.expire_date);
+
   const [participants, setParticipants] = useState<Participant[]>(
     projectInfo?.participants || [new Participant(), new Participant()],
   );
-  const [companyName, setCompanyName] = useState<string>(projectInfo?.company_name || '');
-  const [companyLogo, setCompanyLogo] = useState<File>();
+
   const [previewImage, setPreviewImage] = useState<string>();
   const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
+
+  const [certTitle, setCertTitle] = useState<string>(projectInfo?.cert_title || '');
+  const [certName, setCertName] = useState<string>(projectInfo?.cert_name || '');
+
+  const [companyName, setCompanyName] = useState<string>(projectInfo?.company_name || '');
+  const [companyLogo, setCompanyLogo] = useState<File>();
+
+  const [signer, setSigner] = useState<string>(projectInfo?.signer || '');
+  const [signerTitle, setSignerTitle] = useState<string>(projectInfo?.signer_title || '');
+
+  const [line1Text, setLine1Text] = useState<string>(projectInfo?.line1Text || '');
+  const [line3Text, setLine3Text] = useState<string>(projectInfo?.line3Text || '');
+
+  const [issueDate, setIssueDate] = useState(projectInfo?.issue_date);
+  const [expireDate, setExpireDate] = useState(projectInfo?.expire_date);
+
+  const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
+  const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
+
+  const [templateBg, setTemplateBg] = useState<number>(1);
 
   const rendering = useRef(false);
 
@@ -108,6 +131,14 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   };
 
   useEffect(() => {
+    if (projectInfo?.company_logo) {
+      const file = dataURLtoFile(projectInfo.company_logo);
+      console.log('FILE', file);
+      setCompanyLogo(file);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!projectInfo) return;
 
     switch (step) {
@@ -135,14 +166,20 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       const input: GenerateInput = {
         logoData: logoData,
         fullName: `${participant.name} ${participant.surname}`,
-        companyName: companyName,
+        dob: participant.dob,
+        certNum: participant.cert_num,
+        companyName: companyName || 'CFI',
         issueDate: issueDate as Date,
         expireDate: expireDate,
-        certType: certType,
-        signer: signer,
+        certTitle: certTitle,
+        signer: signer || 'John Smith',
+        signerTitle: signerTitle || 'Director',
+        line1: line1Text || 'This certifies that',
+        line3: line3Text || 'has completed Advanced Financial Training',
+        templateBg: templateBg + 1 || 1,
       };
 
-      const preview = await generateWithWait('1', input);
+      const preview = await generateWithWait('2', input);
       if (!preview) {
         console.log('skipping render');
         return;
@@ -150,10 +187,21 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       setPreviewImage(preview);
       setLoadingPreview(false);
       rendering.current = false;
-      console.log(certType);
     };
     run();
-  }, [issueDate, expireDate, participants[0], signer, companyLogo, companyName, certType]);
+  }, [
+    templateBg,
+    participants[0],
+    certTitle,
+    line1Text,
+    line3Text,
+    companyName,
+    companyLogo,
+    signer,
+    signerTitle,
+    issueDate,
+    expireDate,
+  ]);
 
   function BackButton() {
     return (
@@ -206,24 +254,36 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     }
     const tid = toast.loading('Saving...');
 
+    const logoData = companyLogo
+      ? bufferToDataURI(
+          (await companyLogo?.arrayBuffer()) as ArrayBuffer,
+          companyLogo?.type as string,
+        )
+      : '';
+
     try {
       const project: Project = {
         //_id: projectId.current,
         project_name: projectName,
         owner: Address,
-        cert_type: certType,
+        cert_title: certTitle,
+        cert_name: certName,
         company_name: companyName,
+        company_logo: logoData,
         pub_description: pubDesc,
         priv_description: privDesc,
         template: 1,
+        template_bg: templateBg,
         issue_date: issueDate,
         expire_date: expireDate,
         signer: signer,
+        signer_title: signerTitle,
         participants: participants,
+        line1Text: line1Text,
+        line3Text: line3Text,
       };
 
       const token = `Permit ${JSON.stringify(LoginToken)}`;
-      console.log(token);
       console.log(project);
       if (!projectId.current) {
         const response = await axios.post(projectsUrl, project, {
@@ -238,7 +298,6 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       } else {
         //update extsting project
         const url = new URL(`/projects/${projectId.current}`, process.env.REACT_APP_BACKEND);
-        console.log(url.toString());
 
         const response = await axios.put(url.toString(), project, {
           headers: {
@@ -299,6 +358,11 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
         break;
     }
     setParticipants(newAry);
+  };
+
+  const onPick = (image: PickImage) => {
+    console.log('Picked:', image);
+    setTemplateBg(image.value);
   };
 
   return (
@@ -458,14 +522,30 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Certificate Type
+                  Certificate Name
                 </Col>
                 <Col>
                   <Form.Group as={Col} md="6" controlId="validationCustom02">
                     <Form.Control
                       required
-                      value={certType}
-                      onChange={(e) => setCertType(e.target.value)}
+                      value={certName}
+                      onChange={(e) => setCertName(e.target.value)}
+                      type="text"
+                      placeholder="2022 CFI Training Certificate"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Title
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={certTitle}
+                      onChange={(e) => setCertTitle(e.target.value)}
                       type="text"
                       placeholder="Certificate of Completion"
                     />
@@ -508,9 +588,47 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Template{' '}
+                  Template
                 </Col>
-                <Col></Col>
+                <Col>
+                  <ImagePicker
+                    images={bgList.map((image, i) => ({ src: image, value: i }))}
+                    onPick={onPick}
+                    selected={{ src: bgList[0], value: 0 }}
+                  />
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Line 1 Text
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={line1Text}
+                      onChange={(e) => setLine1Text(e.target.value)}
+                      type="text"
+                      placeholder="This certifies that"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Line 3 Text
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={line3Text}
+                      onChange={(e) => setLine3Text(e.target.value)}
+                      type="text"
+                      placeholder="has completed Advanced Financial Training"
+                    />
+                  </Form.Group>
+                </Col>
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
@@ -533,7 +651,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                   Company Logo
                 </Col>
                 <Col>
-                  <LogoDropzone set={setCompanyLogo} />
+                  <LogoDropzone set={setCompanyLogo} external={companyLogo} />
                 </Col>
               </Row>
               <Row className="mb-4 align-items-center">
@@ -548,6 +666,22 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                       onChange={(e) => setSigner(e.target.value)}
                       type="text"
                       placeholder="John Smith"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Signer Title
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={signerTitle}
+                      onChange={(e) => setSignerTitle(e.target.value)}
+                      type="text"
+                      placeholder="Director"
                     />
                   </Form.Group>
                 </Col>
@@ -600,7 +734,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
           <Row className="mb-5">
             <Col>
               <div className={styles.previewContainer}>
-                <Image src={previewImage} />
+                <Image src={previewImage} fluid={true} />
                 {loadingPreview ? (
                   <div className={styles.previewLoading}>
                     <Spinner animation="border" variant="info" />

@@ -1,5 +1,5 @@
 import { SecretNetworkClient, Wallet } from 'secretjs';
-import { Metadata } from 'secretjs/dist/extensions/snip721/types';
+import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
 import { classicNameResolver } from 'typescript';
 import { LoginToken } from '../utils/loginPermit';
 
@@ -55,17 +55,20 @@ export class Project {
   _id?: string;
   owner: string;
   project_name: string;
-  cert_type: string | undefined;
+  template: number;
+  template_bg: number;
+  cert_title: string | undefined;
+  cert_name: string | undefined;
   pub_description: string;
   priv_description: string;
-  template: number;
-  // issue_d: number;
-  // issue_m: number;
-  // issue_y: number;
+  line1Text: string | undefined;
+  line3Text: string | undefined;
   issue_date: Date | undefined;
   expire_date: Date | undefined;
   company_name: string | undefined;
+  company_logo: string | undefined;
   signer: string;
+  signer_title: string;
   participants: Participant[];
 
   constructor(
@@ -77,14 +80,18 @@ export class Project {
     issue_date?: Date,
     signer?: string,
     participants?: Participant[],
+    signerTitle?: string,
+    template_bg?: number,
   ) {
     this.owner = owner || '';
     this.project_name = project_name || '';
     this.pub_description = pub_description || '';
     this.priv_description = priv_description || '';
     this.template = template || 0;
+    this.template_bg = template_bg || 0;
     this.issue_date = issue_date;
     this.signer = signer || '';
+    this.signer_title = signerTitle || '';
     this.participants = participants || [new Participant(), new Participant()];
   }
 }
@@ -130,6 +137,10 @@ export interface PermitSignature {
   signature: string;
 }
 
+export interface DossierResponse {
+  nft_dossier: NftDossier;
+}
+
 export interface BatchDossierResponse {
   batch_nft_dossier: _BatchDossiers;
 }
@@ -142,6 +153,22 @@ export interface NftDossier {
   token_id: string;
   display_private_metadata_error: string | null;
   owner: string | null;
-  private_metadata: Metadata;
-  public_metadata: Metadata;
+  private_metadata: CertupMetadata;
+  public_metadata: CertupMetadata;
+}
+
+export interface CertupExtension extends Extension {
+  certificate: CertMetadata;
+}
+
+export interface CertMetadata {
+  name: string;
+  cert_type: string | null;
+  issue_date: string;
+  expire_date: string | null;
+  cert_number: string;
+}
+
+export interface CertupMetadata extends Metadata {
+  extension: CertupExtension;
 }

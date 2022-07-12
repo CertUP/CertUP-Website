@@ -16,6 +16,8 @@ import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
 import {
   BatchDossierResponse,
+  CertupExtension,
+  CertupMetadata,
   NftDossier,
   Participant,
   PermitSignature,
@@ -31,8 +33,13 @@ import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
 import { permissions, allowedTokens, permitName } from '../../utils/loginPermit';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
-import { queryPermitCertupContract, WithPermit } from '../../utils/secretJsWrappers';
+import {
+  getAllOwnedDossiers,
+  queryPermitCertupContract,
+  WithPermit,
+} from '../../utils/secretJsWrappers';
 import ReactJson from 'react-json-view';
+import { Extension } from 'secretjs/dist/extensions/snip721/types';
 
 export default function Access() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
@@ -46,51 +53,53 @@ export default function Access() {
   //const numCerts = location.state?.num_certificates || undefined;
 
   useEffect(() => {
-    console.log('running effect');
     console.log(location.state);
     if (QueryPermit) queryOwnedCerts();
   }, []);
 
   useEffect(() => {
-    console.log('running after login effect');
-    if (QueryPermit) queryOwnedCerts();
+    if (!QueryPermit || !Client || !Address) return;
+    queryOwnedCerts();
   }, [QueryPermit]);
 
   const queryOwnedCerts = async () => {
     console.log(QueryPermit);
 
-    // query owned token IDs
-    const tokensQuery = {
-      tokens: {
-        owner: Address,
-      },
-    };
+    //@ts-ignore
+    const dossiers = await getAllOwnedDossiers(Client, Address, QueryPermit);
 
-    console.log('Owned Certs Query', tokensQuery);
+    // // query owned token IDs
+    // const tokensQuery = {
+    //   tokens: {
+    //     owner: Address,
+    //   },
+    // };
 
-    const { token_list } = (await queryPermitCertupContract(
-      Client as SecretNetworkClient,
-      tokensQuery,
-      QueryPermit as PermitSignature,
-    )) as Snip721GetTokensResponse;
+    // console.log('Owned Certs Query', tokensQuery);
 
-    console.log('owned certs list', token_list.tokens);
+    // const { token_list } = (await queryPermitCertupContract(
+    //   Client as SecretNetworkClient,
+    //   tokensQuery,
+    //   QueryPermit as PermitSignature,
+    // )) as Snip721GetTokensResponse;
 
-    // query NFT metadata
-    const dossierQuery = {
-      batch_nft_dossier: {
-        token_ids: token_list.tokens,
-      },
-    };
+    // console.log('owned certs list', token_list.tokens);
 
-    const response = (await queryPermitCertupContract(
-      Client as SecretNetworkClient,
-      dossierQuery,
-      QueryPermit as PermitSignature,
-    )) as BatchDossierResponse;
+    // // query NFT metadata
+    // const dossierQuery = {
+    //   batch_nft_dossier: {
+    //     token_ids: token_list.tokens,
+    //   },
+    // };
 
-    console.log('owned certs data', response);
-    setCerts(response.batch_nft_dossier.nft_dossiers);
+    // const response = (await queryPermitCertupContract(
+    //   Client as SecretNetworkClient,
+    //   dossierQuery,
+    //   QueryPermit as PermitSignature,
+    // )) as BatchDossierResponse;
+
+    // console.log('owned certs data', response);
+    setCerts(dossiers);
     setLoading(false);
   };
 
@@ -101,6 +110,10 @@ export default function Access() {
     } else {
       navigate('/', { replace: true }); // the current entry in the history stack will be replaced with the new one with { replace: true }
     }
+  };
+
+  const handleView = (cert: NftDossier) => {
+    navigate(`/access/${cert.token_id}`, { state: { cert: cert } });
   };
 
   const handleMint = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -207,11 +220,78 @@ export default function Access() {
               </div>
             ) : (
               certs.map((cert, index) => {
-                console.log(cert);
+                console.log('aaa', cert);
+
+                const fakeMedia = [
+                  {
+                    url: '',
+                  },
+                ];
+
+                const fakeExtension: CertupExtension = {
+                  certificate: {
+                    name: 'Hello Certup',
+                    cert_type: null,
+                    issue_date: '2222-05-31T00:23:03.000Z',
+                    expire_date: null,
+                    cert_number: '123',
+                  },
+                  image: undefined,
+                  image_data: undefined,
+                  external_url: undefined,
+                  description: undefined,
+                  name: undefined,
+                  attributes: undefined,
+                  media: fakeMedia,
+                  protected_attributes: [],
+                };
+
+                if (!cert.private_metadata.extension) {
+                  console.log(`replacing extension on ${index}`, cert.private_metadata);
+                  cert.private_metadata.extension = fakeExtension;
+                } else if (!(cert.private_metadata.extension.media || []).length) {
+                  console.log(`replacing media on ${index}`, cert.private_metadata.extension);
+                  cert.private_metadata.extension.media = fakeMedia;
+                }
+
                 return (
-                  <Col md={6} key={`cert-${index}-${cert.token_id}`}>
-                    {cert.token_id}
-                    <ReactJson src={cert} />
+                  <Col
+                    md={6}
+                    key={`cert-${index}-${cert.token_id}`}
+                    style={{ marginBottom: '3rem', minHeight: '300px' }}
+                  >
+                    <Row className="mb-2">
+                      {
+                        //@ts-ignore
+                        // eslint-disable-next-line prettier/prettier
+                        <Image
+                          src={(cert.private_metadata?.extension || fakeExtension).media[0].url}
+                          fluid={true}
+                        />
+                      }
+                    </Row>
+                    <Row className={`justify-content-between mx-1 ${styles.certName}`}>
+                      <Col md="auto">{cert.private_metadata.extension.certificate.name}</Col>
+                      <Col md="auto">
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => handleView(cert)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleView(cert);
+                          }}
+                        >
+                          View
+                        </span>
+                      </Col>
+                    </Row>
+                    {/* <ReactJson
+                      src={cert}
+                      collapsed={true}
+                      displayObjectSize={false}
+                      displayDataTypes={false}
+                    /> */}
                   </Col>
                 );
               })

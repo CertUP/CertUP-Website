@@ -23,10 +23,12 @@ import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
 import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
+import { GenerateInput, generateMultiple } from '../../utils/backendHelper';
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
   const [project, setProject] = useState<Project>();
+  const [hashes, setHashes] = useState([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const navigate = useNavigate();
@@ -46,6 +48,46 @@ export default function Mint() {
     setProject(location.state?.project);
   }, []);
 
+  useEffect(() => {
+    if (!project) return;
+    generate();
+  }, [project]);
+
+  const generate = async () => {
+    // const logoData = bufferToDataURI(
+    //   (await companyLogo?.arrayBuffer()) as ArrayBuffer,
+    //   companyLogo?.type as string,
+    // );
+    const logoData = '';
+
+    const inputs: GenerateInput[] = [];
+
+    //@ts-ignore
+    for (let i = 0; i < project?.participants?.length; i++) {
+      const participant = project?.participants[i];
+      const input: GenerateInput = {
+        logoData: logoData,
+        fullName: `${participant?.name} ${participant?.surname}`,
+        dob: participant?.dob,
+        certNum: participant?.cert_num as string,
+        companyName: project?.company_name as string,
+        issueDate: project?.issue_date as Date,
+        expireDate: project?.expire_date as Date,
+        certTitle: project?.cert_title as string,
+        signer: project?.signer as string,
+        signerTitle: project?.signer_title as string,
+        line1: project?.line1Text as string,
+        line3: project?.line3Text,
+        templateBg: (project?.template_bg as number) + 1,
+      };
+      inputs.push(input);
+    }
+
+    const hashes = await generateMultiple('1', inputs);
+    console.log('hashes', hashes);
+    setHashes(hashes);
+  };
+
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (window.history.state && window.history.state.idx > 0) {
@@ -62,13 +104,64 @@ export default function Mint() {
     let result;
 
     try {
-      const newData = project?.participants.map((participant) => {
+      const newData = project?.participants.map((participant, i) => {
         return {
           name: `${participant.name} ${participant.surname}`,
           date: project.issue_date?.toLocaleDateString(),
           cert_type: 'test',
           pub_metadata: {
             description: project.pub_description,
+            certificate: {
+              name: project.project_name,
+              issue_date: project.issue_date?.toISOString(),
+              cert_number: participant.cert_num?.toString(),
+            },
+            recipient: {
+              first_name: participant.name,
+              last_name: participant.surname,
+              date_of_birth: participant.dob?.toISOString(),
+            },
+            issuing_organizations: [
+              {
+                name: 'Corporate Finance Institute',
+                url: 'https://cfi.org',
+              },
+            ],
+            issuing_individuals: [
+              {
+                name: project.signer,
+                company: 'Corporate Finance Institute',
+                title: 'Director',
+              },
+            ],
+            inclusions: [
+              {
+                type: 'Course',
+                name: 'Introduction to Finance',
+                value: '89.4',
+              },
+              {
+                type: 'Instructor',
+                name: 'Jane Smith',
+              },
+            ],
+            attributes: [
+              {
+                trait_type: 'Certificate Number',
+                value: participant.cert_num?.toString(),
+              },
+              {
+                trait_type: 'Certificate Name',
+                value: project.project_name,
+              },
+              {
+                trait_type: 'Issue Date',
+                value: project.issue_date?.toDateString(),
+              },
+            ],
+          },
+          priv_metadata: {
+            description: project.priv_description,
             certificate: {
               name: project.project_name,
               issue_date: project.issue_date?.toISOString(),
@@ -117,58 +210,17 @@ export default function Mint() {
                 value: project.issue_date?.toDateString(),
               },
             ],
+            media: [
+              {
+                file_type: 'image/png',
+                extension: 'png',
+                authentication: {
+                  key: 'TO DO',
+                },
+                url: `https://ipfs.io/ipfs/${hashes[i]}`,
+              },
+            ],
           },
-          // priv_metadata: {
-          //   description: project.priv_description,
-          //   certificate: {
-          //     name: project.project_name,
-          //     issue_date: project.issue_date?.toISOString(),
-          //     cert_number: participant.cert_num.toString(),
-          //   },
-          //   recipient: {
-          //     first_name: participant.name,
-          //     last_name: participant.surname,
-          //     date_of_birth: participant.dob?.toISOString(),
-          //   },
-          //   issuing_organizations: [
-          //     {
-          //       name: 'Corporate Finance Institute',
-          //       url: 'https://cfi.org',
-          //     },
-          //   ],
-          //   issuing_individuals: [
-          //     {
-          //       name: project.issuer,
-          //       company: 'Corporate Finance Institute',
-          //       title: 'Director',
-          //     },
-          //   ],
-          //   inclusions: [
-          //     {
-          //       type: 'Course',
-          //       name: 'Introduction to Finance',
-          //       value: '89.4',
-          //     },
-          //     {
-          //       type: 'Instructor',
-          //       name: 'Jane Smith',
-          //     },
-          //   ],
-          //   attributes: [
-          //     {
-          //       trait_type: 'Certificate Number',
-          //       value: participant.cert_num.toString(),
-          //     },
-          //     {
-          //       trait_type: 'Certificate Name',
-          //       value: project.project_name,
-          //     },
-          //     {
-          //       trait_type: 'Issue Date',
-          //       value: project.issue_date?.toDateString(),
-          //     },
-          //   ],
-          // },
         };
       });
 
@@ -188,7 +240,7 @@ export default function Mint() {
           msg: mintMsg,
         },
         {
-          gasLimit: 100_000,
+          gasLimit: 120_000,
         },
       );
       console.log(result);
