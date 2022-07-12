@@ -262,9 +262,9 @@ export default function Access() {
                   >
                     <Row className="mb-2">
                       {
-                        //@ts-ignore
-                        // eslint-disable-next-line prettier/prettier
                         <Image
+                          // eslint-disable-next-line prettier/prettier
+                          //@ts-ignore
                           src={(cert.private_metadata?.extension || fakeExtension).media[0].url}
                           fluid={true}
                         />
