@@ -70,7 +70,7 @@ export default function LogoDropzone({ set, external }: props) {
 
   return (
     <section className={styles.logoContainer}>
-      <div {...getRootProps({ className: 'dropzone' })}>
+      <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: 'pointer' }}>
         <input {...getInputProps()} />
         {files.length ? (
           <Image
@@ -86,12 +86,8 @@ export default function LogoDropzone({ set, external }: props) {
         )}
       </div>
       <aside>
-        {files.length ? (
-          <ul>
-            <li key={files[0].path}>
-              {files[0].path} - {files[0].size / 1000} kb
-            </li>
-          </ul>
+        {files.length && files[0].path ? (
+          <span style={{ fontSize: '14px', textAlign: 'left' }}>{files[0].path}</span>
         ) : null}
       </aside>
     </section>

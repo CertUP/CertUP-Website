@@ -102,7 +102,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
       query: query,
     });
-    console.log('qresp', response);
     if (response?.parse_error || response?.generic_error)
       throw new Error((response?.parse_error || response?.generic_error || '').toString());
     setRemainingCerts(parseInt(response?.remaining_certs?.certs || '0', 10));

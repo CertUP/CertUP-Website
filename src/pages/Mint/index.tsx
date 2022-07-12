@@ -83,7 +83,7 @@ export default function Mint() {
       inputs.push(input);
     }
 
-    const hashes = await generateMultiple('1', inputs);
+    const hashes = await generateMultiple('2', inputs);
     console.log('hashes', hashes);
     setHashes(hashes);
   };

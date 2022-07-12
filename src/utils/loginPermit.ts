@@ -70,72 +70,97 @@ export default async function getPermits(
   issueDate: Date,
   expDate: Date,
 ): Promise<GetPermitResponse> {
-  const unsignedPermit = {
-    chain_id: process.env.REACT_APP_CHAIN_ID,
-    account_number: '0', // Must be 0
-    sequence: '0', // Must be 0
-    fee: {
-      amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
-      gas: '1', // Must be 1
-    },
-    msgs: [
-      {
-        type: 'CertUP-Login-Token',
-        value: {
-          issued: issueDate,
-          expires: expDate,
-        },
+  // Begin LOGIN TOKEN
+  const cachedToken: string | null = localStorage.getItem(`Certup-Login-Token-v1-${address}`);
+  let finalToken: LoginToken | undefined;
+
+  if (cachedToken) {
+    console.log('found cached token', cachedToken);
+    finalToken = JSON.parse(cachedToken);
+    if (!finalToken?.expires || new Date(finalToken.expires) < new Date()) finalToken = undefined;
+  }
+  if (!finalToken) {
+    const unsignedPermit = {
+      chain_id: process.env.REACT_APP_CHAIN_ID,
+      account_number: '0', // Must be 0
+      sequence: '0', // Must be 0
+      fee: {
+        amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
+        gas: '1', // Must be 1
       },
-    ],
-    memo: '', // Must be empty
-  };
-
-  const unsignedPermit2 = {
-    chain_id: process.env.REACT_APP_CHAIN_ID,
-    account_number: '0', // Must be 0
-    sequence: '0', // Must be 0
-    fee: {
-      amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
-      gas: '1', // Must be 1
-    },
-    msgs: [
-      {
-        type: 'query_permit', // Must be "query_permit"
-        value: {
-          permit_name: permitName,
-          allowed_tokens: allowedTokens,
-          permissions: permissions,
+      msgs: [
+        {
+          type: 'CertUP-Login-Token',
+          value: {
+            issued: issueDate,
+            expires: expDate,
+          },
         },
+      ],
+      memo: '', // Must be empty
+    };
+
+    const { signature } = await window.keplr.signAmino(
+      process.env.REACT_APP_CHAIN_ID,
+      address,
+      unsignedPermit,
+      {
+        preferNoSetFee: true, // Fee must be 0, so hide it from the user
+        preferNoSetMemo: true, // Memo must be empty, so hide it from the user
       },
-    ],
-    memo: '', // Must be empty
-  };
+    );
+    finalToken = { permit: signature, issued: issueDate, expires: expDate };
+    localStorage.setItem(`Certup-Login-Token-v1-${address}`, JSON.stringify(finalToken));
+    //console.log(`Certup-Login-Token-v1-${address}`, JSON.stringify(finalToken, undefined, 2));
+  }
 
-  const { signature } = await window.keplr.signAmino(
-    process.env.REACT_APP_CHAIN_ID,
-    address,
-    unsignedPermit,
-    {
-      preferNoSetFee: true, // Fee must be 0, so hide it from the user
-      preferNoSetMemo: true, // Memo must be empty, so hide it from the user
-    },
-  );
+  // Wait for Keplr window to close
+  await new Promise((r) => setTimeout(r, 150));
 
-  await new Promise((r) => setTimeout(r, 100));
+  // Begin QUERY PERMIT
+  let cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
+  if (!cachedPermit) {
+    const unsignedQueryPermit = {
+      chain_id: process.env.REACT_APP_CHAIN_ID,
+      account_number: '0', // Must be 0
+      sequence: '0', // Must be 0
+      fee: {
+        amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
+        gas: '1', // Must be 1
+      },
+      msgs: [
+        {
+          type: 'query_permit', // Must be "query_permit"
+          value: {
+            permit_name: permitName,
+            allowed_tokens: allowedTokens,
+            permissions: permissions,
+          },
+        },
+      ],
+      memo: '', // Must be empty
+    };
 
-  const { signature: signature2 } = await window.keplr.signAmino(
-    process.env.REACT_APP_CHAIN_ID,
-    address,
-    unsignedPermit2,
-    {
-      preferNoSetFee: true, // Fee must be 0, so hide it from the user
-      preferNoSetMemo: true, // Memo must be empty, so hide it from the user
-    },
-  );
+    const { signature } = await window.keplr.signAmino(
+      process.env.REACT_APP_CHAIN_ID,
+      address,
+      unsignedQueryPermit,
+      {
+        preferNoSetFee: true, // Fee must be 0, so hide it from the user
+        preferNoSetMemo: true, // Memo must be empty, so hide it from the user
+      },
+    );
+
+    localStorage.setItem(`Certup-Query-Permit-v1-${address}`, JSON.stringify(signature));
+    cachedPermit = signature;
+  } else cachedPermit = JSON.parse(cachedPermit);
 
   //return { loginPermit: signature, queryPermit: signature2, issued: issueDate, expires: expDate };
   return {
-    loginPermit: { permit: signature, issued: issueDate, expires: expDate },
-    queryPermit: signature2,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    // eslint-disable-next-line prettier/prettier
+    loginPermit: finalToken,
+    queryPermit: cachedPermit,
   };
 }

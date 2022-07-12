@@ -650,7 +650,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                 <Col md={2} className={styles.participantLabels}>
                   Company Logo
                 </Col>
-                <Col>
+                <Col md="auto">
                   <LogoDropzone set={setCompanyLogo} external={companyLogo} />
                 </Col>
               </Row>
