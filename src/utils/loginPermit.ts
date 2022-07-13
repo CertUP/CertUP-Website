@@ -118,7 +118,8 @@ export default async function getPermits(
   await new Promise((r) => setTimeout(r, 150));
 
   // Begin QUERY PERMIT
-  let cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
+  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
+  let finalPermit: PermitSignature;
   if (!cachedPermit) {
     const unsignedQueryPermit = {
       chain_id: process.env.REACT_APP_CHAIN_ID,
@@ -152,8 +153,8 @@ export default async function getPermits(
     );
 
     localStorage.setItem(`Certup-Query-Permit-v1-${address}`, JSON.stringify(signature));
-    cachedPermit = signature;
-  } else cachedPermit = JSON.parse(cachedPermit);
+    finalPermit = signature;
+  } else finalPermit = JSON.parse(cachedPermit);
 
   //return { loginPermit: signature, queryPermit: signature2, issued: issueDate, expires: expDate };
   return {
@@ -161,6 +162,6 @@ export default async function getPermits(
     //@ts-ignore
     // eslint-disable-next-line prettier/prettier
     loginPermit: finalToken,
-    queryPermit: cachedPermit,
+    queryPermit: finalPermit,
   };
 }
