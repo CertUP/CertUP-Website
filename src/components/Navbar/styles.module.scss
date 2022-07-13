@@ -1,10 +1,5 @@
 @use '../../global/_variables.scss' as vars;
 
-a {
-  color: #000000 !important;
-  text-decoration: none !important;
-}
-
 .navItem {
   margin-right: 90px;
   font-style: normal;
@@ -12,10 +7,36 @@ a {
   font-size: 20px;
   line-height: 30px;
 
-  color: #000000 !important;
+  // color: #000000 !important;
 }
 
 .navbarContainer {
   border-bottom: 1px solid #676767;
   height: 135px;
+}
+.navItem,
+.navbarContainer a {
+  color: #000000 !important;
+  transition: color 0.2s ease-in-out;
+  //-webkit-transition: all .5s ease-in-out;
+  // -moz-transition: all .5s ease-in-out; /*gecko*/
+  // -ms-transition: all .5s ease-in-out; /*IE10*/
+  //  -o-transition: all .5s ease-in-out; /*opera 11.10+*/
+  //  -pie-transition: all .5s ease-in-out; /*PIE*/
+  // transition: all .5s ease-in-out;
+}
+.navItem:hover,
+.navbarContainer a:hover {
+  // color: #31b5c7 !important;
+  background-color: #31b5c7;
+  color: #31b5c759 !important;
+  background-image: vars.$certupGradient;
+  background-size: 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+
+  // // -webkit-text-fill-color: transparent;
+  // -webkit-text-fill-color: #31b5c765;
+  // -moz-text-fill-color: transparent;
 }

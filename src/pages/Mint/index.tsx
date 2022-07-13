@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -9,82 +9,99 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import exampleCert from '../../assets/ExampleCert.svg';
-import { useWallet } from '../../contexts';
+import { useProject, useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { Participant, Project } from '../../interfaces';
+import { PreloadData } from '../../interfaces';
+import Project, { Participant, ProjectToCertList } from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
+import { Form, Spinner } from 'react-bootstrap';
 import { Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
 import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
 import { GenerateInput, generateMultiple } from '../../utils/backendHelper';
+import { SuccessToast, ToastProps } from '../../utils/toastHelper';
+import dlExcel from '../../assets/dlExcel.svg';
+import * as XLSX from 'xlsx';
+import useExecute from '../../hooks/ExecuteHook';
+
+const participantsToWorksheet = (participants: Participant[]) => {
+  const modified = participants.map((p: Participant) => {
+    return {
+      name: p.name,
+      surname: p.surname,
+      dob: p.dob,
+      cert_num: p.cert_num,
+      claim_code: p.claim_code || 'Not yet Generated',
+    };
+  });
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(modified);
+  console.log(worksheet);
+  worksheet['!cols'] = [];
+  //worksheet['!cols'][0] = { hidden: true };
+  worksheet['!cols'][0] = { wch: 20 };
+  worksheet['!cols'][1] = { wch: 20 };
+  worksheet['!cols'][2] = { wch: 15 };
+  worksheet['!cols'][3] = { wch: 15 };
+  worksheet['!cols'][4] = { wch: 50 };
+  XLSX.utils.sheet_add_aoa(
+    worksheet,
+    [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code']],
+    { origin: 'A1' },
+  );
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Codes');
+  XLSX.writeFile(workbook, `CertUP.xlsx`);
+};
 
 export default function Mint() {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
+  const { findProject, LoadingProjects } = useProject();
+  const { preloadCerts } = useExecute();
+
+  const [projectId, setProjectId] = useState();
   const [project, setProject] = useState<Project>();
   const [hashes, setHashes] = useState([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [generated, setGenerated] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   //const numCerts = location.state?.num_certificates || undefined;
 
   useEffect(() => {
-    console.log('running effect');
-    console.log(location.state);
-    if (!location.state?.project) {
+    console.log('Passed State', location.state);
+    if (!location.state?.projectId) {
       navigate('/issuers');
       return;
     }
+    if (!Wallet || !Address || LoadingProjects) return;
 
     // TODO check for empty project fields
-
-    setProject(location.state?.project);
-  }, []);
-
-  useEffect(() => {
-    if (!project) return;
-    generate();
-  }, [project]);
+    const foundProject = findProject(location.state?.projectId);
+    setProject(foundProject);
+    if (!foundProject) {
+      toast.error("Didn't find a project to mint, please try again.");
+      navigate('/issuers');
+    }
+  }, [Wallet, Address, LoadingProjects]);
 
   const generate = async () => {
-    // const logoData = bufferToDataURI(
-    //   (await companyLogo?.arrayBuffer()) as ArrayBuffer,
-    //   companyLogo?.type as string,
-    // );
-    const logoData = '';
+    if (!project) return;
+    console.log('Project', project);
+    const inputs = ProjectToCertList(project);
 
-    const inputs: GenerateInput[] = [];
+    console.log('toGenerate', inputs);
+    const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
+    console.log('hashes');
+    hashes.map((e: string) => console.log(`https://infura-ipfs.io/ipfs/${e}`));
 
-    //@ts-ignore
-    for (let i = 0; i < project?.participants?.length; i++) {
-      const participant = project?.participants[i];
-      const input: GenerateInput = {
-        logoData: logoData,
-        fullName: `${participant?.name} ${participant?.surname}`,
-        dob: participant?.dob,
-        certNum: participant?.cert_num as string,
-        companyName: project?.company_name as string,
-        issueDate: project?.issue_date as Date,
-        expireDate: project?.expire_date as Date,
-        certTitle: project?.cert_title as string,
-        signer: project?.signer as string,
-        signerTitle: project?.signer_title as string,
-        line1: project?.line1Text as string,
-        line3: project?.line3Text,
-        templateBg: (project?.template_bg as number) + 1,
-      };
-      inputs.push(input);
-    }
-
-    const hashes = await generateMultiple('2', inputs);
-    console.log('hashes', hashes);
     setHashes(hashes);
   };
 
@@ -97,12 +114,24 @@ export default function Mint() {
     }
   };
 
+  const handleDl = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    e.preventDefault();
+    if (!project || !project.participants) {
+      toast.error('Project not loaded.');
+      return;
+    }
+    participantsToWorksheet(project.participants);
+  };
+
   const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const toastRef = toast.loading('Transaction Processing...');
+    setLoading(true);
 
+    const toastRef = toast.loading('Generating Certificate Images...');
+    await generate();
+
+    toast.update(toastRef, { render: 'Processing Transaction...' });
     let result;
-
     try {
       const newData = project?.participants.map((participant, i) => {
         return {
@@ -224,43 +253,13 @@ export default function Mint() {
         };
       });
 
-      const mintMsg = {
-        pre_load: {
-          new_data: newData,
-        },
-      };
+      result = await preloadCerts(newData as PreloadData[], toastRef);
 
-      //console.log(JSON.stringify(mintMsg, undefined, 2));
-
-      result = await Client?.tx.compute.executeContract(
-        {
-          sender: Address,
-          contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
-          codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
-          msg: mintMsg,
-        },
-        {
-          gasLimit: 120_000,
-        },
-      );
-      console.log(result);
-      if (!result) throw new Error('Something went wrong');
-      if (result.code) throw new Error(result.rawLog);
-
-      toast.update(toastRef, {
-        render: 'Success!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 5000,
-      });
+      //toast.update(toastRef, SuccessToast);
     } catch (error: any) {
       console.error(error);
-      toast.update(toastRef, {
-        render: error.toString(),
-        type: 'error',
-        isLoading: false,
-        autoClose: 5000,
-      });
+      setLoading(false);
+      //toast.update(toastRef, new ToastProps(error.toString(), 'error'));
     }
 
     const wasmLogs =
@@ -285,17 +284,13 @@ export default function Mint() {
       participant.claim_code = claimCode;
     }
 
-    const newProject = new Project(
-      project?.owner,
-      project?.project_name,
-      project?.pub_description,
-      project?.priv_description,
-      project?.template,
-      project?.issue_date,
-      project?.signer,
-      newParticipants,
-    );
+    const newProject = new Project({
+      ...project,
+      participants: newParticipants,
+    });
     setProject(newProject);
+    setGenerated(true);
+    setLoading(false);
   };
 
   if (!Wallet || !Address || !LoginToken)
@@ -332,8 +327,16 @@ export default function Mint() {
         <Container>
           <Row className="justify-content-center" style={{ marginBottom: '25px' }}>
             <Col xs={'auto'}>
-              <button className={styles.cancelBtn} onClick={handleGenerate}>
-                Generate
+              <button
+                className={styles.cancelBtn}
+                onClick={handleGenerate}
+                disabled={ProcessingTx || loading}
+              >
+                {ProcessingTx || loading ? (
+                  <Spinner animation="border" size="sm" variant="light" />
+                ) : (
+                  'Generate'
+                )}
               </button>
             </Col>
           </Row>
@@ -366,6 +369,18 @@ export default function Mint() {
               </tbody>
             </Table>
           </Row>
+          {generated ? (
+            <Row className="justify-content-end">
+              <Col xs={2}>
+                <Image
+                  src={dlExcel}
+                  fluid={true}
+                  style={{ cursor: 'pointer' }}
+                  onClick={handleDl}
+                />
+              </Col>
+            </Row>
+          ) : null}
         </Container>
       </Layout>
     </>

@@ -12,30 +12,10 @@ import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
 import getPermits, { LoginToken } from '../../utils/loginPermit';
 
-export interface KeplrWindow extends Window {
-  keplr: any;
-  getEnigmaUtils(_: string): EncryptionUtils;
-  getOfflineSigner(): Wallet;
-  getOfflineSignerOnlyAmino(_: string): Wallet;
-  enable(_: string): Function;
-  getAccounts(): Function;
-}
-
-// declare interface Date {
-//   addHours(h: number): Date;
-// }
-
-// Date.prototype.addHours = function(h: number) {
-//   this.setTime(this.getTime() + (h*60*60*1000));
-//   return this;
-// }
-
 const addHours = (date: Date, hours: number): Date => {
   date.setTime(date.getTime() + hours * 60 * 60 * 1000);
   return date;
 };
-
-declare let window: KeplrWindow;
 
 const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;
@@ -58,9 +38,9 @@ export default function KeplrButton(): ReactElement {
         return;
       }
 
-      await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
+      await window.keplr.enable(process.env.REACT_APP_CHAIN_ID as string);
 
-      const keplrOfflineSigner: Wallet = window.getOfflineSignerOnlyAmino(
+      const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
         process.env.REACT_APP_CHAIN_ID as string,
       );
       const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
@@ -81,7 +61,7 @@ export default function KeplrButton(): ReactElement {
         expDate,
       );
       console.log('Permits', token, permit);
-      await updateClient(secretjs, keplrOfflineSigner, myAddress, token, permit);
+      await updateClient(secretjs, keplrOfflineSigner as Wallet, myAddress, token, permit);
       setLoading(false);
     } catch (error) {
       setLoading(false);

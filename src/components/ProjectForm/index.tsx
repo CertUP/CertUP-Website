@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -16,46 +16,56 @@ import ImagePicker, { PickImage } from '../ImagePicker';
 import styles from './styles.module.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 import DeleteButton from '../DeleteButton';
-import { Participant, Project } from '../../interfaces';
+import Project, { Participant } from '../../interfaces/Project';
 import trashImg from '../../assets/trash-2.svg';
 import CUButton from '../CUButton';
 import { useRef } from 'react';
 import axios from 'axios';
-import { useWallet } from '../../contexts';
+import { useProject, useWallet } from '../../contexts';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { ProgressBar } from '../../components';
 import StepNumber from '../StepNumber';
 import MiniCircle from '../MiniCircle';
 import LogoDropzone from '../LogoDropzone';
-import {
-  dataURLtoFile,
-  bufferToDataURI,
-  fileToBase64,
-  generateImage,
-  GenerateInput,
-  generateWithWait,
-} from '../../utils/backendHelper';
+import { generateImage, GenerateInput, generateWithWait } from '../../utils/backendHelper';
+import { fileToDataURI } from '../../utils/fileHelper';
 import { Spinner } from 'react-bootstrap';
-import { sleep } from '../../utils/helpers';
 
 import bg1 from '../../assets/bg1-thumb.jpg';
 import bg2 from '../../assets/bg2-thumb.jpg';
 import bg3 from '../../assets/bg3-thumb.jpg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCoffee,
+  faTimesCircle,
+  faCoins,
+  faArrowRight,
+  faCloudArrowUp,
+} from '@fortawesome/free-solid-svg-icons';
+import CUSelectButton from '../CUSelectButton';
+import CsvModal from '../CsvModal';
+import ChooseFile from '../../assets/ChooseFile.svg';
 
 const bgList = [bg1, bg2, bg3];
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
-interface formProps {
+interface FormProps {
   pid?: string;
-  projectInfo?: Project;
   step?: string;
   backHandler: () => void;
 }
 
-export default function ProjectForm({ pid, projectInfo, step, backHandler }: formProps) {
+export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
+  const { findProject, updateProject, addProject } = useProject();
+  const [projectInfo, setProjectInfo] = useState(pid ? findProject(pid) : undefined);
+  //const projectInfo = pid ? findProject(pid) : undefined;
+  // const projectInfo = useMemo<Project | undefined>(() => {
+  //   return pid ? findProject(pid) : undefined;
+  // }, [pid]);
+
   const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
   const [validated, setValidated] = useState(false);
 
@@ -70,7 +80,12 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   const [certName, setCertName] = useState<string>(projectInfo?.cert_name || '');
 
   const [companyName, setCompanyName] = useState<string>(projectInfo?.company_name || '');
-  const [companyLogo, setCompanyLogo] = useState<File>();
+  const [companyLogoFile, setCompanyLogoFile] = useState<File | undefined>(
+    projectInfo?.company_logo_file,
+  );
+  const [companyLogoURI, setCompanyLogoURI] = useState<string | undefined>(
+    projectInfo?.company_logo_uri,
+  );
 
   const [signer, setSigner] = useState<string>(projectInfo?.signer || '');
   const [signerTitle, setSignerTitle] = useState<string>(projectInfo?.signer_title || '');
@@ -79,12 +94,15 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   const [line3Text, setLine3Text] = useState<string>(projectInfo?.line3Text || '');
 
   const [issueDate, setIssueDate] = useState(projectInfo?.issue_date);
-  const [expireDate, setExpireDate] = useState(projectInfo?.expire_date);
+  const [expireDate, setExpireDate] = useState<Date | undefined>(projectInfo?.expire_date);
 
   const [pubDesc, setPubDesc] = useState<string>(projectInfo?.pub_description || '');
   const [privDesc, setPrivDesc] = useState<string>(projectInfo?.priv_description || '');
 
-  const [templateBg, setTemplateBg] = useState<number>(1);
+  const [templateBg, setTemplateBg] = useState<number>(0);
+  const [templateLayout, setTemplateLayout] = useState<number>(2);
+
+  const [showCsvModal, setShowCsvModal] = useState<boolean>(false);
 
   const rendering = useRef(false);
 
@@ -118,39 +136,60 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
   );
 
   const getProject = (): Project => {
-    return new Project(
-      Address,
-      projectName,
-      pubDesc,
-      privDesc,
-      undefined,
-      issueDate,
-      signer,
-      participants,
-    );
+    return new Project({
+      _id: projectId.current,
+      owner: Address,
+      project_name: projectName,
+      template: '2',
+      template_bg: templateBg,
+      template_layout: templateLayout,
+      cert_title: certTitle,
+      cert_name: certName,
+      pub_description: pubDesc,
+      priv_description: privDesc,
+      line1Text: line1Text,
+      line3Text: line3Text,
+      issue_date: issueDate,
+      expire_date: expireDate,
+      company_name: companyName,
+      signer: signer,
+      signer_title: signerTitle,
+      participants: participants,
+      company_logo_file: companyLogoFile,
+      company_logo_uri: companyLogoURI,
+    });
   };
 
-  useEffect(() => {
-    if (projectInfo?.company_logo) {
-      const file = dataURLtoFile(projectInfo.company_logo);
-      console.log('FILE', file);
-      setCompanyLogo(file);
-    }
-  }, []);
+  const handleLogoChange = async (logo: File) => {
+    console.log('Logo Change!', logo);
+    setCompanyLogoFile(logo);
+    setCompanyLogoURI(await getLogoURI(logo));
+  };
 
-  useEffect(() => {
-    if (!projectInfo) return;
+  // useEffect(() => {
+  //   if (projectInfo?.company_logo) {
+  //     const file = dataURLtoFile(projectInfo.company_logo);
+  //     console.log('FILE', file);
+  //     setCompanyLogo(file);
+  //     setCompanyLogoURI(projectInfo.company_logo);
+  //   }
+  // }, []);
 
-    switch (step) {
-      case 'generate':
-        navigate('/generate', { state: { project: getProject() } });
-        break;
-      default:
-        null;
-        break;
-    }
-  }, [step, projectInfo]);
+  // is this needed anymore?? handled previous payment callback
+  // useEffect(() => {
+  //   if (!projectInfo) return;
 
+  //   switch (step) {
+  //     case 'generate':
+  //       navigate('/generate', { state: { projectId: projectId.current } });
+  //       break;
+  //     default:
+  //       null;
+  //       break;
+  //   }
+  // }, [step, projectInfo]);
+
+  // Re-Render Peview when data changes
   useEffect(() => {
     const run = async () => {
       console.log('rendering preview');
@@ -158,19 +197,21 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
       setLoadingPreview(true);
 
       const participant = participants[0];
-      const logoData = bufferToDataURI(
-        (await companyLogo?.arrayBuffer()) as ArrayBuffer,
-        companyLogo?.type as string,
-      );
+      const logoData = await fileToDataURI(companyLogoFile, companyLogoFile?.type || 'image/jpg');
+
+      // bufferToDataURI(
+      //   (await companyLogo?.arrayBuffer()) as ArrayBuffer,
+      //   companyLogo?.type as string,
+      // );
 
       const input: GenerateInput = {
         logoData: logoData,
         fullName: `${participant.name} ${participant.surname}`,
-        dob: participant.dob,
+        dob: participant.dob?.toDateString(),
         certNum: participant.cert_num,
         companyName: companyName || 'CFI',
-        issueDate: issueDate as Date,
-        expireDate: expireDate,
+        issueDate: issueDate ? issueDate.toDateString() : undefined,
+        expireDate: expireDate ? expireDate.toDateString() : undefined,
         certTitle: certTitle,
         signer: signer || 'John Smith',
         signerTitle: signerTitle || 'Director',
@@ -179,9 +220,8 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
         templateBg: templateBg + 1 || 1,
       };
 
-      const preview = await generateWithWait('2', input);
+      const preview = await generateWithWait({ id: '2', layoutId: templateLayout, input });
       if (!preview) {
-        console.log('skipping render');
         return;
       }
       setPreviewImage(preview);
@@ -191,12 +231,13 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     run();
   }, [
     templateBg,
+    templateLayout,
     participants[0],
     certTitle,
     line1Text,
     line3Text,
     companyName,
-    companyLogo,
+    companyLogoFile,
     signer,
     signerTitle,
     issueDate,
@@ -221,29 +262,41 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     );
   }
 
-  const scrtPayment = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    handleSave();
-    console.log('remain', RemainingCerts);
-    const project = new Project(
-      Address,
-      projectName,
-      pubDesc,
-      privDesc,
-      undefined,
-      issueDate,
-      signer,
-      participants,
-    );
-    if (RemainingCerts >= participants.length)
-      navigate('/generate', { state: { project: project } });
-    else
-      navigate('/addCredit', {
-        state: { num_certificates: participants.length, projectId: projectId.current },
-      });
+  const scrtPayment = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    try {
+      if (e) e.preventDefault();
+      await handleSave();
+      console.log('remain', RemainingCerts);
+
+      if (RemainingCerts >= participants.length) {
+        navigate('/generate', { state: { projectId: projectId.current } });
+      } else
+        navigate('/payment', {
+          state: { num_certificates: participants.length, projectId: projectId.current },
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const projectId = useRef<string | undefined>(projectInfo?._id || pid);
+
+  const getLogoURI = async (logo?: File) => {
+    if (!logo) logo = companyLogoFile;
+    if (logo) return await fileToDataURI(logo, logo?.type || 'image.jpg');
+    // return bufferToDataURI(
+    //   (await companyLogo?.arrayBuffer()) as ArrayBuffer,
+    //   companyLogo?.type as string,
+    // );
+
+    // const logoData = companyLogoFile
+    //   ? bufferToDataURI(
+    //       (await companyLogoFile?.arrayBuffer()) as ArrayBuffer,
+    //       companyLogoFile?.type as string,
+    //     )
+    //   : '';
+    // return logoData;
+  };
 
   const handleSave = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (e) e.preventDefault();
@@ -254,58 +307,20 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
     }
     const tid = toast.loading('Saving...');
 
-    const logoData = companyLogo
-      ? bufferToDataURI(
-          (await companyLogo?.arrayBuffer()) as ArrayBuffer,
-          companyLogo?.type as string,
-        )
-      : '';
-
     try {
-      const project: Project = {
-        //_id: projectId.current,
-        project_name: projectName,
-        owner: Address,
-        cert_title: certTitle,
-        cert_name: certName,
-        company_name: companyName,
-        company_logo: logoData,
-        pub_description: pubDesc,
-        priv_description: privDesc,
-        template: 1,
-        template_bg: templateBg,
-        issue_date: issueDate,
-        expire_date: expireDate,
-        signer: signer,
-        signer_title: signerTitle,
-        participants: participants,
-        line1Text: line1Text,
-        line3Text: line3Text,
-      };
+      const project = getProject();
 
-      const token = `Permit ${JSON.stringify(LoginToken)}`;
-      console.log(project);
       if (!projectId.current) {
-        const response = await axios.post(projectsUrl, project, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        console.log(response);
+        console.log('Saving New Project:', project);
+        const id = await addProject(project);
 
-        projectId.current = response.data.data._id;
-        console.log(response.data.data._id, projectId.current);
+        console.log('New Project ID', id);
+        projectId.current = id;
       } else {
-        //update extsting project
-        const url = new URL(`/projects/${projectId.current}`, process.env.REACT_APP_BACKEND);
-
-        const response = await axios.put(url.toString(), project, {
-          headers: {
-            Authorization: token,
-          },
-        });
-        console.log(response);
+        console.log('Saving Existing Project:', projectId.current, project);
+        await updateProject(projectId.current, project);
       }
+
       toast.update(tid, {
         render: `Saved Project`,
         type: 'success',
@@ -367,6 +382,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
 
   return (
     <>
+      <CsvModal show={showCsvModal} setShow={setShowCsvModal} setParticipants={setParticipants} />
       <Container>
         <Row>
           <span className={styles.aboutTitle}>Create a Project</span>
@@ -400,14 +416,20 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
             </Col>
             <Col style={{ paddingTop: '0vh' }}>
               <Form.Group as={Col} md="4" controlId="validationCustom01">
-                <Form.Label className={styles.largeLabel}>Project Name</Form.Label>
+                <Form.Label className={`${styles.largeLabel} mb-0`}>Project Name</Form.Label>
+                <p
+                  className={`${styles.sectionTitle} mx-2`}
+                  style={{ fontSize: '14px', lineHeight: '16px' }}
+                >
+                  Only visible to you
+                </p>
                 <Form.Control
                   required
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   type="text"
                   placeholder="My Project"
-                  //className={styles.certupInput}
+                  className="mt-1"
                 />
               </Form.Group>
             </Col>
@@ -503,6 +525,12 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
               <button className={styles.addBtn} onClick={addParticipant}>
                 + Add
               </button>
+              <Image
+                src={ChooseFile}
+                alt="Choose File"
+                style={{ cursor: 'pointer' }}
+                onClick={() => setShowCsvModal(true)}
+              />
             </Col>
           </Row>
 
@@ -532,22 +560,6 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                       onChange={(e) => setCertName(e.target.value)}
                       type="text"
                       placeholder="2022 CFI Training Certificate"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Certificate Title
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={certTitle}
-                      onChange={(e) => setCertTitle(e.target.value)}
-                      type="text"
-                      placeholder="Certificate of Completion"
                     />
                   </Form.Group>
                 </Col>
@@ -588,6 +600,66 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
+                  Issue Date
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="3" controlId="validationCustom02">
+                    <DatePicker
+                      selected={issueDate}
+                      onChange={(date: Date) => setIssueDate(date)}
+                      customInput={<ExampleCustomInput />}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Expire Date
+                </Col>
+                <Col>
+                  <Row style={{ margin: 0 }}>
+                    <Form.Group
+                      as={Col}
+                      md="3"
+                      controlId="validationCustom02"
+                      style={{ padding: 0 }}
+                    >
+                      <DatePicker
+                        selected={expireDate}
+                        onChange={(date: Date) => setExpireDate(date)}
+                        customInput={<ExampleCustomInput />}
+                      />
+                    </Form.Group>
+                    {expireDate ? (
+                      <Col className="d-flex align-items-center">
+                        <FontAwesomeIcon
+                          icon={faTimesCircle}
+                          size="lg"
+                          onClick={() => setExpireDate(undefined)}
+                          style={{ cursor: 'pointer' }}
+                        />
+                      </Col>
+                    ) : null}
+                  </Row>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+
+          {/* \/ Cert Image Section \/ */}
+
+          <Row className="mb-4">
+            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+              <MiniCircle />
+              <div className={styles.vr} />
+            </Col>
+            <Col>
+              <Row>
+                <span className={`${styles.sectionTitle} mb-1`}>Certificate Image</span>
+                <hr className={styles.formHr} />
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
                   Template
                 </Col>
                 <Col>
@@ -596,6 +668,49 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                     onPick={onPick}
                     selected={{ src: bgList[0], value: 0 }}
                   />
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Layout
+                </Col>
+                <Col>
+                  <Row>
+                    <Col md="auto">
+                      <CUSelectButton
+                        type="button"
+                        selected={templateLayout === 1}
+                        onClick={() => setTemplateLayout(1)}
+                      >
+                        Left
+                      </CUSelectButton>
+                    </Col>
+                    <Col md="auto">
+                      <CUSelectButton
+                        type="button"
+                        selected={templateLayout === 2}
+                        onClick={() => setTemplateLayout(2)}
+                      >
+                        Center
+                      </CUSelectButton>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Title
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={certTitle}
+                      onChange={(e) => setCertTitle(e.target.value)}
+                      type="text"
+                      placeholder="Certificate of Completion"
+                    />
+                  </Form.Group>
                 </Col>
               </Row>
               <Row className="mb-4 align-items-center">
@@ -651,7 +766,7 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                   Company Logo
                 </Col>
                 <Col md="auto">
-                  <LogoDropzone set={setCompanyLogo} external={companyLogo} />
+                  <LogoDropzone set={handleLogoChange} external={companyLogoFile} />
                 </Col>
               </Row>
               <Row className="mb-4 align-items-center">
@@ -682,34 +797,6 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
                       onChange={(e) => setSignerTitle(e.target.value)}
                       type="text"
                       placeholder="Director"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Issue Date
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="3" controlId="validationCustom02">
-                    <DatePicker
-                      selected={issueDate}
-                      onChange={(date: Date) => setIssueDate(date)}
-                      customInput={<ExampleCustomInput />}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Expire Date{' '}
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="3" controlId="validationCustom02">
-                    <DatePicker
-                      selected={expireDate}
-                      onChange={(date: Date) => setExpireDate(date)}
-                      customInput={<ExampleCustomInput />}
                     />
                   </Form.Group>
                 </Col>
@@ -746,28 +833,39 @@ export default function ProjectForm({ pid, projectInfo, step, backHandler }: for
 
           <BackButton />
           <Spacer height={40} />
-
-          <Row style={{ marginBottom: '10px' }}>
-            <Col md="3">
-              <CUButton disabled={false} large={false} fill={true} onClick={handleSave}>
-                Save
-              </CUButton>
+          <Row className="justify-content-end">
+            <Col md="3" className="text-center">
+              <h6>{participants.length} Certificates</h6>
             </Col>
           </Row>
-          <Row style={{ marginBottom: '10px' }}>
+          <Row style={{ marginBottom: '10px' }} className="justify-content-between">
             <Col md="3">
-              <CUButton disabled={false} large={false} fill={true} onClick={scrtPayment}>
-                Pay with $SCRT
+              <CUButton disabled={false} fill={true} onClick={handleSave}>
+                <Row className="justify-content-space-between text-center">
+                  <Col md={2} style={{ padding: '0px' }}>
+                    <FontAwesomeIcon icon={faCloudArrowUp} />
+                  </Col>
+                  <Col style={{ padding: '0px', textAlign: 'center' }}>Save Project</Col>
+                  <Col md={2} style={{ padding: '0px' }}>
+                    {' '}
+                  </Col>
+                </Row>
               </CUButton>
             </Col>
-          </Row>
-          <Row>
             <Col md="3">
-              <CUButton disabled={true} large={false} fill={true}>
-                Proceed to Payment
+              <CUButton disabled={false} fill={true} onClick={scrtPayment} role="button">
+                <Row className="justify-content-space-between">
+                  <Col md={1} style={{ padding: '0px' }}>
+                    {' '}
+                  </Col>
+                  <Col md="auto" style={{ padding: '0px' }}>
+                    Proceed to Payment
+                  </Col>
+                  <Col style={{ padding: '0px', textAlign: 'right' }}>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </Col>
+                </Row>
               </CUButton>
-              <br />
-              <span>You will be redirected to Coinbase Cryptocurrency Gateway</span>
             </Col>
           </Row>
         </Form>

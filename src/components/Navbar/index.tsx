@@ -62,8 +62,11 @@ export default function CertUpNavbar() {
         <div className="text-center">
           <b>Chain ID: </b> {process.env.REACT_APP_CHAIN_ID} &nbsp;&nbsp;&nbsp;&nbsp;
           <b>gRPC: </b> {process.env.REACT_APP_GRPC_URL} &nbsp;&nbsp;&nbsp;&nbsp;
-          <b>Contract: </b> {process.env.REACT_APP_CONTRACT_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
           <b>Backend: </b> {process.env.REACT_APP_BACKEND}
+          <br />
+          <b>20: </b> {process.env.REACT_APP_SNIP20_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
+          <b>721: </b> {process.env.REACT_APP_NFT_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
+          <b>Manager: </b> {process.env.REACT_APP_MANAGER_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
         </div>
       ) : null}
     </>

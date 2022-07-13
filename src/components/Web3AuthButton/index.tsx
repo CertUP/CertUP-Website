@@ -18,16 +18,6 @@ import getPermits, { LoginToken } from '../../utils/loginPermit';
 
 const clientId =
   'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU'; // get from https://dashboard.web3auth.io
-
-export interface KeplrWindow extends Window {
-  keplr: any;
-  getEnigmaUtils(_: string): EncryptionUtils;
-  getOfflineSigner(): Wallet;
-  getOfflineSignerOnlyAmino(_: string): Wallet;
-  enable(_: string): Function;
-  getAccounts(): Function;
-}
-
 // declare interface Date {
 //   addHours(h: number): Date;
 // }
@@ -41,8 +31,6 @@ const addHours = (date: Date, hours: number): Date => {
   date.setTime(date.getTime() + hours * 60 * 60 * 1000);
   return date;
 };
-
-declare let window: KeplrWindow;
 
 const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;

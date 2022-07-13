@@ -46,9 +46,7 @@ export default function Footer() {
               </Col> */}
               <Col className="text-center">
                 <a href="https://scrt.network">
-                  <span className={`${styles.footerLinkGray}`}>Powered by</span>
-                  <br />
-                  <Image src={secretlogo} style={{ height: '50px' }} />
+                  <Image src="/securedby.png" style={{ height: '75px' }} />
                 </a>
               </Col>
             </Row>

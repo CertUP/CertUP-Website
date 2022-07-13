@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -13,13 +13,14 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { Project } from '../../interfaces';
+import Project from '../../interfaces/Project';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
-  const [projectInfo, setProjectInfo] = useState<Project | undefined>();
+  //const [projectInfo, setProjectInfo] = useState<Project | undefined>();
+  const [projectId, setProjectId] = useState<string>();
   const [projectStep, setProjectStep] = useState();
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
 
@@ -33,9 +34,9 @@ export default function Issuers() {
     if (location.state?.projectId) {
       if (location.state?.step) setProjectStep(location.state?.step);
 
-      const project = await getProject(location.state?.projectId);
-      console.log('project', project);
-      setProject(project);
+      //const project = await getProject(location.state?.projectId);
+      console.log('projectId', location.state?.projectId);
+      setProjectId(location.state?.projectId);
     }
   };
 
@@ -52,23 +53,13 @@ export default function Issuers() {
     return response.data.data;
   };
 
-  const setProject = (project: Project) => {
-    //convert issue date string from DB into Date
-    if (project.issue_date) project.issue_date = new Date(project.issue_date);
-    if (project.expire_date) project.expire_date = new Date(project.expire_date);
-
-    // convert participant dob strings from DB to Date
-    for (let i = 0; i < project.participants.length; i++) {
-      if (project.participants[i].dob)
-        project.participants[i].dob = new Date(project.participants[i].dob || '');
-    }
-
-    setProjectInfo(project);
+  const setProject = (projectId?: string) => {
+    setProjectId(projectId);
     setShowProject(true);
   };
 
   const showList = () => {
-    setProjectInfo(undefined);
+    setProjectId(undefined);
     setShowProject(false);
   };
 
@@ -96,9 +87,9 @@ export default function Issuers() {
       <Layout>
         <Spacer height={100} />
         {showProject ? (
-          <ProjectForm projectInfo={projectInfo} backHandler={showList} step={projectStep} />
+          <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
         ) : (
-          <ProjectList setProject={setProject} />
+          <ProjectList setProjectId={setProject} />
         )}
       </Layout>
     </>

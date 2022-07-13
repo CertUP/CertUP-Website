@@ -11,6 +11,10 @@ $mainGradient1: rgb(116, 235, 213, 75%);
 $mainGradient2: rgb(144, 148, 255, 75%);
 $certupGradient: linear-gradient(135deg, $mainGradient1, $mainGradient2);
 
+$lightMainGradient1: rgb(116, 235, 213, 25%);
+$lightMainGradient2: rgb(144, 148, 255, 25%);
+$lightCertupGradient: linear-gradient(135deg, $lightMainGradient1, $lightMainGradient2);
+
 // General Colors
 $body-bg: #0000;
 $text-color: #0000;

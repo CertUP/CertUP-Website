@@ -18,28 +18,28 @@ export interface ButtonProps
   fill?: boolean;
 }
 
-export const CUButtonSq: React.FC<ButtonProps> = (props) => {
-  const { children, large, fill, ...rest } = props;
+// export const CUButtonSq: React.FC<ButtonProps> = (props) => {
+//   const { children, large, fill, ...rest } = props;
 
-  // return (
-  //     <button {...rest}>{children}</button>
-  // )
-  if (large)
-    return (
-      <button {...rest} className={styles.sqButton}>
-        {children}
-      </button>
-    );
-  else
-    return (
-      <button
-        {...rest}
-        className={`${styles.certupBtn} ${styles.sqButton}`}
-        //style={fill ? { width: '100%' } : undefined}
-      >
-        {children}
-      </button>
-    );
-};
+//   // return (
+//   //     <button {...rest}>{children}</button>
+//   // )
+//   if (large)
+//     return (
+//       <button {...rest} className={styles.sqButton}>
+//         {children}
+//       </button>
+//     );
+//   else
+//     return (
+//       <button
+//         {...rest}
+//         className={`${styles.certupBtn} ${styles.sqButton}`}
+//         //style={fill ? { width: '100%' } : undefined}
+//       >
+//         {children}
+//       </button>
+//     );
+// };
 
-export default CUButtonSq;
+// export default CUButtonSq;

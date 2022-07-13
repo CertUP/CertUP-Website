@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, CUButtonSq, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -18,10 +18,9 @@ import {
   BatchDossierResponse,
   CertupExtension,
   NftDossier,
-  Participant,
   PermitSignature,
-  Project,
 } from '../../interfaces';
+import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Form, Spinner } from 'react-bootstrap';
@@ -32,17 +31,14 @@ import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
 import { permissions, allowedTokens, permitName } from '../../utils/loginPermit';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
-import {
-  getAllOwnedDossiers,
-  queryPermitCertupContract,
-  WithPermit,
-  getDossier,
-} from '../../utils/secretJsWrappers';
 import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
+import useQuery from '../../hooks/QueryHook';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
+  const { getCert } = useQuery();
+
   const [loading, setLoading] = useState<boolean>(true);
   const [cert, setCert] = useState<NftDossier>();
 
@@ -68,7 +64,8 @@ export default function ViewCert() {
   const queryCert = async () => {
     if (!Client || !Address || !QueryPermit || !tokenid) return; //todo: handle this better
     console.log('Querying Cert Info');
-    const dossier = await getDossier(Client, Address, QueryPermit, tokenid);
+    //const dossier = await getDossier(Client, Address, QueryPermit, tokenid);
+    const dossier = await getCert(tokenid);
 
     // // query owned token IDs
     // const tokensQuery = {
@@ -79,7 +76,7 @@ export default function ViewCert() {
 
     // console.log('Owned Certs Query', tokensQuery);
 
-    // const { token_list } = (await queryPermitCertupContract(
+    // const { token_list } = (await queryPermitNFTContract(
     //   Client as SecretNetworkClient,
     //   tokensQuery,
     //   QueryPermit as PermitSignature,
@@ -94,7 +91,7 @@ export default function ViewCert() {
     //   },
     // };
 
-    // const response = (await queryPermitCertupContract(
+    // const response = (await queryPermitNFTContract(
     //   Client as SecretNetworkClient,
     //   dossierQuery,
     //   QueryPermit as PermitSignature,
@@ -138,7 +135,9 @@ export default function ViewCert() {
         <Container>
           <Row className="mb-4">
             <Col md={'auto'}>
-              <CUButtonSq onClick={handleBack}>← Back to Certificates</CUButtonSq>
+              <CUButton btnStyle="square" onClick={handleBack}>
+                ← Back to Certificates
+              </CUButton>
             </Col>
           </Row>
           {!cert ? (
@@ -217,7 +216,9 @@ export default function ViewCert() {
           )}
           <Row className="mt-4">
             <Col md={'auto'}>
-              <CUButtonSq onClick={handleBack}>← Back to Certificates</CUButtonSq>
+              <CUButton btnStyle="square" onClick={handleBack}>
+                ← Back to Certificates
+              </CUButton>
             </Col>
           </Row>
         </Container>

@@ -47,7 +47,7 @@ export default function LogoDropzone({ set, external }: props) {
 
       setFiles([added]);
     }
-  }, [external]);
+  }, []);
 
   const acceptedFileItems = acceptedFiles.map((file: FileWithPath) => {
     return (
@@ -87,7 +87,9 @@ export default function LogoDropzone({ set, external }: props) {
       </div>
       <aside>
         {files.length && files[0].path ? (
-          <span style={{ fontSize: '14px', textAlign: 'left' }}>{files[0].path}</span>
+          <span style={{ fontSize: '14px', textAlign: 'left' }}>
+            {files[0].path || files[0].name}
+          </span>
         ) : null}
       </aside>
     </section>

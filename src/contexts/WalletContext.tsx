@@ -1,18 +1,10 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import { PermitSignature, WalletContextState } from '../interfaces';
+import { PermitSignature, RemainingCertsResponse, WalletContextState } from '../interfaces';
 import { SecretNetworkClient, Wallet } from 'secretjs';
 import { LoginToken, permissions, allowedTokens, permitName } from '../utils/loginPermit';
 
 interface Props {
   children: ReactNode;
-}
-
-interface RemainingCertsResponse {
-  remaining_certs?: {
-    certs: string;
-  };
-  parse_error?: object;
-  generic_error?: object;
 }
 
 // set default values for initializing
@@ -24,10 +16,14 @@ const contextDefaultValues: WalletContextState = {
   LoginToken: undefined,
   QueryPermit: undefined,
   RemainingCerts: 0,
+  ProcessingTx: false,
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
   queryCredits: function (): void {
+    throw new Error('Function not implemented.');
+  },
+  setProcessingTx: function (): void {
     throw new Error('Function not implemented.');
   },
 };
@@ -52,6 +48,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.QueryPermit,
   );
   const [RemainingCerts, setRemainingCerts] = useState<number>(contextDefaultValues.RemainingCerts);
+  const [ProcessingTx, setProcessingTx] = useState<boolean>(contextDefaultValues.ProcessingTx);
 
   const updateClient = (
     client: SecretNetworkClient | undefined,
@@ -73,7 +70,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     queryCredits();
   }, [QueryPermit]);
 
-  const queryCredits = async () => {
+  const queryCredits = async (): Promise<number | undefined> => {
     if (!QueryPermit) return;
 
     const query = {
@@ -98,13 +95,16 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     };
 
     const response: RemainingCertsResponse | undefined = await Client?.query.compute.queryContract({
-      contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
-      codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     });
     if (response?.parse_error || response?.generic_error)
       throw new Error((response?.parse_error || response?.generic_error || '').toString());
-    setRemainingCerts(parseInt(response?.remaining_certs?.certs || '0', 10));
+    console.log('Remaining Certs Query Response', response);
+    const result = parseInt(response?.remaining_certs?.certs || '0', 10);
+    setRemainingCerts(result);
+    return result;
   };
 
   const values = {
@@ -115,8 +115,10 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     LoginToken,
     QueryPermit,
     RemainingCerts,
+    ProcessingTx,
     updateClient,
     queryCredits,
+    setProcessingTx,
   };
 
   // add values to provider to reach them out from another component
@@ -124,4 +126,4 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 };
 
 // created custom hook
-export const useWallet = () => useContext(WalletContext);
+export const useWallet = (): WalletContextState => useContext(WalletContext);

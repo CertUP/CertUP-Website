@@ -1,12 +1,12 @@
 import { Permission } from 'secretjs';
-import { KeplrWindow } from '../components/KeplrButton';
 import { PermitSignature } from '../interfaces';
 
 export const permitName = 'CertUP-Query-Permit';
-export const allowedTokens: string[] = [process.env.REACT_APP_CONTRACT_ADDR as string];
+export const allowedTokens: string[] = [
+  process.env.REACT_APP_NFT_ADDR as string,
+  process.env.REACT_APP_MANAGER_ADDR as string,
+];
 export const permissions: Permission[] = ['owner'];
-
-declare let window: KeplrWindow;
 
 export interface LoginToken {
   permit: PermitSignature;
@@ -70,6 +70,10 @@ export default async function getPermits(
   issueDate: Date,
   expDate: Date,
 ): Promise<GetPermitResponse> {
+  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+    throw new Error('Keplr Extension Not Found');
+  }
+
   // Begin LOGIN TOKEN
   const cachedToken: string | null = localStorage.getItem(`Certup-Login-Token-v1-${address}`);
   let finalToken: LoginToken | undefined;
@@ -81,7 +85,7 @@ export default async function getPermits(
   }
   if (!finalToken) {
     const unsignedPermit = {
-      chain_id: process.env.REACT_APP_CHAIN_ID,
+      chain_id: process.env.REACT_APP_CHAIN_ID as string,
       account_number: '0', // Must be 0
       sequence: '0', // Must be 0
       fee: {
@@ -101,7 +105,7 @@ export default async function getPermits(
     };
 
     const { signature } = await window.keplr.signAmino(
-      process.env.REACT_APP_CHAIN_ID,
+      process.env.REACT_APP_CHAIN_ID as string,
       address,
       unsignedPermit,
       {
@@ -122,7 +126,7 @@ export default async function getPermits(
   let finalPermit: PermitSignature;
   if (!cachedPermit) {
     const unsignedQueryPermit = {
-      chain_id: process.env.REACT_APP_CHAIN_ID,
+      chain_id: process.env.REACT_APP_CHAIN_ID as string,
       account_number: '0', // Must be 0
       sequence: '0', // Must be 0
       fee: {
@@ -143,7 +147,7 @@ export default async function getPermits(
     };
 
     const { signature } = await window.keplr.signAmino(
-      process.env.REACT_APP_CHAIN_ID,
+      process.env.REACT_APP_CHAIN_ID as string,
       address,
       unsignedQueryPermit,
       {

@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark } from '../../components';
+import { CUButton } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -32,7 +32,7 @@ export default function Home() {
                   {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
                     <CUButton disabled={true}>Coming Soon</CUButton>
                   ) : (
-                    <CUButton>Get Started</CUButton>
+                    <CUButton btnStyle="large">Get Started</CUButton>
                   )}
                 </Col>
               </Row>
@@ -149,9 +149,11 @@ export default function Home() {
             <Row className="justify-content-center">
               <Col xs="auto">
                 {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                  <CUButtonDark disabled={true}>Coming Soon</CUButtonDark>
+                  <CUButton btnStyle="dark" disabled={true}>
+                    Coming Soon
+                  </CUButton>
                 ) : (
-                  <CUButtonDark>Get Started</CUButtonDark>
+                  <CUButton btnStyle="dark">Get Started</CUButton>
                 )}
               </Col>
             </Row>

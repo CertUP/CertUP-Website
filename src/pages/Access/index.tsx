@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -19,10 +19,9 @@ import {
   CertupExtension,
   CertupMetadata,
   NftDossier,
-  Participant,
   PermitSignature,
-  Project,
 } from '../../interfaces';
+import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form, Spinner } from 'react-bootstrap';
@@ -33,13 +32,9 @@ import { ProgressBar } from '../../components';
 import Table from 'react-bootstrap/Table';
 import { permissions, allowedTokens, permitName } from '../../utils/loginPermit';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
-import {
-  getAllOwnedDossiers,
-  queryPermitCertupContract,
-  WithPermit,
-} from '../../utils/secretJsWrappers';
 import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
+import useQuery from '../../hooks/QueryHook';
 
 export default function Access() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
@@ -47,6 +42,8 @@ export default function Access() {
   const [certs, setCerts] = useState<NftDossier[]>([]);
 
   const [accessCode, setAccessCode] = useState<string>('');
+
+  const { getOwnedCerts } = useQuery();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -66,39 +63,9 @@ export default function Access() {
     console.log(QueryPermit);
 
     //@ts-ignore
-    const dossiers = await getAllOwnedDossiers(Client, Address, QueryPermit);
+    const dossiers = await getOwnedCerts();
+    console.log('Owned Certs Response', dossiers);
 
-    // // query owned token IDs
-    // const tokensQuery = {
-    //   tokens: {
-    //     owner: Address,
-    //   },
-    // };
-
-    // console.log('Owned Certs Query', tokensQuery);
-
-    // const { token_list } = (await queryPermitCertupContract(
-    //   Client as SecretNetworkClient,
-    //   tokensQuery,
-    //   QueryPermit as PermitSignature,
-    // )) as Snip721GetTokensResponse;
-
-    // console.log('owned certs list', token_list.tokens);
-
-    // // query NFT metadata
-    // const dossierQuery = {
-    //   batch_nft_dossier: {
-    //     token_ids: token_list.tokens,
-    //   },
-    // };
-
-    // const response = (await queryPermitCertupContract(
-    //   Client as SecretNetworkClient,
-    //   dossierQuery,
-    //   QueryPermit as PermitSignature,
-    // )) as BatchDossierResponse;
-
-    // console.log('owned certs data', response);
     setCerts(dossiers);
     setLoading(false);
   };
@@ -121,16 +88,18 @@ export default function Access() {
     const toastRef = toast.loading('Transaction Processing...');
     try {
       const mintMsg = {
-        mint_nft: {
-          keys: [accessCode],
+        mint_cert: {
+          cert_key: accessCode,
+          recipient: Address,
+          keys: [],
         },
       };
 
       const result = await Client?.tx.compute.executeContract(
         {
           sender: Address,
-          contractAddress: process.env.REACT_APP_CONTRACT_ADDR as string,
-          codeHash: process.env.REACT_APP_CONTRACT_HASH as string,
+          contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+          codeHash: process.env.REACT_APP_MANAGER_HASH as string,
           msg: mintMsg,
         },
         {
@@ -140,7 +109,10 @@ export default function Access() {
       console.log('Mint Result:', result);
       if (!result) throw new Error('Something went wrong');
       console.log('OK');
-      if (result.code) throw new Error(result.rawLog);
+      if (result.code) {
+        console.log(result);
+        throw new Error(result.rawLog);
+      }
 
       toast.update(toastRef, {
         render: 'Success!',

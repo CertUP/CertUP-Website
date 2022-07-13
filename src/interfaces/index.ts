@@ -3,6 +3,8 @@ import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
 import { classicNameResolver } from 'typescript';
 import { LoginToken } from '../utils/loginPermit';
 
+export * as Project from './Project';
+
 export interface Item {
   id: string;
   value: string;
@@ -18,6 +20,14 @@ export interface ItemContextState {
   updateItem: (id: string, data: Item) => void;
 }
 
+export interface PreloadData {
+  name: string;
+  date: string;
+  cert_type: string;
+  pub_metadata: any;
+  priv_metadata: any;
+}
+
 export interface WalletContextState {
   Client: SecretNetworkClient | undefined;
   ClientIsSigner: boolean;
@@ -26,6 +36,7 @@ export interface WalletContextState {
   LoginToken: LoginToken | undefined;
   QueryPermit: PermitSignature | undefined;
   RemainingCerts: number;
+  ProcessingTx: boolean;
   updateClient: (
     client: SecretNetworkClient,
     wallet: Wallet,
@@ -33,6 +44,7 @@ export interface WalletContextState {
     token: LoginToken,
     permit: PermitSignature,
   ) => void;
+  setProcessingTx: (newState: boolean) => void;
   queryCredits: () => void;
 }
 
@@ -46,55 +58,10 @@ export interface WalletContextState {
 //   // issue_d: number;
 //   // issue_m: number;
 //   // issue_y: number;
-//   issue_date: Date | undefined;
+//   issue_date?: Date;
 //   issuer: string;
 //   participants: Participant[];
 // }
-
-export class Project {
-  _id?: string;
-  owner: string;
-  project_name: string;
-  template: number;
-  template_bg: number;
-  cert_title: string | undefined;
-  cert_name: string | undefined;
-  pub_description: string;
-  priv_description: string;
-  line1Text: string | undefined;
-  line3Text: string | undefined;
-  issue_date: Date | undefined;
-  expire_date: Date | undefined;
-  company_name: string | undefined;
-  company_logo: string | undefined;
-  signer: string;
-  signer_title: string;
-  participants: Participant[];
-
-  constructor(
-    owner?: string,
-    project_name?: string,
-    pub_description?: string,
-    priv_description?: string,
-    template?: number,
-    issue_date?: Date,
-    signer?: string,
-    participants?: Participant[],
-    signerTitle?: string,
-    template_bg?: number,
-  ) {
-    this.owner = owner || '';
-    this.project_name = project_name || '';
-    this.pub_description = pub_description || '';
-    this.priv_description = priv_description || '';
-    this.template = template || 0;
-    this.template_bg = template_bg || 0;
-    this.issue_date = issue_date;
-    this.signer = signer || '';
-    this.signer_title = signerTitle || '';
-    this.participants = participants || [new Participant(), new Participant()];
-  }
-}
 
 interface PermitParams {
   permit_name: string;
@@ -106,25 +73,6 @@ interface PermitParams {
 interface Permit {
   params: PermitParams;
   signature: PermitSignature;
-}
-
-export class Participant {
-  name: string;
-  surname: string;
-  // dob_d: number;
-  // dob_m: number;
-  // dob_y: number;
-  dob: Date | undefined;
-  cert_num: string;
-  claim_code: string | undefined;
-
-  constructor(name?: string, surname?: string, dob?: Date, certNum?: string, claimCode?: string) {
-    this.name = name || '';
-    this.surname = surname || '';
-    this.dob = dob;
-    this.cert_num = certNum || '';
-    this.claim_code = claimCode;
-  }
 }
 
 export interface TendermintPubKey {
@@ -171,4 +119,12 @@ export interface CertMetadata {
 
 export interface CertupMetadata extends Metadata {
   extension: CertupExtension;
+}
+
+export interface RemainingCertsResponse {
+  remaining_certs?: {
+    certs: string;
+  };
+  parse_error?: object;
+  generic_error?: object;
 }

@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonSq, Spacer, StepNumber } from '../../components';
+import { CUButton, Spacer, StepNumber } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -48,7 +48,9 @@ export default function Guide() {
                   <div>
                     <p className={`${styles.guideStep}`}>Login with Keplr Wallet</p>
                     <p className={styles.keplrSupports}>(supported on Chrome/Brave browsers)</p>
-                    <CUButtonSq style={{ color: '#000', width: '50%' }}>Get Keplr</CUButtonSq>
+                    <CUButton btnStyle="square" style={{ color: '#000', width: '50%' }}>
+                      Get Keplr
+                    </CUButton>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <Image className="mt-3" src={connectImg} fluid />

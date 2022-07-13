@@ -11,36 +11,36 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import styles from './styles.module.scss';
 import ProjectTile from '../ProjectTile';
-import { Project } from '../../interfaces';
+import Project from '../../interfaces/Project';
 import CUButton from '../CUButton';
+import { useProject } from '../../contexts/ProjectContext';
 
 interface Props {
-  setProject: (project: Project) => void;
+  setProjectId: (projectId?: string) => void;
 }
 
-export default function ProjectList({ setProject }: Props) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+export default function ProjectList({ setProjectId }: Props) {
+  //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const { Projects, LoadingProjects } = useProject();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [projects, setProjects] = useState([]);
-
-  useEffect(() => {
-    getProjects();
-  }, [Address]);
-
-  const getProjects = async () => {
-    console.log('running', LoginToken, Address);
-    const token = `Permit ${JSON.stringify(LoginToken)}`;
-    const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
-    const response = await axios.get(url.toString(), {
-      headers: {
-        Authorization: token,
-      },
-    });
-    console.log(response);
-    setProjects(response.data.data);
-    setLoading(false);
-  };
+  // const [loading, setLoading] = useState<boolean>(true);
+  // const [projects, setProjects] = useState([]);
+  // useEffect(() => {
+  //   getProjects();
+  // }, [Address]);
+  // const getProjects = async () => {
+  //   console.log('running', LoginToken, Address);
+  //   const token = `Permit ${JSON.stringify(LoginToken)}`;
+  //   const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
+  //   const response = await axios.get(url.toString(), {
+  //     headers: {
+  //       Authorization: token,
+  //     },
+  //   });
+  //   console.log(response);
+  //   setProjects(response.data.data);
+  //   setLoading(false);
+  // };
 
   return (
     <>
@@ -49,7 +49,7 @@ export default function ProjectList({ setProject }: Props) {
           <span className={styles.aboutTitle}>For Issuers</span>
 
           <Col xs={'auto'}>
-            <CUButton onClick={() => setProject(new Project())}>New Certificate</CUButton>
+            <CUButton onClick={() => setProjectId()}>New Certificate</CUButton>
           </Col>
         </Row>
       </Container>
@@ -58,14 +58,14 @@ export default function ProjectList({ setProject }: Props) {
 
       <Container>
         <h3 className={styles.certsLabel}>Your Certificates</h3>
-        {loading ? (
+        {LoadingProjects ? (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
-        ) : projects.length ? (
+        ) : Projects.length ? (
           <Row>
-            {projects.map((p, i) => (
-              <ProjectTile projectIn={p} setProject={setProject} key={`project-list-${i}`} />
+            {Projects.map((p, i) => (
+              <ProjectTile projectIn={p} setProjectId={setProjectId} key={`project-list-${i}`} />
             ))}
           </Row>
         ) : (

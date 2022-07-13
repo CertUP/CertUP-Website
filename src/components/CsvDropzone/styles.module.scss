@@ -1,0 +1,22 @@
+.dropzoneContainer {
+  height: 100px;
+  width: 250px;
+  border: 1px dashed #9191918c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzoneText {
+  color: #000000;
+  margin-bottom: 0px;
+  // font-style: italic;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.dropzoneSubText {
+  color: #696969;
+  font-style: italic;
+  font-size: 0.75rem;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}

@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -13,7 +13,7 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { Project } from '../../interfaces';
+import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
@@ -188,7 +188,7 @@ export default function AddCredit() {
 
                 <Row className="justify-content-center">
                   <Col md="7">
-                    <CUButton disabled={false} large={false} fill={true} onClick={handlePayment}>
+                    <CUButton disabled={false} fill={true} onClick={handlePayment}>
                       Pay with Keplr Wallet
                     </CUButton>
                   </Col>

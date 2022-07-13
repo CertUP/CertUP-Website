@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
