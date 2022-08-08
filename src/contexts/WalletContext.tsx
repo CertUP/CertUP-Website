@@ -10,6 +10,7 @@ interface Props {
 // set default values for initializing
 const contextDefaultValues: WalletContextState = {
   Client: undefined,
+  Querier: undefined,
   ClientIsSigner: false,
   Wallet: undefined,
   Address: '',
@@ -35,6 +36,9 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   // set default values
   const [Client, setClient] = useState<SecretNetworkClient | undefined>(
     contextDefaultValues.Client,
+  );
+  const [Querier, setQuerier] = useState<SecretNetworkClient | undefined>(
+    contextDefaultValues.Querier,
   );
   const [ClientIsSigner, setClientIsSigner] = useState<boolean>(
     contextDefaultValues.ClientIsSigner,
@@ -69,6 +73,19 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   useEffect(() => {
     queryCredits();
   }, [QueryPermit]);
+
+  useEffect(() => {
+    getQuerier();
+  }, []);
+
+  const getQuerier = async () => {
+    console.log('getting querier');
+    const querier = await SecretNetworkClient.create({
+      grpcWebUrl: process.env.REACT_APP_GRPC_URL,
+      chainId: process.env.REACT_APP_CHAIN_ID,
+    });
+    setQuerier(querier);
+  };
 
   const queryCredits = async (): Promise<number | undefined> => {
     if (!QueryPermit) return;
@@ -109,6 +126,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
   const values = {
     Client,
+    Querier,
     ClientIsSigner,
     Wallet,
     Address,

@@ -103,7 +103,7 @@ export default function Access() {
           msg: mintMsg,
         },
         {
-          gasLimit: 50_000,
+          gasLimit: 75_000,
         },
       );
       console.log('Mint Result:', result);
@@ -237,7 +237,9 @@ export default function Access() {
                         <Image
                           // eslint-disable-next-line prettier/prettier
                           //@ts-ignore
-                          src={(cert.private_metadata?.extension || fakeExtension).media[0].url}
+                          src={(
+                            cert.private_metadata?.extension || fakeExtension
+                          ).media[0].url.replace('ipfs.io', 'infura-ipfs.io')}
                           fluid={true}
                         />
                       }
@@ -248,7 +250,7 @@ export default function Access() {
                         <span
                           role="button"
                           tabIndex={0}
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: 'pointer', textDecoration: 'underline' }}
                           onClick={() => handleView(cert)}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handleView(cert);

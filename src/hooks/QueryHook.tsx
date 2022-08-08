@@ -10,6 +10,38 @@ import {
 } from '../interfaces';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 
+interface TokenApprovalsResponse {
+  token_approvals: TokenApprovals;
+}
+
+export interface TokenApprovals {
+  owner_is_public: boolean;
+  public_ownership_expiration: Snip721Expiration;
+  private_metadata_is_public: boolean;
+  private_metadata_is_public_expiration: Snip721Expiration;
+  token_approvals: Snip721Approval[];
+}
+
+export interface Snip721Approval {
+  address: string;
+  view_owner_expiration: Snip721Expiration;
+  view_private_metadata_expiration: Snip721Expiration;
+  transfer_expiration: Snip721Expiration;
+}
+
+enum Snip721Expiration {
+  'never',
+  TimeExpiration,
+  HeightExpiration,
+}
+
+interface TimeExpiration {
+  at_time: number;
+}
+interface HeightExpiration {
+  at_height: number;
+}
+
 export class WithPermit {
   query: object;
   permit: Permit;
@@ -41,21 +73,21 @@ const checkError = (queryResponse: any) => {
 };
 
 export default function useQuery() {
-  const { Address, QueryPermit } = useWallet();
-  const querier = useRef<SecretNetworkClient>();
+  const { Address, QueryPermit, Querier } = useWallet();
+  //const querier = useRef<SecretNetworkClient>();
 
-  useEffect(() => {
-    const run = async () => {
-      querier.current = await SecretNetworkClient.create({
-        grpcWebUrl: process.env.REACT_APP_GRPC_URL as string,
-        chainId: process.env.REACT_APP_CHAIN_ID as string,
-      });
-    };
-    run();
-  });
+  // useEffect(() => {
+  //   const run = async () => {
+  //     querier.current = await SecretNetworkClient.create({
+  //       grpcWebUrl: process.env.REACT_APP_GRPC_URL as string,
+  //       chainId: process.env.REACT_APP_CHAIN_ID as string,
+  //     });
+  //   };
+  //   run();
+  // });
 
   const queryCredits = async () => {
-    if (!querier.current) throw new Error('Client not available.');
+    if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     const query = {
@@ -79,12 +111,11 @@ export default function useQuery() {
       },
     };
 
-    const response: RemainingCertsResponse | undefined =
-      await querier.current.query.compute.queryContract({
-        contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
-        codeHash: process.env.REACT_APP_MANAGER_HASH as string,
-        query: query,
-      });
+    const response: RemainingCertsResponse | undefined = await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    });
     if (!response || response.parse_error || response.generic_error)
       throw new Error((response.parse_error || response.generic_error || '').toString());
     //setRemainingCerts(parseInt(response.remaining_certs.certs || '0', 10));
@@ -92,7 +123,7 @@ export default function useQuery() {
   };
 
   const getOwnedCerts = async () => {
-    if (!querier.current) throw new Error('Querier not available.');
+    if (!Querier) throw new Error('Querier not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query owned token IDs
@@ -118,7 +149,7 @@ export default function useQuery() {
   };
 
   const getCert = async (token_id: string) => {
-    if (!querier.current) throw new Error('Querier not available.');
+    if (!Querier) throw new Error('Querier not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query NFT metadata
@@ -134,8 +165,7 @@ export default function useQuery() {
   };
 
   const getSSCRTBalance = async () => {
-    if (!querier.current) throw new Error('Querier not available.');
-    if (!QueryPermit) throw new Error('QueryPermit not available.');
+    if (!Querier) throw new Error('Querier not available.');
 
     //get view key
     const vkey = await window.keplr?.getSecret20ViewingKey(
@@ -144,7 +174,7 @@ export default function useQuery() {
     );
     console.log(vkey);
 
-    const response = await querier.current.query.snip20.getBalance({
+    const response = await Querier.query.snip20.getBalance({
       contract: {
         address: process.env.REACT_APP_SNIP20_ADDR as string,
         codeHash: process.env.REACT_APP_SNIP20_HASH as string,
@@ -159,9 +189,9 @@ export default function useQuery() {
   };
 
   const getSCRTBalance = async (): Promise<number> => {
-    if (!querier.current) throw new Error('Querier not available.');
+    if (!Querier) throw new Error('Querier not available.');
 
-    const response = await querier.current.query.bank.balance({
+    const response = await Querier.query.bank.balance({
       address: Address,
       denom: 'uscrt',
     });
@@ -170,9 +200,9 @@ export default function useQuery() {
   };
 
   const queryNFTContract = async (query: object) => {
-    if (!querier.current) throw new Error('Querier not available.');
+    if (!Querier) throw new Error('Querier not available.');
 
-    const response = await querier.current.query.compute.queryContract({
+    const response = await Querier.query.compute.queryContract({
       contractAddress: process.env.REACT_APP_NFT_ADDR as string,
       codeHash: process.env.REACT_APP_NFT_HASH as string,
       query: query,
@@ -199,12 +229,23 @@ export default function useQuery() {
     //console.log('wrapped permit query', permitQuery);
 
     return await queryNFTContract(permitQuery);
+  };
 
-    // return await querier.current.query.compute.queryContract({
-    //   contractAddress: process.env.REACT_APP_NFT_ADDR as string,
-    //   codeHash: process.env.REACT_APP_NFT_HASH as string,
-    //   query: permitQuery,
-    // });
+  const queryNFTWhitelist = async (token_id: string): Promise<TokenApprovals> => {
+    if (!Querier) throw new Error('Querier not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    // query NFT metadata
+    const approvalQuery = {
+      token_approvals: {
+        token_id: token_id,
+        include_expired: true,
+      },
+    };
+
+    const response = (await queryPermitNFTContract(approvalQuery)) as TokenApprovalsResponse;
+
+    return response.token_approvals;
   };
 
   return {
@@ -215,5 +256,6 @@ export default function useQuery() {
     getSCRTBalance,
     queryNFTContract,
     queryPermitNFTContract,
+    queryNFTWhitelist,
   };
 }

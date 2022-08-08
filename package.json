@@ -33,6 +33,7 @@
     "react-middle-truncate": "^1.0.3",
     "react-router-dom": "6",
     "react-scripts": "5.0.0",
+    "react-share": "^4.4.0",
     "react-toastify": "^9.0.0-rc-2",
     "sass": "^1.45.0",
     "secretjs": "^1.2.0-beta.66",

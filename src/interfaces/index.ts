@@ -30,6 +30,7 @@ export interface PreloadData {
 
 export interface WalletContextState {
   Client: SecretNetworkClient | undefined;
+  Querier: SecretNetworkClient | undefined;
   ClientIsSigner: boolean;
   Wallet: Wallet | undefined;
   Address: string;

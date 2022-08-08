@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, Spacer } from '../../components';
+import { CUButton, SaveModal, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -34,6 +34,8 @@ import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/G
 import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
 import useQuery from '../../hooks/QueryHook';
+import { FacebookShareButton, LinkedinShareButton, TwitterShareButton } from 'react-share';
+import AllowModal from '../../components/Access/AllowModal';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
@@ -45,6 +47,9 @@ export default function ViewCert() {
   const navigate = useNavigate();
   const location = useLocation();
   const { tokenid } = useParams();
+
+  const [showSave, setShowSave] = useState(false);
+  const [showAllow, setShowAllow] = useState(false);
 
   useEffect(() => {
     console.log('Passed State', location.state);
@@ -59,6 +64,16 @@ export default function ViewCert() {
   const handleBack = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault;
     navigate('/access');
+  };
+
+  const handleShowSave = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault;
+    setShowSave(true);
+  };
+
+  const handleShowAllow = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault;
+    setShowAllow(true);
   };
 
   const queryCert = async () => {
@@ -124,6 +139,8 @@ export default function ViewCert() {
   return (
     <>
       <Layout>
+        <SaveModal show={showSave} setShow={setShowSave} metadata={cert as NftDossier} />
+        <AllowModal show={showAllow} setShow={setShowAllow} tokenId={tokenid as string} />
         <Spacer height={100} />
 
         <Container>
@@ -154,7 +171,10 @@ export default function ViewCert() {
               <Row style={{ marginBottom: '3rem' }}>
                 <Col md={{ span: 8, offset: 2 }}>
                   <Image
-                    src={(cert?.private_metadata?.extension?.media || [])[0].url}
+                    src={(cert?.private_metadata?.extension?.media || [])[0].url.replace(
+                      'ipfs.io',
+                      'infura-ipfs.io',
+                    )}
                     fluid={true}
                   />
                 </Col>
@@ -165,10 +185,10 @@ export default function ViewCert() {
                   <Col md={{ span: 6, offset: 1 }}>
                     <Row>
                       <Col>
-                        <CUButton>Save Certificate</CUButton>
+                        <CUButton onClick={handleShowSave}>Save Certificate</CUButton>
                       </Col>
                       <Col>
-                        <CUButton>Allow Access</CUButton>
+                        <CUButton onClick={handleShowAllow}>Allow Access</CUButton>
                         <p className={`${styles.accessText} mt-3 ms-3`}>
                           Whitelist a wallet address,
                           <br />
@@ -191,6 +211,7 @@ export default function ViewCert() {
                       </Col>
                       <Col>
                         <span>Twitter</span>
+                        <TwitterShareButton url="test">aaa</TwitterShareButton>
                       </Col>
                       <Col>
                         <span>Facebook</span>

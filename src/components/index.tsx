@@ -5,3 +5,4 @@ export { default as CUSelectButton } from './CUSelectButton';
 export { default as Spacer } from './Spacer';
 export { default as StepNumber } from './StepNumber';
 export { default as ProgressBar } from './ProgressBar';
+export { default as SaveModal } from './Access/SaveModal';

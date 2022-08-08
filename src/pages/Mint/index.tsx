@@ -67,7 +67,7 @@ export default function Mint() {
 
   const [projectId, setProjectId] = useState();
   const [project, setProject] = useState<Project>();
-  const [hashes, setHashes] = useState([]);
+  //const [hashes, setHashes] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [generated, setGenerated] = useState<boolean>(false);
 
@@ -92,17 +92,17 @@ export default function Mint() {
     }
   }, [Wallet, Address, LoadingProjects]);
 
-  const generate = async () => {
-    if (!project) return;
-    console.log('Project', project);
-    const inputs = ProjectToCertList(project);
+  const generate = async (projectInput: Project): Promise<string[]> => {
+    //if (!project) return [];
+    const inputs = ProjectToCertList(projectInput);
 
     console.log('toGenerate', inputs);
     const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
     console.log('hashes');
     hashes.map((e: string) => console.log(`https://infura-ipfs.io/ipfs/${e}`));
 
-    setHashes(hashes);
+    //setHashes(hashes);
+    return hashes;
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -125,10 +125,11 @@ export default function Mint() {
 
   const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    if (!project) throw new Error('Project Data Not Found');
     setLoading(true);
 
     const toastRef = toast.loading('Generating Certificate Images...');
-    await generate();
+    const hashes = await generate(project);
 
     toast.update(toastRef, { render: 'Processing Transaction...' });
     let result;
@@ -139,116 +140,120 @@ export default function Mint() {
           date: project.issue_date?.toLocaleDateString(),
           cert_type: 'test',
           pub_metadata: {
-            description: project.pub_description,
-            certificate: {
-              name: project.project_name,
-              issue_date: project.issue_date?.toISOString(),
-              cert_number: participant.cert_num?.toString(),
+            extention: {
+              description: project.pub_description,
+              certificate: {
+                name: project.project_name,
+                issue_date: project.issue_date?.toISOString(),
+                cert_number: participant.cert_num?.toString(),
+              },
+              recipient: {
+                first_name: participant.name,
+                last_name: participant.surname,
+                date_of_birth: participant.dob?.toISOString(),
+              },
+              issuing_organizations: [
+                {
+                  name: 'Corporate Finance Institute',
+                  url: 'https://cfi.org',
+                },
+              ],
+              issuing_individuals: [
+                {
+                  name: project.signer,
+                  company: 'Corporate Finance Institute',
+                  title: 'Director',
+                },
+              ],
+              inclusions: [
+                {
+                  type: 'Course',
+                  name: 'Introduction to Finance',
+                  value: '89.4',
+                },
+                {
+                  type: 'Instructor',
+                  name: 'Jane Smith',
+                },
+              ],
+              attributes: [
+                {
+                  trait_type: 'Certificate Number',
+                  value: participant.cert_num?.toString(),
+                },
+                {
+                  trait_type: 'Certificate Name',
+                  value: project.project_name,
+                },
+                {
+                  trait_type: 'Issue Date',
+                  value: project.issue_date?.toDateString(),
+                },
+              ],
             },
-            recipient: {
-              first_name: participant.name,
-              last_name: participant.surname,
-              date_of_birth: participant.dob?.toISOString(),
-            },
-            issuing_organizations: [
-              {
-                name: 'Corporate Finance Institute',
-                url: 'https://cfi.org',
-              },
-            ],
-            issuing_individuals: [
-              {
-                name: project.signer,
-                company: 'Corporate Finance Institute',
-                title: 'Director',
-              },
-            ],
-            inclusions: [
-              {
-                type: 'Course',
-                name: 'Introduction to Finance',
-                value: '89.4',
-              },
-              {
-                type: 'Instructor',
-                name: 'Jane Smith',
-              },
-            ],
-            attributes: [
-              {
-                trait_type: 'Certificate Number',
-                value: participant.cert_num?.toString(),
-              },
-              {
-                trait_type: 'Certificate Name',
-                value: project.project_name,
-              },
-              {
-                trait_type: 'Issue Date',
-                value: project.issue_date?.toDateString(),
-              },
-            ],
           },
           priv_metadata: {
-            description: project.priv_description,
-            certificate: {
-              name: project.project_name,
-              issue_date: project.issue_date?.toISOString(),
-              cert_number: participant.cert_num.toString(),
-            },
-            recipient: {
-              first_name: participant.name,
-              last_name: participant.surname,
-              date_of_birth: participant.dob?.toISOString(),
-            },
-            issuing_organizations: [
-              {
-                name: 'Corporate Finance Institute',
-                url: 'https://cfi.org',
+            extension: {
+              description: project.priv_description,
+              certificate: {
+                name: project.project_name,
+                issue_date: project.issue_date?.toISOString(),
+                cert_number: participant.cert_num.toString(),
               },
-            ],
-            issuing_individuals: [
-              {
-                name: project.signer,
-                company: 'Corporate Finance Institute',
-                title: 'Director',
+              recipient: {
+                first_name: participant.name,
+                last_name: participant.surname,
+                date_of_birth: participant.dob?.toISOString(),
               },
-            ],
-            inclusions: [
-              {
-                type: 'Course',
-                name: 'Introduction to Finance',
-                value: '89.4',
-              },
-              {
-                type: 'Instructor',
-                name: 'Jane Smith',
-              },
-            ],
-            attributes: [
-              {
-                trait_type: 'Certificate Number',
-                value: participant.cert_num.toString(),
-              },
-              {
-                trait_type: 'Certificate Name',
-                value: project.project_name,
-              },
-              {
-                trait_type: 'Issue Date',
-                value: project.issue_date?.toDateString(),
-              },
-            ],
-            media: [
-              {
-                file_type: 'image/png',
-                extension: 'png',
-                authentication: {
-                  key: 'TO DO',
+              issuing_organizations: [
+                {
+                  name: 'Corporate Finance Institute',
+                  url: 'https://cfi.org',
                 },
-                url: `https://ipfs.io/ipfs/${hashes[i]}`,
-              },
-            ],
+              ],
+              issuing_individuals: [
+                {
+                  name: project.signer,
+                  company: 'Corporate Finance Institute',
+                  title: 'Director',
+                },
+              ],
+              inclusions: [
+                {
+                  type: 'Course',
+                  name: 'Introduction to Finance',
+                  value: '89.4',
+                },
+                {
+                  type: 'Instructor',
+                  name: 'Jane Smith',
+                },
+              ],
+              attributes: [
+                {
+                  trait_type: 'Certificate Number',
+                  value: participant.cert_num.toString(),
+                },
+                {
+                  trait_type: 'Certificate Name',
+                  value: project.project_name,
+                },
+                {
+                  trait_type: 'Issue Date',
+                  value: project.issue_date?.toDateString(),
+                },
+              ],
+              media: [
+                {
+                  file_type: 'image/png',
+                  extension: 'png',
+                  authentication: {
+                    key: 'TO DO',
+                  },
+                  url: `https://ipfs.io/ipfs/${hashes[i]}`,
+                },
+              ],
+            },
           },
         };
       });

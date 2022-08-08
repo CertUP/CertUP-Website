@@ -16,6 +16,7 @@ import {
   PreloadData,
   RemainingCertsResponse,
 } from '../interfaces';
+import { logSizeInBytes } from '../utils/helpers';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 import { ToastProps } from '../utils/toastHelper';
 
@@ -255,15 +256,17 @@ export default function useExecute() {
 
   const preloadCerts = async (data: PreloadData[], toast?: any) => {
     if (!Client) throw new Error('Client not available.');
-    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
     const preloadMsg = {
       pre_load: {
         new_data: data,
       },
     };
 
+    logSizeInBytes('Preload Msg', preloadMsg);
     //todo: extimate gas based on number of participants
-    const response = await executeManager(preloadMsg, 55000, toast);
+    const response = await executeManager(preloadMsg, 65000, toast);
+    console.log('Preload Used', response.gasUsed, 'gas.');
     queryCredits();
     return response;
   };
@@ -284,7 +287,7 @@ export default function useExecute() {
           msg: msg,
         },
         {
-          gasLimit: 45000,
+          gasLimit: gas,
           gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
         },
       );
@@ -297,6 +300,55 @@ export default function useExecute() {
       toast.update(toastRef, new ToastProps(err.toString(), 'error'));
       throw err;
     }
+  };
+
+  const executeNft = async (msg: any, gas = 50000, toastRef?: any) => {
+    if (!Client) throw new Error('Client not available.');
+
+    if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
+    else toastRef = toast.loading('Processing Transaction...');
+    try {
+      setProcessingTx(true);
+
+      const response = await Client.tx.compute.executeContract(
+        {
+          contractAddress: process.env.REACT_APP_NFT_ADDR,
+          codeHash: process.env.REACT_APP_NFT_HASH,
+          sender: Address,
+          msg: msg,
+        },
+        {
+          gasLimit: gas,
+          gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+        },
+      );
+      parseError(response);
+      setProcessingTx(false);
+      if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+      return response;
+    } catch (err: any) {
+      setProcessingTx(false);
+      toast.update(toastRef, new ToastProps(err.toString(), 'error'));
+      throw err;
+    }
+  };
+
+  const approveAccessGlobal = async (tokenId: string, toastRef?: any) => {
+    if (!Client) throw new Error('Client not available.');
+
+    const approveMsg = {
+      set_global_approval: {
+        token_id: tokenId,
+        view_private_metadata: 'approve_token',
+      },
+    };
+
+    const response = await executeNft(approveMsg, 50000, toastRef);
+    return response;
+  };
+
+  const revokeAccessGlobal = async (tokenId: string) => {
+    // null
   };
 
   return { paySSCRT, preloadCerts };
