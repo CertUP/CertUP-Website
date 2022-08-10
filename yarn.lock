@@ -9997,6 +9997,11 @@ react-bootstrap@^2.2.1:
     uncontrollable "^7.2.1"
     warning "^4.0.3"
 
+react-coinbase-commerce@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/react-coinbase-commerce/-/react-coinbase-commerce-1.6.0.tgz#1b3bde9178c028cded2070b31a57ae110bb7b62b"
+  integrity sha512-FFN4wD4e5jA6BQIb5tHm74p9Fzei5FecPG3NQuOhUtVRuL65J9aDeBirgv9/KmUdepqjzZgVktxfFvo9vTkcBQ==
+
 react-datepicker@^4.8.0:
   version "4.8.0"
   resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-4.8.0.tgz#11b8918d085a1ce4781eee4c8e4641b3cd592010"

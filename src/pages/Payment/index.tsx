@@ -24,6 +24,9 @@ import useExecute from '../../hooks/ExecuteHook';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ToastProps } from '../../utils/toastHelper';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import CoinbaseCommerceButton from 'react-coinbase-commerce';
 
 const certPriceSCRT = 5; //uscrt
 const certPriceUSD = 10; //cents
@@ -45,6 +48,7 @@ export default function Payment() {
   const [paymentAddr, setPaymentAddr] = useState<string>();
   const [gotError, setGotError] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>();
+  const [chargeId, setChargeId] = useState<string>();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -53,13 +57,14 @@ export default function Payment() {
   const { paySSCRT } = useExecute();
 
   useEffect(() => {
+    if (!Address) return;
     console.log('Passed State', location.state);
     if (!location.state?.projectId) {
       navigate('/issuers');
       return;
     }
     init();
-  }, []);
+  }, [Address]);
 
   const init = async () => {
     const credits = await queryCredits();
@@ -70,6 +75,7 @@ export default function Payment() {
     }
     calculateTotalSCRT(location.state.num_certificates.toString() || '0');
     calculateTotalUSD(location.state.num_certificates.toString() || '0');
+    getCharge(location.state.num_certificates.toString());
     setLoading(false);
   };
 
@@ -89,6 +95,41 @@ export default function Payment() {
     setTotalUSDString(`$${(total / 10e1).toFixed(2)}`);
     setTotalUSD(total);
     setNumCerts(numCerts);
+  };
+
+  const getCharge = async (numCert: string) => {
+    console.log('Getting Coinbase Charge');
+    const numCertNum = parseInt(numCert, 10);
+    // const toastRef = toast.loading('Transaction Processing...');
+    // const result: Tx | undefined = await Client?.tx.bank.send(
+    //   {
+    //     fromAddress: Address,
+    //     toAddress: paymentAddr || '',
+    //     amount: [{ denom: 'uscrt', amount: totaluSCRT.toString() }],
+    //   },
+    //   {
+    //     gasLimit: 20_000,
+    //   },
+    // );
+    // console.log(result);
+    // if (!result) throw new Error('Something went wrong');
+    // if (result.code) throw new Error(result.rawLog);
+
+    const request = {
+      address: Address,
+      num_certs: numCertNum,
+      issuer_name: 'todo',
+    };
+
+    const url = new URL(`/payment/createCharge`, process.env.REACT_APP_BACKEND).toString();
+
+    const chargeResult = await axios.post(url, request);
+    console.log(chargeResult);
+    //toast.update(toastRef, { render: 'Success!', type: 'success', isLoading: false });
+
+    // if (location.state?.projectId)
+    //   navigate('/issuers', { state: { projectId: location.state?.projectId, step: 'generate' } });
+    setChargeId(chargeResult.data.chargeId);
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -274,9 +315,10 @@ export default function Payment() {
 
                   <Row className="justify-content-center">
                     <Col md="7">
-                      <CUButton disabled={false} fill={true} onClick={handleUSDPayment}>
+                      <CUButton disabled={!chargeId} fill={true} onClick={handleUSDPayment}>
                         Pay with Coinbase
                       </CUButton>
+                      {chargeId ? <CoinbaseCommerceButton chargeId={chargeId} /> : null}
                     </Col>
                   </Row>
                 </Form>
