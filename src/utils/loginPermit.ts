@@ -6,7 +6,7 @@ export const allowedTokens: string[] = [
   process.env.REACT_APP_NFT_ADDR as string,
   process.env.REACT_APP_MANAGER_ADDR as string,
 ];
-export const permissions: Permission[] = ['owner'];
+export const permissions: Permission[] = ['owner', 'balance'];
 
 export interface LoginToken {
   permit: PermitSignature;

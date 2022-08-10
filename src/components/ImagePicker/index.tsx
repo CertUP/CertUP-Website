@@ -27,17 +27,17 @@ class ImagePicker extends Component<Props, State> {
     this.renderImage = this.renderImage.bind(this);
 
     if (props.selected) {
+      console.log('Pre-Selected BG Image', props.selected);
+      const pickedImage = Map();
+      const newerPickedImage = pickedImage.set(props.selected.value.toString(), props.selected.src);
       this.state = {
-        picked: Map({ 0: props.selected.src }),
+        picked: newerPickedImage,
       };
     } else {
       this.state = {
         picked: Map(),
       };
     }
-
-    console.log('state', this.state);
-    console.log('selected', this.props.selected);
   }
 
   // handleSelected(selected) {
@@ -45,13 +45,13 @@ class ImagePicker extends Component<Props, State> {
   // }
 
   handleImageClick(image: PickImage) {
-    console.log('flicked', image);
+    console.log('Clicked Internal', image.value);
     const { onPick } = this.props;
     const pickedImage = Map();
     const newerPickedImage = pickedImage.set(image.value.toString(), image.src);
 
     this.setState({ picked: newerPickedImage }, () => {
-      console.log('state changed', this.state);
+      //console.log('state changed', this.state);
     });
 
     const pickedImageToArray: PickImage[] = [];

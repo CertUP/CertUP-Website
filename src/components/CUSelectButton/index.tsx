@@ -24,7 +24,6 @@ export const CUSelectButton: React.FC<ButtonProps> = (props) => {
   //     <button {...rest}>{children}</button>
   // )
   if (selected) {
-    console.log('selected!');
     return (
       <button {...rest} className={styles.selectedBtn}>
         {children}

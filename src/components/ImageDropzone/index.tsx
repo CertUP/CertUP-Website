@@ -6,10 +6,12 @@ import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 
 import ChooseFile from '../../assets/ChooseFile.svg';
+import { dataURLtoFile, fileToDataURI } from '../../utils/fileHelper';
 
 interface props {
-  set: (a: any) => void;
-  external?: ExFile;
+  set: (a: string) => void;
+  //external?: ExFile;
+  externalUri?: string;
 }
 
 interface ExFile extends File {
@@ -17,7 +19,7 @@ interface ExFile extends File {
   path?: string;
 }
 
-export default function LogoDropzone({ set, external }: props) {
+export default function ImageDropzone({ set, externalUri }: props) {
   const [files, setFiles] = useState<ExFile[]>([]);
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -34,20 +36,34 @@ export default function LogoDropzone({ set, external }: props) {
           }),
         ),
       );
-      set(acceptedFiles[0]);
+      returnAcceptedFile(acceptedFiles[0]);
+      //set(acceptedFiles[0]);
     },
   });
 
   useEffect(() => {
-    if (external) {
-      const added = Object.assign(external, {
-        preview: URL.createObjectURL(external),
-      });
-      console.log('external file', added);
-
-      setFiles([added]);
+    if (externalUri) {
+      processExternalURI(externalUri);
     }
   }, []);
+
+  const returnAcceptedFile = async (file: File) => {
+    //convert URI to file object
+    const dataUri = await fileToDataURI(file, file.type);
+    set(dataUri);
+  };
+
+  const processExternalURI = async (externalUri: string) => {
+    //convert URI to file object
+    const externalFile = await dataURLtoFile(externalUri, 'Saved Image');
+
+    const added = Object.assign(externalFile, {
+      preview: URL.createObjectURL(externalFile),
+    });
+    console.log('External File', added);
+
+    setFiles([added]);
+  };
 
   const acceptedFileItems = acceptedFiles.map((file: FileWithPath) => {
     return (

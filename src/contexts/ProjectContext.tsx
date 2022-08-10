@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import Project, { RemoteProject } from '../interfaces/Project';
+import Project from '../interfaces/Project';
 // import { getRandom } from '../utils/helpers';
 import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { useWallet } from '.';
@@ -83,13 +83,15 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     for (let i = 0; i < returnedProjects.length; i++) {
       const project: Project = returnedProjects[i];
 
-      // convert logo URI into File object
-      if (project.company_logo_uri)
-        project.company_logo_file = await dataURLtoFile(project.company_logo_uri, 'Saved Image');
+      // // convert logo URI into File object
+      // if (project.renderProps.company_logo_uri)
+      //   project.renderProps.company_logo_file = await dataURLtoFile(project.renderProps.company_logo_uri, 'Saved Image');
 
       //convert issue date string from DB into Date
-      if (project.issue_date) project.issue_date = new Date(project.issue_date);
-      if (project.expire_date) project.expire_date = new Date(project.expire_date);
+      if (project.certInfo.issue_date)
+        project.certInfo.issue_date = new Date(project.certInfo.issue_date);
+      if (project.certInfo.expire_date)
+        project.certInfo.expire_date = new Date(project.certInfo.expire_date);
 
       // convert participant dob strings from DB to Date
       for (let i = 0; i < project.participants.length; i++) {
@@ -186,12 +188,12 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     console.log('Updating Remote Project:', project);
 
     const url = new URL(`/projects/${project._id}`, process.env.REACT_APP_BACKEND);
-    const remoteProject: RemoteProject = {
-      ...project,
-      company_logo: '',
-    };
+    // const remoteProject: RemoteProject = {
+    //   ...project,
+    //   company_logo: '',
+    // };
 
-    const response = await axios.put(url.toString(), remoteProject, {
+    const response = await axios.put(url.toString(), project, {
       headers: {
         Authorization: token,
       },

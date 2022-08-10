@@ -1,25 +1,38 @@
 {
-    "external_url": ,
+    "external_url": "",
     "description": "Public or Private description",
 	"certificate": {
 		"name": "CFI Training Certificate",
 		"type" : "Certificate of Completion",
 		"issue_date": "",
 		"expire_date": "",
-		"cert_number": "123",
+		"cert_number": "123"
 	},
-	"recipient": {
+	"certified_individual": {
 		"first_name": "David",
 		"middle_name": "Jackson",
 		"last_name": "Smith",
 		"date_of_birth": "how will we pass a date? Or will it just be a string?",
-		"id": "optional",
+		"id": "optional"
 	},
+	"certified_items": [
+		{
+			"name": "Door Handle",
+			"model_number": "123POQ",
+			"serial_number": "123AG76765",
+			"manufacturer": "Door Handle Experts Group",
+			"manufacture_date": "how will we pass a date? Or will it just be a string?",
+		},
+		{
+			...
+		}
+	],
     "issuing_organizations": [
 		{
 			"name": "Corporate Finance Institute",
 			"address": "optional company address",
 			"url": "optional company website",
+			"details": "optional description"
 		},
 		{
 			...
@@ -30,6 +43,7 @@
 			"name": "John Smith",
 			"company": "Corporate Finance Institute",
 			"title": "Director",
+			"details": "optional description"
 		},
 		{
 			...
@@ -39,12 +53,14 @@
 		{
 			"type": "Course",
 			"name": "Introduction to Finance",
-			"value": "89.4"
+			"value": "89.4",
+			"details": "optional description"
 		},
 		{
 			"type": "Instructor",
 			"name": "Jane Smith",
-			"value": "optional"
+			"value": "optional",
+			"details": "optional description"
 		}
 	],
     "attributes": [ 
@@ -63,10 +79,10 @@
             "file_type": "optional_file_type",
             "extension": "pdf",
             "authentication": {
-                "key": Decryption Key,
+                "key": "Decryption Key",
                 "user": 
             },
-            "url": Image URL,
+            "url": "Image URL",
         }
     ],
     "protected_attributes": [ "list", "of_attributes", "whose_types", "are_public", "but_values", "are_private" ],

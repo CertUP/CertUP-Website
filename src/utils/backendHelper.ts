@@ -1,21 +1,32 @@
 import axios from 'axios';
+import { CertInfo, RenderProps } from '../interfaces/Project';
 import { sleep } from './helpers';
 
 export interface GenerateInput {
-  logoData: string;
-  companyName: string;
-  certTitle: string;
-  fullName: string;
-  dob?: string;
-  certNum: string;
-  issueDate?: string;
-  expireDate?: string;
-  signer: string;
-  signerTitle: string;
-  line1: string;
-  line3?: string;
-  templateBg: number;
-  upload?: boolean;
+  renderProps: RenderProps;
+  certInfo: CertInfo;
+  participant: RenderParticipant;
+  // logoData: string;
+  // companyName: string;
+  // certTitle: string;
+  // fullName: string;
+  // dob?: string;
+  // certNum: string;
+  // issueDate?: string;
+  // expireDate?: string;
+  // signer: string;
+  // signerTitle: string;
+  // line1: string;
+  // line3?: string;
+  // templateBg: number;
+  // upload?: boolean;
+}
+
+export interface RenderParticipant {
+  name: string;
+  surname: string;
+  dob: string;
+  cert_num: string;
 }
 
 interface PendingRender {

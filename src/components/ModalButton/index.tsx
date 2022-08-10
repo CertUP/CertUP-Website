@@ -6,12 +6,14 @@ import styles from './styles.module.scss';
 export interface ButtonProps
   extends React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>,
     React.AriaAttributes {
-  test?: string;
+  btnStyle?: string;
 }
 
-export function ModalButton({ onClick, children }: ButtonProps) {
+export function ModalButton({ onClick, children, btnStyle }: ButtonProps) {
+  let extraClass = '';
+  if (btnStyle === 'red') extraClass = styles.redOverlay;
   return (
-    <Button onClick={onClick} className={styles.modalButton}>
+    <Button onClick={onClick} className={`${styles.modalButton} ${extraClass}`}>
       {children}
     </Button>
   );

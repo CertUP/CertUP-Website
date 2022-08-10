@@ -137,14 +137,14 @@ export default function Mint() {
       const newData = project?.participants.map((participant, i) => {
         return {
           name: `${participant.name} ${participant.surname}`,
-          date: project.issue_date?.toLocaleDateString(),
+          date: project.certInfo.issue_date?.toLocaleDateString(),
           cert_type: 'test',
           pub_metadata: {
             extention: {
-              description: project.pub_description,
+              description: project.certInfo.pub_description,
               certificate: {
                 name: project.project_name,
-                issue_date: project.issue_date?.toISOString(),
+                issue_date: project.certInfo.issue_date?.toISOString(),
                 cert_number: participant.cert_num?.toString(),
               },
               recipient: {
@@ -160,7 +160,7 @@ export default function Mint() {
               ],
               issuing_individuals: [
                 {
-                  name: project.signer,
+                  name: project.renderProps.signer,
                   company: 'Corporate Finance Institute',
                   title: 'Director',
                 },
@@ -187,17 +187,17 @@ export default function Mint() {
                 },
                 {
                   trait_type: 'Issue Date',
-                  value: project.issue_date?.toDateString(),
+                  value: project.certInfo.issue_date?.toDateString(),
                 },
               ],
             },
           },
           priv_metadata: {
             extension: {
-              description: project.priv_description,
+              description: project.certInfo.priv_description,
               certificate: {
                 name: project.project_name,
-                issue_date: project.issue_date?.toISOString(),
+                issue_date: project.certInfo.issue_date?.toISOString(),
                 cert_number: participant.cert_num.toString(),
               },
               recipient: {
@@ -213,7 +213,7 @@ export default function Mint() {
               ],
               issuing_individuals: [
                 {
-                  name: project.signer,
+                  name: project.renderProps.signer,
                   company: 'Corporate Finance Institute',
                   title: 'Director',
                 },
@@ -240,7 +240,7 @@ export default function Mint() {
                 },
                 {
                   trait_type: 'Issue Date',
-                  value: project.issue_date?.toDateString(),
+                  value: project.certInfo.issue_date?.toDateString(),
                 },
               ],
               media: [
