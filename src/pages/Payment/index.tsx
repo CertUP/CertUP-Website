@@ -129,7 +129,7 @@ export default function Payment() {
 
     // if (location.state?.projectId)
     //   navigate('/issuers', { state: { projectId: location.state?.projectId, step: 'generate' } });
-    setChargeId(chargeResult.data.chargeId);
+    setChargeId(chargeResult.data.chargeCode);
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
