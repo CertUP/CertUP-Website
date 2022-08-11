@@ -37,7 +37,9 @@ export interface WalletContextState {
   LoginToken: LoginToken | undefined;
   QueryPermit: PermitSignature | undefined;
   RemainingCerts: number;
+  LoadingRemainingCerts: boolean;
   ProcessingTx: boolean;
+  VerifiedIssuer: boolean;
   updateClient: (
     client: SecretNetworkClient,
     wallet: Wallet,
@@ -126,6 +128,6 @@ export interface RemainingCertsResponse {
   remaining_certs?: {
     certs: string;
   };
-  parse_error?: object;
-  generic_error?: object;
+  parse_err?: object;
+  generic_err?: object;
 }

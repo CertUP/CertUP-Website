@@ -22,7 +22,15 @@ export default function Issuers() {
   //const [projectInfo, setProjectInfo] = useState<Project | undefined>();
   const [projectId, setProjectId] = useState<string>();
   const [projectStep, setProjectStep] = useState();
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const {
+    Client,
+    ClientIsSigner,
+    Wallet,
+    Address,
+    LoginToken,
+    VerifiedIssuer,
+    LoadingRemainingCerts,
+  } = useWallet();
 
   const location = useLocation();
 

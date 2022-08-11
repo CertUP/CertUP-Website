@@ -60,6 +60,7 @@ const bgList = [bg1, bg2, bg3];
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
 type ButtonProps = JSX.IntrinsicElements['button'];
+type InputProps = JSX.IntrinsicElements['input'];
 
 const ExampleCustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
   // eslint-disable-next-line react/prop-types
@@ -82,6 +83,31 @@ const ExampleCustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {value}
       </button>
+    );
+  },
+);
+
+const TypeableDatePicker = forwardRef<HTMLInputElement, InputProps>(
+  // eslint-disable-next-line react/prop-types
+  ({ value, onClick }, ref) => {
+    return (
+      <input
+        type="text"
+        style={{
+          width: '100%',
+          background: '#F2F2F2',
+          borderRadius: '38px',
+          //textAlign: 'left',
+          border: '1px solid #ced4da',
+          padding: '6px 12px',
+          lineHeight: '1.5',
+          height: '36px',
+        }}
+        onClick={onClick}
+        //onChange={(e) => }
+        ref={ref}
+        value={value}
+      />
     );
   },
 );
@@ -176,6 +202,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       _id: projectId.current,
       owner: Address,
       project_name: projectName,
+      lastPreview: previewImage,
       participants: participants,
       certInfo: cinfo,
       renderProps: rprops,
@@ -191,11 +218,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     setDirty(true);
     updateRenderProps({ signerSignatureUri: uri });
   };
-
-  //monitor for changes to prompt save
-  useEffect(() => {
-    setDirty(true);
-  }, [participants, projectName]);
 
   // Re-Render Peview when data changes
   useEffect(() => {
@@ -438,7 +460,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Form.Control
                   required
                   value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
+                  onChange={(e) => {
+                    setProjectName(e.target.value);
+
+                    setDirty(true);
+                  }}
                   type="text"
                   placeholder="My Project"
                   className="mt-1"
@@ -619,7 +645,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                     <DatePicker
                       selected={certInfo.issue_date}
                       onChange={(date: Date) => updateCertInfo({ issue_date: date })}
-                      customInput={<ExampleCustomInput />}
+                      className={styles.inputStyle}
+                      //customInput={<TypeableDatePicker />}
                     />
                   </Form.Group>
                 </Col>
@@ -639,11 +666,12 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       <DatePicker
                         selected={certInfo.expire_date}
                         onChange={(date: Date) => updateCertInfo({ expire_date: date })}
-                        customInput={<ExampleCustomInput />}
+                        className={styles.inputStyle}
+                        //customInput={<ExampleCustomInput />}
                       />
                     </Form.Group>
                     {certInfo.expire_date ? (
-                      <Col className="d-flex align-items-center">
+                      <Col className="d-flex align-items-center mx-2">
                         <FontAwesomeIcon
                           icon={faTimesCircle}
                           size="lg"

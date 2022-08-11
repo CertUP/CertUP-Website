@@ -4,6 +4,7 @@ export interface ProjectProps {
   _id?: string;
   owner?: string;
   project_name?: string;
+  lastPreview?: string;
   // template?: string;
   // template_bg?: number;
   // template_layout?: number;
@@ -45,8 +46,8 @@ export interface RenderProps {
 
 export const defaultRenderProps: RenderProps = {
   template: '2',
-  templateBg: 0,
-  templateLayout: 0,
+  templateBg: 1,
+  templateLayout: 2,
   certTitle: '',
   line1Text: '',
   line3Text: '',
@@ -78,12 +79,14 @@ export const defaultCertInfo: CertInfo = {
   cert_name: '',
   pub_description: '',
   priv_description: '',
+  issue_date: new Date(),
 };
 
 export default class Project {
   _id?: string;
   owner: string;
   project_name: string;
+  lastPreview?: string;
   // template: string;
   // template_bg: number;
   // template_layout?: number;
@@ -108,6 +111,7 @@ export default class Project {
     this._id = props?._id;
     this.owner = props?.owner || '';
     this.project_name = props?.project_name || '';
+    this.lastPreview = props?.lastPreview;
     this.participants = props?.participants || [];
     this.certInfo = props?.certInfo || defaultCertInfo;
     this.renderProps = props?.renderProps || defaultRenderProps;

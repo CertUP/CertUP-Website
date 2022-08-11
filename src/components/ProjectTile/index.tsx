@@ -1,7 +1,10 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
 import Project from '../../interfaces/Project';
+
+import styles from './styles.module.scss';
 
 interface Props {
   projectIn: Project;
@@ -11,12 +14,26 @@ interface Props {
 export default function ProjectTile({ projectIn, setProjectId }: Props) {
   return (
     <Col md="5">
-      <Row>TODO Show Preview</Row>
-      <Row>
+      {projectIn.lastPreview ? (
+        <Row className="align-content-center" style={{ height: '215px' }}>
+          <Image fluid src={projectIn.lastPreview} style={{ width: 'auto', maxHeight: '100%' }} />
+        </Row>
+      ) : (
+        <Row
+          className={`align-content-center ${styles.missingImageBox}`}
+          style={{ height: '215px' }}
+        >
+          <Col xs={'auto'}>
+            <h5>Preview Not Available</h5>
+          </Col>
+        </Row>
+      )}
+
+      <Row className="text-left">
         <Col>
           <span>{projectIn.project_name}</span>
         </Col>
-        <Col>
+        <Col xs={'auto'}>
           <span
             role="button"
             tabIndex={0}

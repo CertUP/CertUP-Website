@@ -36,6 +36,27 @@ $gradient3: #a659f3;
   background: #f2f2f2;
   border-radius: 38px;
 }
+.certupInputForm input:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.inputStyle {
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    background-color 0.15s ease-in-out;
+}
+.inputStyle:focus-visible {
+  color: #212529;
+  background-color: #fff;
+  //border-color: #86b7fe;
+  border-color: vars.$certupBtnGradient;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+  //box-shadow: 0 0 0 0.25rem vars.$certupBtnGradient;
+  //box-shadow: 0 0 1px 1px white, inset 0 0 23px 22px white;
+  //background: vars.$certupBtnGradient;
+}
 
 .certupInputForm textarea {
   background: #f2f2f2;

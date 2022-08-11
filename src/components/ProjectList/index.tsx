@@ -14,6 +14,7 @@ import ProjectTile from '../ProjectTile';
 import Project from '../../interfaces/Project';
 import CUButton from '../CUButton';
 import { useProject } from '../../contexts/ProjectContext';
+import { Link } from 'react-router-dom';
 
 interface Props {
   setProjectId: (projectId?: string) => void;
@@ -22,6 +23,7 @@ interface Props {
 export default function ProjectList({ setProjectId }: Props) {
   //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
   const { Projects, LoadingProjects } = useProject();
+  const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
 
   // const [loading, setLoading] = useState<boolean>(true);
   // const [projects, setProjects] = useState([]);
@@ -42,6 +44,38 @@ export default function ProjectList({ setProjectId }: Props) {
   //   setLoading(false);
   // };
 
+  //refresh credits on mount if they are nto verified (to see if they became verified)
+  useEffect(() => {
+    if (!VerifiedIssuer) queryCredits();
+  }, []);
+
+  if (!LoadingRemainingCerts && !VerifiedIssuer)
+    return (
+      <>
+        <Container>
+          <Row className="justify-content-center">
+            <span className={styles.aboutTitle}>For Issuers</span>
+
+            <Col xs={'auto'}>
+              <CUButton onClick={() => setProjectId()} disabled={true}>
+                New Certificate
+              </CUButton>
+            </Col>
+          </Row>
+        </Container>
+
+        <Spacer height={50} />
+
+        <Container>
+          <Row className="text-center">
+            <h4>
+              You are not a verified issuer. Please <Link to="/">Contact Us</Link> for access.
+            </h4>
+          </Row>
+        </Container>
+      </>
+    );
+
   return (
     <>
       <Container>
@@ -49,7 +83,9 @@ export default function ProjectList({ setProjectId }: Props) {
           <span className={styles.aboutTitle}>For Issuers</span>
 
           <Col xs={'auto'}>
-            <CUButton onClick={() => setProjectId()}>New Certificate</CUButton>
+            <CUButton onClick={() => setProjectId()} disabled={LoadingRemainingCerts}>
+              New Certificate
+            </CUButton>
           </Col>
         </Row>
       </Container>
@@ -58,12 +94,12 @@ export default function ProjectList({ setProjectId }: Props) {
 
       <Container>
         <h3 className={styles.certsLabel}>Your Certificates</h3>
-        {LoadingProjects ? (
+        {LoadingProjects || LoadingRemainingCerts ? (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         ) : Projects.length ? (
-          <Row>
+          <Row className="justify-content-around">
             {Projects.map((p, i) => (
               <ProjectTile projectIn={p} setProjectId={setProjectId} key={`project-list-${i}`} />
             ))}

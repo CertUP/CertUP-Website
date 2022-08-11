@@ -17,7 +17,9 @@ const contextDefaultValues: WalletContextState = {
   LoginToken: undefined,
   QueryPermit: undefined,
   RemainingCerts: 0,
+  LoadingRemainingCerts: true,
   ProcessingTx: false,
+  VerifiedIssuer: true,
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
@@ -52,7 +54,14 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.QueryPermit,
   );
   const [RemainingCerts, setRemainingCerts] = useState<number>(contextDefaultValues.RemainingCerts);
+  const [LoadingRemainingCerts, setLoadingRemainingCerts] = useState<boolean>(
+    contextDefaultValues.LoadingRemainingCerts,
+  );
   const [ProcessingTx, setProcessingTx] = useState<boolean>(contextDefaultValues.ProcessingTx);
+
+  const [VerifiedIssuer, setVerifiedIssuer] = useState<boolean>(
+    contextDefaultValues.VerifiedIssuer,
+  );
 
   const updateClient = (
     client: SecretNetworkClient | undefined,
@@ -89,6 +98,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
   const queryCredits = async (): Promise<number | undefined> => {
     if (!QueryPermit) return;
+    setLoadingRemainingCerts(true);
 
     const query = {
       with_permit: {
@@ -116,11 +126,19 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     });
-    if (response?.parse_error || response?.generic_error)
-      throw new Error((response?.parse_error || response?.generic_error || '').toString());
-    console.log('Remaining Certs Query Response', response);
+    console.log('Remaining Certs Query Responseeeee', response);
+
+    if (response?.parse_err || response?.generic_err) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      if (response.generic_err?.msg === 'You are not a verified issuer.') setVerifiedIssuer(false);
+
+      setLoadingRemainingCerts(false);
+      throw new Error((response?.parse_err || response?.generic_err || '').toString());
+    }
     const result = parseInt(response?.remaining_certs?.certs || '0', 10);
     setRemainingCerts(result);
+    setLoadingRemainingCerts(false);
     return result;
   };
 
@@ -133,10 +151,12 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     LoginToken,
     QueryPermit,
     RemainingCerts,
+    LoadingRemainingCerts,
     ProcessingTx,
     updateClient,
     queryCredits,
     setProcessingTx,
+    VerifiedIssuer,
   };
 
   // add values to provider to reach them out from another component

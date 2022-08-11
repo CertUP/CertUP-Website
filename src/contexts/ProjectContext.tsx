@@ -180,6 +180,11 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
     const data = Projects;
     const index = data.findIndex((Project) => Project._id === id);
+
+    // if last save has preview but current doesnt, use last save's preview
+    if (!project.lastPreview && data[index].lastPreview)
+      project.lastPreview = data[index].lastPreview;
+
     data[index] = project;
     setProjects([...data]);
 

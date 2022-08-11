@@ -116,8 +116,8 @@ export default function useQuery() {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     });
-    if (!response || response.parse_error || response.generic_error)
-      throw new Error((response.parse_error || response.generic_error || '').toString());
+    if (!response || response.parse_err || response.generic_err)
+      throw new Error((response.parse_err || response.generic_err || '').toString());
     //setRemainingCerts(parseInt(response.remaining_certs.certs || '0', 10));
     return parseInt(response.remaining_certs?.certs || '0', 10);
   };
