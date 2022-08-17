@@ -1,0 +1,22 @@
+@use '../../../global/_variables.scss' as vars;
+
+.blankButton {
+  border: none;
+  background-color: inherit;
+  padding: 0px 3px;
+  transition: color 0.2s ease-in-out;
+}
+.blankButton:active:enabled {
+  transform: translateY(3px);
+}
+
+.removeButton {
+  transition: color 0.2s ease-in-out;
+}
+.removeButton:hover:enabled {
+  color: rgb(211, 25, 25);
+}
+
+.clicked {
+  color: rgb(211, 25, 25);
+}

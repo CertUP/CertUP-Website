@@ -34,11 +34,17 @@ import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/G
 import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
 import useQuery from '../../hooks/QueryHook';
-import { FacebookShareButton, LinkedinShareButton, TwitterShareButton } from 'react-share';
+import {
+  FacebookShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+  TwitterIcon,
+} from 'react-share';
 import AllowModal from '../../components/Access/AllowModal';
+import { useNft } from '../../contexts/NftContext';
 
 export default function ViewCert() {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();
   const { getCert } = useQuery();
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,19 +53,28 @@ export default function ViewCert() {
   const navigate = useNavigate();
   const location = useLocation();
   const { tokenid } = useParams();
+  const [tokenId, setTokenId] = useState(location.state?.tokenId || tokenid);
 
   const [showSave, setShowSave] = useState(false);
   const [showAllow, setShowAllow] = useState(false);
 
+  const { Dossiers, LoadingNfts, refreshInventory, refreshDossiers, findNft } = useNft();
+
   useEffect(() => {
     console.log('Passed State', location.state);
-    if (location.state?.cert) setCert(location.state.cert);
+    if (!tokenId) {
+      navigate('/access');
+    } else queryCert();
   }, []);
 
   useEffect(() => {
-    if (!QueryPermit || !Client || !Address || cert) return;
+    if (!QueryPermit || !Querier || !Address) return;
     queryCert();
   }, [QueryPermit]);
+
+  useEffect(() => {
+    queryCert();
+  }, [Dossiers]);
 
   const handleBack = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault;
@@ -77,44 +92,12 @@ export default function ViewCert() {
   };
 
   const queryCert = async () => {
-    if (!Client || !Address || !QueryPermit || !tokenid) return; //todo: handle this better
-    console.log('Querying Cert Info');
-    //const dossier = await getDossier(Client, Address, QueryPermit, tokenid);
-    const dossier = await getCert(tokenid);
+    if (!Querier || !Address || !QueryPermit || !tokenId) return; //todo: handle this better
+    if (!Dossiers.length) await refreshDossiers();
 
-    // // query owned token IDs
-    // const tokensQuery = {
-    //   tokens: {
-    //     owner: Address,
-    //   },
-    // };
-
-    // console.log('Owned Certs Query', tokensQuery);
-
-    // const { token_list } = (await queryPermitNFTContract(
-    //   Client as SecretNetworkClient,
-    //   tokensQuery,
-    //   QueryPermit as PermitSignature,
-    // )) as Snip721GetTokensResponse;
-
-    // console.log('owned certs list', token_list.tokens);
-
-    // // query NFT metadata
-    // const dossierQuery = {
-    //   batch_nft_dossier: {
-    //     token_ids: token_list.tokens,
-    //   },
-    // };
-
-    // const response = (await queryPermitNFTContract(
-    //   Client as SecretNetworkClient,
-    //   dossierQuery,
-    //   QueryPermit as PermitSignature,
-    // )) as BatchDossierResponse;
-
-    // console.log('owned certs data', response);
-    setCert(dossier);
-    setLoading(false);
+    const dossier = findNft(tokenId);
+    console.log('Dossier Found', dossier);
+    if (dossier) setCert(dossier);
   };
 
   if (!Wallet || !Address || !LoginToken)
@@ -140,7 +123,12 @@ export default function ViewCert() {
     <>
       <Layout>
         <SaveModal show={showSave} setShow={setShowSave} metadata={cert as NftDossier} />
-        <AllowModal show={showAllow} setShow={setShowAllow} tokenId={tokenid as string} />
+        <AllowModal
+          show={showAllow}
+          setShow={setShowAllow}
+          tokenId={tokenid as string}
+          metadata={cert as NftDossier}
+        />
         <Spacer height={100} />
 
         <Container>
@@ -173,7 +161,7 @@ export default function ViewCert() {
                   <Image
                     src={(cert?.private_metadata?.extension?.media || [])[0].url.replace(
                       'ipfs.io',
-                      'infura-ipfs.io',
+                      process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
                     )}
                     fluid={true}
                   />
@@ -211,7 +199,9 @@ export default function ViewCert() {
                       </Col>
                       <Col>
                         <span>Twitter</span>
-                        <TwitterShareButton url="test">aaa</TwitterShareButton>
+                        <TwitterShareButton url="test">
+                          <TwitterIcon size={32} round={false} />
+                        </TwitterShareButton>
                       </Col>
                       <Col>
                         <span>Facebook</span>

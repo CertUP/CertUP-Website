@@ -69,7 +69,7 @@ export default function SaveModal({ show, setShow, metadata }: props) {
     e.preventDefault;
     const imageUrl = (metadata?.private_metadata?.extension?.media || [])[0].url.replace(
       'ipfs.io',
-      'infura-ipfs.io',
+      process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
     );
     download(imageUrl);
   };

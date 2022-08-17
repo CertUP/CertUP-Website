@@ -99,7 +99,7 @@ export default function Mint() {
     console.log('toGenerate', inputs);
     const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
     console.log('hashes');
-    hashes.map((e: string) => console.log(`https://infura-ipfs.io/ipfs/${e}`));
+    hashes.map((e: string) => console.log(`https://cloudflare-ipfs.io/ipfs/${e}`));
 
     //setHashes(hashes);
     return hashes;
@@ -126,6 +126,8 @@ export default function Mint() {
   const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     if (!project) throw new Error('Project Data Not Found');
+    if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
+
     setLoading(true);
 
     const toastRef = toast.loading('Generating Certificate Images...');
@@ -147,7 +149,7 @@ export default function Mint() {
                 issue_date: project.certInfo.issue_date?.toISOString(),
                 cert_number: participant.cert_num?.toString(),
               },
-              recipient: {
+              certified_individual: {
                 first_name: participant.name,
                 last_name: participant.surname,
                 date_of_birth: participant.dob?.toISOString(),
@@ -200,7 +202,7 @@ export default function Mint() {
                 issue_date: project.certInfo.issue_date?.toISOString(),
                 cert_number: participant.cert_num.toString(),
               },
-              recipient: {
+              certified_individual: {
                 first_name: participant.name,
                 last_name: participant.surname,
                 date_of_birth: participant.dob?.toISOString(),
@@ -258,7 +260,11 @@ export default function Mint() {
         };
       });
 
-      result = await preloadCerts(newData as PreloadData[], toastRef);
+      result = await preloadCerts({
+        data: newData as PreloadData[],
+        toast: toastRef,
+        project_id: project._id,
+      });
 
       //toast.update(toastRef, SuccessToast);
     } catch (error: any) {

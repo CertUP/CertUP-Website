@@ -49,10 +49,12 @@ import {
   faCoins,
   faArrowRight,
   faCloudArrowUp,
+  faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import CUSelectButton from '../CUSelectButton';
 import CsvModal from '../CsvModal';
-import ChooseFile from '../../assets/ChooseFile.svg';
+
+import ImportFile from '../../assets/importfile.svg';
 import { SaveExitModal } from '../Issuers';
 
 const bgList = [bg1, bg2, bg3];
@@ -118,6 +120,24 @@ interface FormProps {
   backHandler: () => void;
 }
 
+interface FormErrors {
+  projectName?: any;
+  cert_name?: any;
+  pub_description?: any;
+  priv_description?: any;
+  issue_date?: any;
+  expire_date?: any;
+  certTitle?: any;
+  displayDob?: any;
+  dobFormat?: any;
+  displayEmployer?: any;
+  employerText?: any;
+  companyName?: any;
+  signer?: any;
+  signerTitle?: any;
+  participants?: any;
+}
+
 export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const { findProject, updateProject, addProject } = useProject();
@@ -135,7 +155,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const [dirty, setDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
-  //const [validated, setValidated] = useState(false);
+  const [validated, setValidated] = useState(false);
+  const [form, setForm] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const [previewImage, setPreviewImage] = useState<string>();
   const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
@@ -161,6 +183,70 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const rendering = useRef(false);
 
   const navigate = useNavigate();
+
+  const findFormErrors = (): FormErrors => {
+    const { cert_name, pub_description, priv_description, issue_date, expire_date } = certInfo;
+    const {
+      certTitle,
+      displayDob,
+      dobFormat,
+      displayEmployer,
+      employerText,
+      companyName,
+      signer,
+      signerTitle,
+    } = renderProps;
+    let newErrors: FormErrors = {};
+    if (!projectName || projectName === '')
+      newErrors = { ...newErrors, projectName: 'Please enter a project name' };
+    if (!cert_name) newErrors = { ...newErrors, cert_name: 'Please enter a certificate name' };
+
+    if (!issue_date) newErrors = { ...newErrors, issue_date: 'Please enter an issue date' };
+
+    if (!certTitle)
+      newErrors = {
+        ...newErrors,
+        certTitle: 'Please enter a title to be displayed on the certificate image',
+      };
+
+    if (!companyName)
+      newErrors = {
+        ...newErrors,
+        companyName: 'Please enter a company name to be displayed on the certificate image',
+      };
+
+    if (!signer)
+      newErrors = {
+        ...newErrors,
+        signer: 'Please enter a signer name to be displayed on the certificate image',
+      };
+
+    if (!signerTitle)
+      newErrors = { ...newErrors, signerTitle: 'Please enter a title for the certificate signer' };
+
+    for (let i = 0; i < participants.length; i++) {
+      let participantErrors = {};
+      const participant = participants[i];
+
+      if (!participant.name) participantErrors = { name: true };
+      if (!participant.surname) participantErrors = { ...participantErrors, surname: true };
+      if (!participant.dob) participantErrors = { ...participantErrors, dob: true };
+      if (!participant.cert_num) participantErrors = { ...participantErrors, cert_num: true };
+
+      if (!Object.keys(participantErrors).length) {
+        if (newErrors.participants) delete newErrors.participants[i];
+      } else
+        newErrors = {
+          ...newErrors,
+          participants: { ...newErrors.participants, [i]: participantErrors },
+        };
+    }
+    if (newErrors.participants && !Object.keys(newErrors.participants).length)
+      delete newErrors.participants;
+
+    console.log('Errors:', newErrors);
+    return newErrors;
+  };
 
   const updateCertInfo = (newCertInfo: object) => {
     setCertInfo({ ...certInfo, ...newCertInfo });
@@ -308,6 +394,16 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const scrtPayment = async (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     try {
       if (e) e.preventDefault();
+
+      const newErrors = findFormErrors();
+      // Conditional logic:
+      if (Object.keys(newErrors).length > 0) {
+        // We got errors!
+        setErrors(newErrors);
+        toast.error('Please complete all required fields.');
+        return;
+      }
+
       await handleSave();
       console.log('remain', RemainingCerts);
 
@@ -431,7 +527,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       <Container>
         <Form
           noValidate
-          //validated={validated}
+          validated={validated}
           onSubmit={handleSubmit}
           className={styles.certupInputForm}
         >
@@ -468,7 +564,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   type="text"
                   placeholder="My Project"
                   className="mt-1"
+                  isInvalid={!!errors.projectName}
                 />
+                <Form.Control.Feedback type="invalid">{errors.projectName}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -501,6 +599,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 </Col>
               </Row>
               {participants.map((item, index) => {
+                let pErrors;
+                if (errors.participants) pErrors = errors.participants[index];
                 return (
                   <Row key={`participant-${index}`} className="mb-2">
                     <Form.Group as={Col} md="3" controlId="validationCustom02">
@@ -510,6 +610,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         onChange={(e) => changeParticipant(index, 'name', e.target.value)}
                         type="text"
                         placeholder="First name"
+                        isInvalid={!!pErrors?.name}
                       />
                     </Form.Group>
 
@@ -520,6 +621,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
                         type="text"
                         placeholder="Last name"
+                        isInvalid={!!pErrors?.surname}
                       />
                     </Form.Group>
 
@@ -527,7 +629,12 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       <DatePicker
                         selected={participants[index].dob}
                         onChange={(date: Date) => changeParticipant(index, 'dob', undefined, date)}
-                        customInput={<ExampleCustomInput />}
+                        className={
+                          pErrors?.dob
+                            ? `${styles.inputStyle} ${styles.invalidDate}`
+                            : styles.inputStyle
+                        }
+                        //customInput={<ExampleCustomInput />}
                       />
                     </Form.Group>
 
@@ -538,6 +645,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
                         type="text"
                         placeholder="123456"
+                        isInvalid={!!pErrors?.cert_num}
                       />
                     </Form.Group>
 
@@ -560,15 +668,21 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Row>
                 );
               })}
-              <button className={styles.addBtn} onClick={addParticipant}>
-                + Add
-              </button>
-              <Image
-                src={ChooseFile}
-                alt="Choose File"
-                style={{ cursor: 'pointer' }}
-                onClick={() => setShowCsvModal(true)}
-              />
+              <Row>
+                <Col>
+                  <button className={styles.addBtn} onClick={addParticipant}>
+                    + Add
+                  </button>
+                </Col>
+                <Col>
+                  <Image
+                    src={ImportFile}
+                    alt="Import From File"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setShowCsvModal(true)}
+                  />
+                </Col>
+              </Row>
             </Col>
           </Row>
 
@@ -598,7 +712,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       onChange={(e) => updateCertInfo({ cert_name: e.target.value })}
                       type="text"
                       placeholder="2022 CFI Training Certificate"
+                      isInvalid={!!errors.cert_name}
                     />
+                    <Form.Control.Feedback type="invalid">{errors.cert_name}</Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -609,12 +725,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Col>
                   <Form.Group as={Col} md="12" controlId="validationCustom02">
                     <Form.Control
-                      required
                       as="textarea"
                       value={certInfo.pub_description}
                       onChange={(e) => updateCertInfo({ pub_description: e.target.value })}
                       type="text"
-                      placeholder="This description will be visible to the public."
+                      placeholder="This optional description will be visible to the public."
                     />
                   </Form.Group>
                 </Col>
@@ -626,12 +741,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Col>
                   <Form.Group as={Col} md="12" controlId="validationCustom02">
                     <Form.Control
-                      required
                       as="textarea"
                       value={certInfo.priv_description}
                       onChange={(e) => updateCertInfo({ priv_description: e.target.value })}
                       type="text"
-                      placeholder="This description will only be visible to the recipient and any third-parties authorized by the recipient."
+                      placeholder="This optional description will only be visible to the recipient and any third-parties authorized by the recipient."
                     />
                   </Form.Group>
                 </Col>
@@ -645,7 +759,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                     <DatePicker
                       selected={certInfo.issue_date}
                       onChange={(date: Date) => updateCertInfo({ issue_date: date })}
-                      className={styles.inputStyle}
+                      className={
+                        errors.issue_date
+                          ? `${styles.inputStyle} ${styles.invalidDate}`
+                          : styles.inputStyle
+                      }
                       //customInput={<TypeableDatePicker />}
                     />
                   </Form.Group>
@@ -752,7 +870,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       onChange={(e) => updateRenderProps({ certTitle: e.target.value })}
                       type="text"
                       placeholder="Certificate of Completion"
+                      isInvalid={!!errors.certTitle}
                     />
+                    <Form.Control.Feedback type="invalid">{errors.certTitle}</Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -800,7 +920,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       onChange={(e) => updateRenderProps({ companyName: e.target.value })}
                       type="text"
                       placeholder="Corporate Finance Institute"
+                      isInvalid={!!errors.companyName}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.companyName}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -824,7 +948,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       onChange={(e) => updateRenderProps({ signer: e.target.value })}
                       type="text"
                       placeholder="John Smith"
+                      isInvalid={!!errors.signer}
                     />
+                    <Form.Control.Feedback type="invalid">{errors.signer}</Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>
@@ -851,7 +977,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       onChange={(e) => updateRenderProps({ signerTitle: e.target.value })}
                       type="text"
                       placeholder="Director"
+                      isInvalid={!!errors.signerTitle}
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.signerTitle}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
               </Row>

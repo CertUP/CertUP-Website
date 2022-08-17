@@ -1,7 +1,13 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
 import { PermitSignature, RemainingCertsResponse, WalletContextState } from '../interfaces';
 import { SecretNetworkClient, Wallet } from 'secretjs';
-import { LoginToken, permissions, allowedTokens, permitName } from '../utils/loginPermit';
+import {
+  LoginToken,
+  permissions,
+  allowedTokens,
+  permitName,
+  getQueryPermit,
+} from '../utils/loginPermit';
 
 interface Props {
   children: ReactNode;
@@ -87,6 +93,12 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     getQuerier();
   }, []);
 
+  const refreshQueryPermit = async () => {
+    const permit = await getQueryPermit(Address, true);
+    setQueryPermit(permit);
+    return permit;
+  };
+
   const getQuerier = async () => {
     console.log('getting querier');
     const querier = await SecretNetworkClient.create({
@@ -96,8 +108,8 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     setQuerier(querier);
   };
 
-  const queryCredits = async (): Promise<number | undefined> => {
-    if (!QueryPermit) return;
+  const queryCredits = async (queryPermit = QueryPermit): Promise<number | undefined> => {
+    if (!queryPermit) return;
     setLoadingRemainingCerts(true);
 
     const query = {
@@ -116,7 +128,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
             chain_id: process.env.REACT_APP_CHAIN_ID,
             permissions: permissions,
           },
-          signature: QueryPermit,
+          signature: queryPermit,
         },
       },
     };
@@ -132,9 +144,17 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       if (response.generic_err?.msg === 'You are not a verified issuer.') setVerifiedIssuer(false);
+      if (response.generic_err?.msg === 'Failed to verify signatures for the given permit') {
+        await refreshQueryPermit();
+        return;
+      }
 
       setLoadingRemainingCerts(false);
-      throw new Error((response?.parse_err || response?.generic_err || '').toString());
+      throw new Error(
+        response?.parse_err?.msg ||
+          response?.generic_err?.msg ||
+          JSON.stringify(response, undefined, 2),
+      );
     }
     const result = parseInt(response?.remaining_certs?.certs || '0', 10);
     setRemainingCerts(result);

@@ -12,6 +12,8 @@ import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/G
 import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
+  ComputeResultCode,
+  ComputeTx,
   DossierResponse,
   PreloadData,
   RemainingCertsResponse,
@@ -34,10 +36,75 @@ export default function useExecute() {
     run();
   });
 
-  const parseError = (tx: Tx) => {
+  const parseComputeError = (tx: ComputeTx) => {
+    if (!tx.code) return;
+
+    switch (tx.code) {
+      case ComputeResultCode.ErrExecuteFailed:
+        throw new Error(`Execute contract failed: ${tx.rawLog}`);
+
+      // ErrQueryFailed error for rust smart query contract failure
+      case ComputeResultCode.ErrQueryFailed:
+        throw new Error(`Query contract failed: ${tx.rawLog}`);
+
+      // ErrAccountExists error for a contract account that already exists
+      case ComputeResultCode.ErrAccountExists:
+        throw new Error(`Experienced account already exists error: ${tx.rawLog}`);
+
+      // ErrGasLimit error for out of gas
+      case ComputeResultCode.ErrGasLimit:
+        throw new Error(`Exceeded gas limit.\nGas Limit: ${tx.gasWanted}\nGas Used: ${tx.gasUsed}`);
+
+      // ErrNotFound error for an entry not found in the store
+      case ComputeResultCode.ErrNotFound:
+        throw new Error(`Contract not found: ${tx.rawLog}`);
+
+      // ErrInvalidMsg error when we cannot process the error returned from the contract
+      case ComputeResultCode.ErrInvalidMsg:
+        throw new Error(`Experienced invalid message error: ${tx.rawLog}`);
+
+      // ErrEmpty error for empty content
+      case ComputeResultCode.ErrEmpty:
+        throw new Error(`Empty Contract: ${tx.rawLog}`);
+
+      // ErrLimit error for content that exceeds a limit
+      case ComputeResultCode.ErrLimit:
+        throw new Error(`Experienced Limit Exceeded error: ${tx.rawLog}`);
+
+      // ErrInvalid error for content that is invalid in this context
+      case ComputeResultCode.ErrInvalid:
+        throw new Error(`Invalid context: ${tx.rawLog}`);
+
+      // ErrDuplicate error for content that exsists
+      case ComputeResultCode.ErrDuplicate:
+        throw new Error(`Duplicate content: ${tx.rawLog}`);
+
+      // ErrSigFailed error for wasm code that has already been uploaded or failed
+      case ComputeResultCode.ErrSigFailed:
+        throw new Error(`Experienced Sig Failed error: ${tx.rawLog}`);
+
+      // case TxResultCode.ErrInsufficientFunds:
+      //   //check if SCRT was sent
+      //   if (tx.tx.body.messages.find((msg) => msg.value.sent_funds.length > 0)) {
+      //     console.log('TX TODO Check this and make a better error', tx);
+      //     throw new Error('Insufficent Funds');
+      //   }
+
+      //   // If not, only fees were trying to be paid
+      //   throw new Error('Insufficent Funds for Transaction Fees');
+    }
+  };
+
+  const parseError = (tx: ComputeTx) => {
     if (!tx.code) return;
     console.log('Failed TX', tx);
     console.error(tx.rawLog);
+    if (tx.codespace === 'compute') parseComputeError(tx);
+    else parseCosmosError(tx);
+  };
+
+  const parseCosmosError = (tx: ComputeTx) => {
+    if (!tx.code) return;
 
     switch (tx.code) {
       /** ErrInternal should never be exposed, but we reserve this code for non-specified errors */
@@ -217,7 +284,7 @@ export default function useExecute() {
     }
   };
 
-  const paySSCRT = async (numCerts: number): Promise<Tx> => {
+  const paySSCRT = async (numCerts: number): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -249,16 +316,23 @@ export default function useExecute() {
         gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
       },
     );
-    parseError(response);
+    parseError(response as ComputeTx);
     queryCredits();
     return response;
   };
 
-  const preloadCerts = async (data: PreloadData[], toast?: any) => {
+  interface PreloadProps {
+    data: PreloadData[];
+    project_id: string;
+    toast?: any;
+  }
+
+  const preloadCerts = async ({ data, project_id, toast }: PreloadProps) => {
     if (!Client) throw new Error('Client not available.');
 
     const preloadMsg = {
       pre_load: {
+        project_id,
         new_data: data,
       },
     };
@@ -291,7 +365,7 @@ export default function useExecute() {
           gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
         },
       );
-      parseError(response);
+      parseError(response as ComputeTx);
       setProcessingTx(false);
       if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
       return response;
@@ -322,7 +396,7 @@ export default function useExecute() {
           gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
         },
       );
-      parseError(response);
+      parseError(response as ComputeTx);
       setProcessingTx(false);
       if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
       return response;
@@ -351,5 +425,86 @@ export default function useExecute() {
     // null
   };
 
-  return { paySSCRT, preloadCerts };
+  interface allowAccessRequest {
+    tokenId: string;
+    address: string;
+    toastRef?: any;
+  }
+
+  const allowAddressAccess = async ({ tokenId, address, toastRef }: allowAccessRequest) => {
+    const approveMsg = {
+      set_whitelisted_approval: {
+        token_id: tokenId,
+        address: address,
+        view_private_metadata: 'approve_token',
+      },
+    };
+
+    const response = await executeNft(approveMsg, 50000, toastRef);
+    return response;
+  };
+
+  const removeAddressAccess = async ({ tokenId, address, toastRef }: allowAccessRequest) => {
+    const removeMsg = {
+      set_whitelisted_approval: {
+        token_id: tokenId,
+        address: address,
+        view_private_metadata: 'none',
+        view_owner: 'none',
+        transfer: 'none',
+      },
+    };
+
+    const response = await executeNft(removeMsg, 50000, toastRef);
+    return response;
+  };
+
+  interface generateAccessCodeProps {
+    tokenId: string;
+    code?: string;
+    toastRef?: any;
+  }
+
+  interface revokeAccessCodeProps {
+    tokenId: string;
+    code: string;
+    toastRef?: any;
+  }
+
+  const generateAccessCode = async ({ tokenId, code, toastRef }: generateAccessCodeProps) => {
+    const approveMsg = {
+      set_code_approval: {
+        token_id: tokenId,
+        code: code,
+        view_private_metadata: 'approve_token',
+      },
+    };
+
+    const response = await executeNft(approveMsg, 50000, toastRef);
+    return response;
+  };
+
+  const removeAccessCode = async ({ tokenId, code, toastRef }: revokeAccessCodeProps) => {
+    const removeMsg = {
+      set_code_approval: {
+        token_id: tokenId,
+        code: code,
+        view_private_metadata: 'none',
+        view_owner: 'none',
+        transfer: 'none',
+      },
+    };
+
+    const response = await executeNft(removeMsg, 50000, toastRef);
+    return response;
+  };
+
+  return {
+    paySSCRT,
+    preloadCerts,
+    generateAccessCode,
+    removeAccessCode,
+    allowAddressAccess,
+    removeAddressAccess,
+  };
 }

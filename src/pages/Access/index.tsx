@@ -35,15 +35,15 @@ import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/G
 import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
 import useQuery from '../../hooks/QueryHook';
+import { useNft } from '../../contexts/NftContext';
 
 export default function Access() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [certs, setCerts] = useState<NftDossier[]>([]);
 
   const [accessCode, setAccessCode] = useState<string>('');
 
   const { getOwnedCerts } = useQuery();
+  const { Dossiers, LoadingNfts, refreshInventory, refreshDossiers, findNft } = useNft();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,36 +51,16 @@ export default function Access() {
 
   useEffect(() => {
     console.log(location.state);
-    if (QueryPermit) queryOwnedCerts();
+    //if (QueryPermit) queryOwnedCerts();
   }, []);
 
   useEffect(() => {
     if (!QueryPermit || !Client || !Address) return;
-    queryOwnedCerts();
+    refreshDossiers();
   }, [QueryPermit]);
 
-  const queryOwnedCerts = async () => {
-    console.log(QueryPermit);
-
-    //@ts-ignore
-    const dossiers = await getOwnedCerts();
-    console.log('Owned Certs Response', dossiers);
-
-    setCerts(dossiers);
-    setLoading(false);
-  };
-
-  const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    if (window.history.state && window.history.state.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate('/', { replace: true }); // the current entry in the history stack will be replaced with the new one with { replace: true }
-    }
-  };
-
-  const handleView = (cert: NftDossier) => {
-    navigate(`/access/${cert.token_id}`, { state: { cert: cert } });
+  const handleView = (tokenId: string) => {
+    navigate(`/access/${tokenId}`, { state: { tokenId: tokenId } });
   };
 
   const handleMint = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -183,7 +163,7 @@ export default function Access() {
           <hr />
           <Row>
             <h2>Your Certificates</h2>
-            {loading ? (
+            {LoadingNfts ? (
               <div
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
@@ -191,7 +171,7 @@ export default function Access() {
                 <Spinner animation="border" />
               </div>
             ) : (
-              certs.map((cert, index) => {
+              Dossiers.map((cert, index) => {
                 console.log('aaa', cert);
 
                 const fakeMedia = [
@@ -239,7 +219,10 @@ export default function Access() {
                           //@ts-ignore
                           src={(
                             cert.private_metadata?.extension || fakeExtension
-                          ).media[0].url.replace('ipfs.io', 'infura-ipfs.io')}
+                          ).media[0].url.replace(
+                            'ipfs.io',
+                            process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
+                          )}
                           fluid={true}
                         />
                       }
@@ -251,9 +234,9 @@ export default function Access() {
                           role="button"
                           tabIndex={0}
                           style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                          onClick={() => handleView(cert)}
+                          onClick={() => handleView(cert.token_id)}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleView(cert);
+                            if (e.key === 'Enter') handleView(cert.token_id);
                           }}
                         >
                           View

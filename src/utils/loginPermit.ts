@@ -120,46 +120,7 @@ export default async function getPermits(
 
   // Wait for Keplr window to close
   await new Promise((r) => setTimeout(r, 150));
-
-  // Begin QUERY PERMIT
-  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
-  let finalPermit: PermitSignature;
-  if (!cachedPermit) {
-    const unsignedQueryPermit = {
-      chain_id: process.env.REACT_APP_CHAIN_ID as string,
-      account_number: '0', // Must be 0
-      sequence: '0', // Must be 0
-      fee: {
-        amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
-        gas: '1', // Must be 1
-      },
-      msgs: [
-        {
-          type: 'query_permit', // Must be "query_permit"
-          value: {
-            permit_name: permitName,
-            allowed_tokens: allowedTokens,
-            permissions: permissions,
-          },
-        },
-      ],
-      memo: '', // Must be empty
-    };
-
-    const { signature } = await window.keplr.signAmino(
-      process.env.REACT_APP_CHAIN_ID as string,
-      address,
-      unsignedQueryPermit,
-      {
-        preferNoSetFee: true, // Fee must be 0, so hide it from the user
-        preferNoSetMemo: true, // Memo must be empty, so hide it from the user
-      },
-    );
-
-    localStorage.setItem(`Certup-Query-Permit-v1-${address}`, JSON.stringify(signature));
-    finalPermit = signature;
-  } else finalPermit = JSON.parse(cachedPermit);
-
+  const finalPermit = await getQueryPermit(address);
   //return { loginPermit: signature, queryPermit: signature2, issued: issueDate, expires: expDate };
   return {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -169,3 +130,50 @@ export default async function getPermits(
     queryPermit: finalPermit,
   };
 }
+
+export const getQueryPermit = async (
+  address: string,
+  refresh = false,
+): Promise<PermitSignature> => {
+  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+    throw new Error('Keplr Extension Not Found');
+  }
+
+  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
+
+  if (!refresh && cachedPermit) return JSON.parse(cachedPermit);
+
+  const unsignedQueryPermit = {
+    chain_id: process.env.REACT_APP_CHAIN_ID as string,
+    account_number: '0', // Must be 0
+    sequence: '0', // Must be 0
+    fee: {
+      amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
+      gas: '1', // Must be 1
+    },
+    msgs: [
+      {
+        type: 'query_permit', // Must be "query_permit"
+        value: {
+          permit_name: permitName,
+          allowed_tokens: allowedTokens,
+          permissions: permissions,
+        },
+      },
+    ],
+    memo: '', // Must be empty
+  };
+
+  const { signature } = await window.keplr.signAmino(
+    process.env.REACT_APP_CHAIN_ID as string,
+    address,
+    unsignedQueryPermit,
+    {
+      preferNoSetFee: true, // Fee must be 0, so hide it from the user
+      preferNoSetMemo: true, // Memo must be empty, so hide it from the user
+    },
+  );
+
+  localStorage.setItem(`Certup-Query-Permit-v1-${address}`, JSON.stringify(signature));
+  return signature;
+};

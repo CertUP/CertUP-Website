@@ -5,6 +5,7 @@ import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
   DossierResponse,
+  NftDossier,
   PermitSignature,
   RemainingCertsResponse,
 } from '../interfaces';
@@ -144,7 +145,6 @@ export default function useQuery() {
     };
 
     const response = (await queryPermitNFTContract(dossierQuery)) as BatchDossierResponse;
-
     return response.batch_nft_dossier.nft_dossiers;
   };
 
@@ -248,6 +248,23 @@ export default function useQuery() {
     return response.token_approvals;
   };
 
+  const queryNFTDossier = async (token_id: string): Promise<NftDossier> => {
+    if (!Querier) throw new Error('Querier not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    // query NFT metadata
+    const approvalQuery = {
+      nft_dossier: {
+        token_id: token_id,
+      },
+    };
+
+    const response = await queryPermitNFTContract(approvalQuery);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    return response.nft_dossier;
+  };
+
   return {
     queryCredits,
     getOwnedCerts,
@@ -257,5 +274,6 @@ export default function useQuery() {
     queryNFTContract,
     queryPermitNFTContract,
     queryNFTWhitelist,
+    queryNFTDossier,
   };
 }
