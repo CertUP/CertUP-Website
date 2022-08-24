@@ -1,7 +1,7 @@
 @use '../../global/_variables.scss' as vars;
 
 .navItem {
-  margin-right: 90px;
+  //margin-right: 90px;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
@@ -39,4 +39,9 @@
   // // -webkit-text-fill-color: transparent;
   // -webkit-text-fill-color: #31b5c765;
   // -moz-text-fill-color: transparent;
+}
+
+
+.offcanvasItem {
+  margin-bottom: .5rem;
 }

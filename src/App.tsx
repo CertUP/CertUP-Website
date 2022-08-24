@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ItemProvider, ProjectProvider, WalletProvider } from './contexts';
 import { Home, Error, About, Clients, Access, ViewCert, Payment } from './pages/';
 import { ToastContainer } from 'react-toastify';
+
 import 'react-toastify/dist/ReactToastify.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import 'react-coinbase-commerce/dist/coinbase-commerce-button.css';

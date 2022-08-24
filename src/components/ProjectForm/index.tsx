@@ -668,13 +668,13 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Row>
                 );
               })}
-              <Row>
-                <Col>
+              <Row className="mt-2">
+                <Col xs={'auto'}>
                   <button className={styles.addBtn} onClick={addParticipant}>
                     + Add
                   </button>
                 </Col>
-                <Col>
+                <Col xs={'auto'} className="d-flex align-items-center mx-2">
                   <Image
                     src={ImportFile}
                     alt="Import From File"

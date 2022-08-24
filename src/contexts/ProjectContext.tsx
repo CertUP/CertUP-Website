@@ -1,19 +1,26 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import Project from '../interfaces/Project';
+import Project, { MintedProject } from '../interfaces/Project';
 // import { getRandom } from '../utils/helpers';
 import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { useWallet } from '.';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { dataURLtoFile } from '../utils/fileHelper';
+import useQuery from '../hooks/QueryHook';
+import { ExportProject } from '../interfaces';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
 export interface ProjectContextState {
-  Projects: Project[];
-  LoadingProjects: boolean;
+  PendingProjects: Project[];
+  MintedProjects: ExportProject[];
+  LoadingPendingProjects: boolean;
+  LoadingMintedProjects: boolean;
   refreshProjects: () => void;
+  refreshPendingProjects: () => void;
+  refreshMintedProjects: () => void;
   findProject: (id: string) => Project | undefined;
+  findMintedProject: (id: string) => ExportProject | undefined;
   addProject: (newProject: Project) => Promise<string>;
   removeProject: (id: string) => void;
   removeAll: () => void;
@@ -26,12 +33,25 @@ interface Props {
 
 // set default values for initializing
 const contextDefaultValues: ProjectContextState = {
-  Projects: [],
-  LoadingProjects: true,
+  PendingProjects: [],
+  LoadingPendingProjects: true,
+
+  MintedProjects: [],
+  LoadingMintedProjects: true,
+
   refreshProjects: function (): void {
     throw new Error('Function not implemented.');
   },
+  refreshPendingProjects: function (): void {
+    throw new Error('Function not implemented.');
+  },
+  refreshMintedProjects: function (): void {
+    throw new Error('Function not implemented.');
+  },
   findProject: function (): Project {
+    throw new Error('Function not implemented.');
+  },
+  findMintedProject: function (): ExportProject {
     throw new Error('Function not implemented.');
   },
   addProject: async function (): Promise<string> {
@@ -53,8 +73,12 @@ const ProjectContext = createContext<ProjectContextState>(contextDefaultValues);
 
 export const ProjectProvider = ({ children }: Props): ReactElement => {
   // set default values
-  const [Projects, setProjects] = useState<Project[]>(contextDefaultValues.Projects);
-  const [LoadingProjects, setLoading] = useState<boolean>(contextDefaultValues.LoadingProjects);
+  const [PendingProjects, setPendingProjects] = useState<Project[]>(contextDefaultValues.PendingProjects);
+  const [MintedProjects, setMintedProjects] = useState<ExportProject[]>(contextDefaultValues.MintedProjects);
+  const [LoadingPendingProjects, setLoadingPending] = useState<boolean>(contextDefaultValues.LoadingPendingProjects);
+  const [LoadingMintedProjects, setLoadingMinted] = useState<boolean>(contextDefaultValues.LoadingMintedProjects);
+
+  const { queryProjects } = useQuery();
 
   const { Address, LoginToken } = useWallet();
 
@@ -63,8 +87,14 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     refreshProjects();
   }, [LoginToken, Address]);
 
-  const refreshProjects = async () => {
-    console.log('Getting Projects from DB', LoginToken, Address);
+  const refreshProjects = () => {
+    refreshPendingProjects();
+    refreshMintedProjects();
+  }
+
+  const refreshPendingProjects = async () => {
+    if (!LoginToken || !Address) return;
+    setLoadingPending(true);
 
     const token = `Permit ${JSON.stringify(LoginToken)}`;
     const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
@@ -75,17 +105,12 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     });
 
     const returnedProjects: Project[] = response.data.data;
-    console.log('Returned from DB:', returnedProjects);
 
     const projects: Project[] = [];
 
     //= response.data.data.map((project: any) => {
     for (let i = 0; i < returnedProjects.length; i++) {
       const project: Project = returnedProjects[i];
-
-      // // convert logo URI into File object
-      // if (project.renderProps.company_logo_uri)
-      //   project.renderProps.company_logo_file = await dataURLtoFile(project.renderProps.company_logo_uri, 'Saved Image');
 
       //convert issue date string from DB into Date
       if (project.certInfo.issue_date)
@@ -102,8 +127,20 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
       projects.push(project);
     }
 
-    setProjects(projects);
-    setLoading(false);
+    setPendingProjects(projects);
+    setLoadingPending(false);
+  };
+
+  const refreshMintedProjects = async () => {
+    
+    setLoadingMinted(true);
+    console.log('Getting Minted Projects from Contract', LoginToken, Address);
+
+    const result = await queryProjects();
+    console.log(result);
+
+    if (result) setMintedProjects(result);
+    setLoadingMinted(false);
   };
 
   const addProject = async (newProject: Project) => {
@@ -113,7 +150,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     }
 
     // add item with new id generated
-    setProjects((Projects) => [...Projects, { ...newProject }]);
+    setPendingProjects((PendingProjects) => [...PendingProjects, { ...newProject }]);
 
     const token = `Permit ${JSON.stringify(LoginToken)}`;
     console.log('Saving Project:', newProject);
@@ -130,7 +167,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   // find item by using id value
   const findProject = (id: string): Project | undefined => {
-    const data = Projects;
+    const data = PendingProjects;
 
     // find the item's index to remove it
     const project = data.find((Project) => Project._id === id);
@@ -145,9 +182,20 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     return new Project(project);
   };
 
+  // find item by using id value
+  const findMintedProject = (id: string): ExportProject | undefined => {
+    const data = MintedProjects;
+
+    // find the item's index to remove it
+    const project = data.find((Project) => Project.project_id === id);
+
+    //return project;
+    return project;
+  };
+
   // remove item by using id value
   const removeProject = (id: string) => {
-    const data = Projects;
+    const data = PendingProjects;
 
     // find the item's index to remove it
     const index = data.findIndex((Project) => Project._id === id);
@@ -163,13 +211,13 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
     // data list will be changed because we are editing on the reference. Therefore, it is enough
     // to spread data values
-    setProjects([...data]);
+    setPendingProjects([...data]);
   };
 
   // Firstly, check if there any value exists in the list.
   // If does exist, set item list to an empty array otherwise, give alert to inform user.
   const removeAll = () =>
-    Projects.length === 0 ? alert('There are no tasks found in the list!') : setProjects([]);
+    PendingProjects.length === 0 ? alert('There are no tasks found in the list!') : setPendingProjects([]);
 
   // Update item with id and item values.
   const updateProject = async (id: string, project: Project) => {
@@ -178,7 +226,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
       return;
     }
 
-    const data = Projects;
+    const data = PendingProjects;
     const index = data.findIndex((Project) => Project._id === id);
 
     // if last save has preview but current doesnt, use last save's preview
@@ -186,7 +234,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
       project.lastPreview = data[index].lastPreview;
 
     data[index] = project;
-    setProjects([...data]);
+    setPendingProjects([...data]);
 
     const token = `Permit ${JSON.stringify(LoginToken)}`;
 
@@ -207,10 +255,15 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   };
 
   const values = {
-    Projects,
-    LoadingProjects,
+    PendingProjects,
+    MintedProjects,
+    LoadingPendingProjects,
+    LoadingMintedProjects,
     refreshProjects,
+    refreshPendingProjects,
+    refreshMintedProjects,
     findProject,
+    findMintedProject,
     addProject,
     removeProject,
     removeAll,

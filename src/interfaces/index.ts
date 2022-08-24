@@ -3,6 +3,7 @@ import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
 import { Tx } from 'secretjs';
 import { classicNameResolver } from 'typescript';
 import { LoginToken } from '../utils/loginPermit';
+import { CertupMetadata } from './token';
 
 export * as Project from './Project';
 
@@ -19,14 +20,6 @@ export interface ItemContextState {
   removeItem: (id: string) => void;
   removeAll: () => void;
   updateItem: (id: string, data: Item) => void;
-}
-
-export interface PreloadData {
-  name: string;
-  date: string;
-  cert_type: string;
-  pub_metadata: any;
-  priv_metadata: any;
 }
 
 export interface WalletContextState {
@@ -106,25 +99,18 @@ export interface NftDossier {
   display_private_metadata_error: string | null;
   owner: string | null;
   private_metadata: CertupMetadata;
+  private_metadata_is_public: boolean;
   public_metadata: CertupMetadata;
   token_approvals: any[];
   token_code_approvals: any[];
 }
 
-export interface CertupExtension extends Extension {
-  certificate: CertMetadata;
-}
-
-export interface CertMetadata {
-  name: string;
-  cert_type: string | null;
-  issue_date: string;
-  expire_date: string | null;
-  cert_number: string;
-}
-
-export interface CertupMetadata extends Metadata {
-  extension: CertupExtension;
+export interface PreLoad {
+  name: string,
+  date: string,
+  cert_type: string,
+  pub_metadata: CertupMetadata,
+  priv_metadata: CertupMetadata,
 }
 
 export interface RemainingCertsResponse {
@@ -135,10 +121,35 @@ export interface RemainingCertsResponse {
   generic_err?: ErrorResponse;
 }
 
+export interface QueryResponse {
+  parse_err?: ErrorResponse;
+  generic_err?: ErrorResponse;
+}
+
+export interface ListProjectsResponse extends QueryResponse {
+  list_projects?: LPSub;
+}
+
+interface LPSub {
+  data_list: ExportProject[]
+}
+
+export interface ExportProject {
+  /// Unique ID of the project
+  project_id: string,
+  project: ProjectOverview,
+}
+
+interface ProjectOverview {
+  pending_certs: string,
+  minted_certs: string,
+}
+
 interface ErrorResponse {
   msg: string;
 }
-export declare enum ComputeResultCode {
+
+export enum ComputeResultCode {
   // ErrInstantiateFailed error for rust instantiate contract failure
   ErrInstantiateFailed = 2, // "instantiate contract failed")
 
@@ -187,14 +198,14 @@ export declare enum ComputeResultCode {
   Success = 0,
 }
 
-export declare type ComputeTx = {
+export type ComputeTx = {
   readonly height: number;
   /** Transaction hash (might be used as transaction ID). Guaranteed to be non-empty upper-case hex */
   readonly transactionHash: string;
   /** Transaction execution error code. 0 on success. See {@link TxResultCode}. */
   readonly code: TxResultCode | ComputeResultCode;
-  /** Transaction execution error codespace. Empty or compute */
-  readonly codespace: string;
+  // /** Transaction execution error codespace. Empty or compute */
+  // readonly codespace: string;
   /**
    * If code != 0, rawLog contains the error.
    *
@@ -202,7 +213,7 @@ export declare type ComputeTx = {
    */
   readonly rawLog: string;
   /** If code = 0, `jsonLog = JSON.parse(rawLow)`. Values are decrypted if possible. */
-  readonly jsonLog?: JsonLog;
+  readonly jsonLog?: any;
   /** If code = 0, `arrayLog` is a flattened `jsonLog`. Values are decrypted if possible. */
   readonly arrayLog?: ArrayLog;
   /** Return value (if there's any) for each input message */

@@ -16,8 +16,6 @@ import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
 import {
   BatchDossierResponse,
-  CertupExtension,
-  CertupMetadata,
   NftDossier,
   PermitSignature,
 } from '../../interfaces';
@@ -36,6 +34,8 @@ import ReactJson from 'react-json-view';
 import { Extension } from 'secretjs/dist/extensions/snip721/types';
 import useQuery from '../../hooks/QueryHook';
 import { useNft } from '../../contexts/NftContext';
+import PreloadImage from '../../components/PreloadImage';
+import { CertupExtension } from '../../interfaces/token';
 
 export default function Access() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
@@ -71,7 +71,6 @@ export default function Access() {
         mint_cert: {
           cert_key: accessCode,
           recipient: Address,
-          keys: [],
         },
       };
 
@@ -83,7 +82,7 @@ export default function Access() {
           msg: mintMsg,
         },
         {
-          gasLimit: 75_000,
+          gasLimit: 85_000,
         },
       );
       console.log('Mint Result:', result);
@@ -100,6 +99,7 @@ export default function Access() {
         isLoading: false,
         autoClose: 5000,
       });
+      refreshDossiers();
     } catch (error: any) {
       toast.update(toastRef, {
         render: error.toString(),
@@ -183,9 +183,8 @@ export default function Access() {
                 const fakeExtension: CertupExtension = {
                   certificate: {
                     name: 'Hello Certup',
-                    cert_type: null,
+                    cert_type: '',
                     issue_date: '2222-05-31T00:23:03.000Z',
-                    expire_date: null,
                     cert_number: '123',
                   },
                   image: undefined,
@@ -214,15 +213,17 @@ export default function Access() {
                   >
                     <Row className="mb-2">
                       {
-                        <Image
+                        <PreloadImage
                           // eslint-disable-next-line prettier/prettier
                           //@ts-ignore
-                          src={(
-                            cert.private_metadata?.extension || fakeExtension
-                          ).media[0].url.replace(
-                            'ipfs.io',
-                            process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
-                          )}
+                          // src={(
+                          //   cert.private_metadata?.extension || fakeExtension
+                          // ).media[0].url.replace(
+                          //   'ipfs.io',
+                          //   process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
+                          // )}
+                          url={(cert?.private_metadata?.extension?.media || [])[0]?.url}
+                          decryptionKey={(cert?.private_metadata?.extension?.media || [])[0]?.authentication?.key}
                           fluid={true}
                         />
                       }

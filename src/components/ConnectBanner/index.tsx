@@ -19,21 +19,25 @@ export default function ConnectBanner() {
             To create certificates you must be connected with Keplr Wallet.
           </span>
         </Row>
+        <Col xs={'auto'}>
         <Row>
-          <Col xs={'auto'}>
-            <KeplrButton />
+          <Col xs={'auto'} className="text-end">
+            <KeplrButton/>
+            <div className="mt-1">
+              <a
+                href="https://keplr.app"
+                className={`${styles.bannerLink}`}
+                target="blank"
+                rel="noopener noreferrer"
+              >
+                Get Keplr Wallet →
+              </a>
+            </div>
+
           </Col>
         </Row>
-        <Row>
-          <a
-            href="https://keplr.app"
-            className={styles.bannerLink}
-            target="blank"
-            rel="noopener noreferrer"
-          >
-            Get Keplr Wallet →
-          </a>
-        </Row>
+        </Col>
+
       </Container>
     </Container>
   );

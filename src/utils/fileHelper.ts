@@ -16,7 +16,76 @@
 //   });
 // }
 
-const fileToDataURI = async (file: File | undefined, type: string): Promise<string> => {
+import axios from "axios";
+import crypto from "crypto";
+
+const ALGORITHM = "aes-256-gcm";
+const IV_LENGTH = 16;
+
+const ipfsMirrors = [
+  'infura-ipfs.io',
+'dweb.link',
+'cloudflare-ipfs.com',
+'gateway.pinata.cloud',
+'cf-ipfs.com',
+'nftstorage.link',
+'storry.tv',
+]
+
+export const ipfsDownload = async (url: string) => {
+  if (!url.includes('ipfs.io')) return await download(url);
+  let final;
+
+  for (let i=0; i < ipfsMirrors.length; i++){
+    const mirror = ipfsMirrors[i];
+    console.log('trying ', mirror)
+    const newUrl = url.replace('ipfs.io', mirror);
+    try {
+      const response = await download(newUrl, 4500);
+      console.log(response);
+      if (response.data) {
+        final = response.data;
+        break;
+      }
+    } catch(error: any) {
+      null //just continue
+    }
+  }
+  if (final) return final
+  else throw new Error('Unable to download file from IPFS.')
+}
+
+
+const download = async (url: string, timeout = 10000) => {
+  return await axios.get(url, {
+    responseType: 'arraybuffer',
+    timeout: timeout
+  })
+}
+
+export const decryptFile = (input: Uint8Array, key: string) => {
+  try {
+  //console.log("key is ", key);
+  const dataBuffer = Buffer.from(input)
+  const data32 = dataBuffer.toString('utf-8').substring(0, 32);
+  const cipherKey = Buffer.from(key);
+  const ivSize = dataBuffer.readUInt8(0);
+  const iv = dataBuffer.slice(1, ivSize + 1);
+  const authTag = dataBuffer.slice(ivSize + 1, ivSize + 17);
+  const decipher = crypto.createDecipheriv(ALGORITHM, cipherKey, iv);
+  decipher.setAuthTag(authTag);
+  return Buffer.concat([
+    decipher.update(dataBuffer.slice(ivSize + 17)),
+    decipher.final(),
+  ]);
+  } catch(error: any) {
+    if (error.toString().includes('invalid key length')) return input;
+    else throw error;
+  }
+
+};
+
+export const fileToDataURI = async (file: File | undefined, type: string): Promise<string> => {
   if (!file) return '';
   const arrayBuffer = await file.arrayBuffer();
   return arrayBufferToDataURI(arrayBuffer, type);
@@ -26,7 +95,7 @@ const fileToDataURI = async (file: File | undefined, type: string): Promise<stri
   return dataURI;
 };
 
-function dataURLtoFile(dataurl: string, filename2?: string) {
+export function dataURLtoFile(dataurl: string, filename2?: string) {
   const filename = 'Previously Uploaded';
   const arr = dataurl.split(',');
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -43,12 +112,10 @@ function dataURLtoFile(dataurl: string, filename2?: string) {
   return new File([u8arr], filename2 || filename, { type: mime });
 }
 
-const arrayBufferToDataURI = (imageBuffer: ArrayBuffer | undefined, type: string): string => {
+export const arrayBufferToDataURI = (imageBuffer: ArrayBuffer | undefined, type: string): string => {
   if (!imageBuffer) return ''; //todo show broken image placeholder
 
   const base64Image = Buffer.from(imageBuffer).toString('base64');
   const dataURI = `data:${type};base64,${base64Image}`;
   return dataURI;
 };
-
-export { fileToDataURI, dataURLtoFile, arrayBufferToDataURI };

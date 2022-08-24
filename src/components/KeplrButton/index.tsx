@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ReactElement, ReactNode, useState } from 'react';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';
 import { toast } from 'react-toastify';
 
+import { useCookies } from "react-cookie";
+
 import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
-import { getErrorMessage, reportError } from '../../utils/helpers';
-import getPermits, { LoginToken } from '../../utils/loginPermit';
+import { getErrorMessage, numDaysBetween, reportError } from '../../utils/helpers';
+import getPermits, { getCachedQueryPermit, LoginToken } from '../../utils/loginPermit';
 
 const addHours = (date: Date, hours: number): Date => {
   date.setTime(date.getTime() + hours * 60 * 60 * 1000);
@@ -24,10 +26,22 @@ const truncateAddress = (address: string) => {
 export default function KeplrButton(): ReactElement {
   const { Address, updateClient } = useWallet();
   const [loading, setLoading] = useState(false);
+  
+  const [cookies, setCookie] = useCookies(["ConnectedKeplr"]);
 
   //const [secretJs, setSecretJs] = useGlobalState('secretJs');
   //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
   //const [isSigner, setIsSigner] = useGlobalState('isSigner');
+
+  useEffect(()=> {
+    if (!window.keplr) return;
+    if (cookies.ConnectedKeplr) {
+      if (numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) < 15 /* && getCachedQueryPermit(Address) */ ) {
+        handleConnect();
+      }
+    }
+
+  },[window.keplr])
 
   const handleConnect = async () => {
     try {
@@ -60,8 +74,8 @@ export default function KeplrButton(): ReactElement {
         issueDate,
         expDate,
       );
-      console.log('Permits', token, permit);
-      await updateClient(secretjs, keplrOfflineSigner as Wallet, myAddress, token, permit);
+      updateClient(secretjs, keplrOfflineSigner as Wallet, myAddress, token, permit);
+      setCookie("ConnectedKeplr", new Date().toISOString(), { path: "/" });
       setLoading(false);
     } catch (error) {
       setLoading(false);

@@ -5,6 +5,7 @@ import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
   DossierResponse,
+  ListProjectsResponse,
   NftDossier,
   PermitSignature,
   RemainingCertsResponse,
@@ -117,10 +118,43 @@ export default function useQuery() {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     });
-    if (!response || response.parse_err || response.generic_err)
-      throw new Error((response.parse_err || response.generic_err || '').toString());
-    //setRemainingCerts(parseInt(response.remaining_certs.certs || '0', 10));
+    
+    checkError(response);
+    
     return parseInt(response.remaining_certs?.certs || '0', 10);
+  };
+
+  const queryProjects = async () => {
+    if (!Querier) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    const query = {
+      with_permit: {
+        query: {
+          list_projects: {
+          },
+        },
+        permit: {
+          params: {
+            permit_name: permitName,
+            allowed_tokens: allowedTokens,
+            chain_id: process.env.REACT_APP_CHAIN_ID,
+            permissions: permissions,
+          },
+          signature: QueryPermit,
+        },
+      },
+    };
+
+    const response: ListProjectsResponse | undefined = await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    });
+    checkError(response);
+    console.log(response)
+
+    return response.list_projects?.data_list;
   };
 
   const getOwnedCerts = async () => {
@@ -271,6 +305,7 @@ export default function useQuery() {
     getCert,
     getSSCRTBalance,
     getSCRTBalance,
+    queryProjects,
     queryNFTContract,
     queryPermitNFTContract,
     queryNFTWhitelist,

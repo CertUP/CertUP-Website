@@ -22,7 +22,7 @@ interface Props {
 
 export default function ProjectList({ setProjectId }: Props) {
   //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
-  const { Projects, LoadingProjects } = useProject();
+  const { PendingProjects, LoadingPendingProjects } = useProject();
   const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
 
   // const [loading, setLoading] = useState<boolean>(true);
@@ -80,7 +80,7 @@ export default function ProjectList({ setProjectId }: Props) {
     <>
       <Container>
         <Row className="justify-content-center">
-          <span className={styles.aboutTitle}>For Issuers</span>
+          <span className={styles.aboutTitle}>Issue Certificate</span>
 
           <Col xs={'auto'}>
             <CUButton onClick={() => setProjectId()} disabled={LoadingRemainingCerts}>
@@ -94,13 +94,13 @@ export default function ProjectList({ setProjectId }: Props) {
 
       <Container>
         <h3 className={styles.certsLabel}>Your Certificates</h3>
-        {LoadingProjects || LoadingRemainingCerts ? (
+        {LoadingPendingProjects || LoadingRemainingCerts ? (
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
-        ) : Projects.length ? (
-          <Row className="justify-content-around">
-            {Projects.map((p, i) => (
+        ) : PendingProjects.length ? (
+          <Row className="">
+            {PendingProjects.map((p, i) => (
               <ProjectTile projectIn={p} setProjectId={setProjectId} key={`project-list-${i}`} />
             ))}
           </Row>

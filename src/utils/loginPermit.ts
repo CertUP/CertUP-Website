@@ -65,6 +65,11 @@ export interface GetPermitResponse {
 //   return { permit: signature, issued: issueDate, expires: expDate };
 // }
 
+export function getCachedQueryPermit(address: string): string | undefined {
+  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`);
+  return cachedPermit ? cachedPermit : undefined;
+}
+
 export default async function getPermits(
   address: string,
   issueDate: Date,
@@ -139,7 +144,7 @@ export const getQueryPermit = async (
     throw new Error('Keplr Extension Not Found');
   }
 
-  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}`);
+  const cachedPermit = getCachedQueryPermit(address);
 
   if (!refresh && cachedPermit) return JSON.parse(cachedPermit);
 
@@ -174,6 +179,6 @@ export const getQueryPermit = async (
     },
   );
 
-  localStorage.setItem(`Certup-Query-Permit-v1-${address}`, JSON.stringify(signature));
+  localStorage.setItem(`Certup-Query-Permit-v1-${address}-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`, JSON.stringify(signature));
   return signature;
 };

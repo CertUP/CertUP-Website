@@ -1,4 +1,5 @@
 import { GenerateInput, RenderParticipant } from '../utils/backendHelper';
+import { CertupMetadata } from './token';
 
 export interface ProjectProps {
   _id?: string;
@@ -66,12 +67,12 @@ interface BaseCertInfo {
 }
 
 export interface CertInfo extends BaseCertInfo {
-  issue_date?: Date;
+  issue_date: Date;
   expire_date?: Date;
 }
 
 export interface RemoteCertInfo extends BaseCertInfo {
-  issue_date?: string;
+  issue_date: string;
   expire_date?: string;
 }
 
@@ -81,6 +82,32 @@ export const defaultCertInfo: CertInfo = {
   priv_description: '',
   issue_date: new Date(),
 };
+
+export interface MintedProject {
+  id: string;
+  num_minted?: string;
+  num_pending?: string;
+  project_contents: PreloadedToken[];
+}
+
+export interface PreloadedToken {
+  preload_data: ManagerPendingToken;
+  claim_code: string;
+  minted: boolean;
+}
+
+export interface ManagerPendingToken {
+  name: string;
+  date: string;
+  cert_type: string;
+  pub_metadata?: CertupMetadata,
+  priv_metadata?: CertupMetadata,
+
+  cert_num: string;
+
+  issuer_addr: string;
+  issuer_name?: string;
+}
 
 export default class Project {
   _id?: string;

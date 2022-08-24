@@ -25,14 +25,14 @@ export default function Footer() {
           <Col md={8}>
             <Row style={{ paddingTop: '75px' }}>
               <Col md={4}>
-                {/* <span className={styles.footerLink}>About</span> */}
+                <span className={styles.footerLink}>About</span>
                 <div style={{ paddingTop: '30px' }} />
-                {/* <span className={styles.footerLink}>For Issuers</span> */}
+                <span className={styles.footerLink}>Issue Certificate</span>
               </Col>
               <Col md={4}>
-                {/* <span className={styles.footerLink}>Get a Certificate</span> */}
+                <span className={styles.footerLink}>Access Certificate</span>
                 <div style={{ paddingTop: '30px' }} />
-                {/* <span className={styles.footerLink}>Verify Certificate</span> */}
+                <span className={styles.footerLink}>Verify Certificate</span>
               </Col>
             </Row>
             <Row style={{ paddingTop: '65px', paddingBottom: '85px' }}>

@@ -79,7 +79,7 @@ export default function Issuers() {
 
           <Container>
             <Row>
-              <span className={styles.aboutTitle}>For Issuers</span>
+              <span className={styles.aboutTitle}>Issue Certificate</span>
             </Row>
           </Container>
           <Spacer height={50} />

@@ -15,7 +15,7 @@ import {
   ComputeResultCode,
   ComputeTx,
   DossierResponse,
-  PreloadData,
+  PreLoad,
   RemainingCertsResponse,
 } from '../interfaces';
 import { logSizeInBytes } from '../utils/helpers';
@@ -39,17 +39,19 @@ export default function useExecute() {
   const parseComputeError = (tx: ComputeTx) => {
     if (!tx.code) return;
 
+    const errorMsg = tx.jsonLog?.generic_err?.msg || tx.jsonLog?.parse_err?.msg || tx.rawLog
+
     switch (tx.code) {
       case ComputeResultCode.ErrExecuteFailed:
-        throw new Error(`Execute contract failed: ${tx.rawLog}`);
+        throw new Error(`Execute contract failed: ${errorMsg}`);
 
       // ErrQueryFailed error for rust smart query contract failure
       case ComputeResultCode.ErrQueryFailed:
-        throw new Error(`Query contract failed: ${tx.rawLog}`);
+        throw new Error(`Query contract failed: ${errorMsg}`);
 
       // ErrAccountExists error for a contract account that already exists
       case ComputeResultCode.ErrAccountExists:
-        throw new Error(`Experienced account already exists error: ${tx.rawLog}`);
+        throw new Error(`Experienced account already exists error: ${errorMsg}`);
 
       // ErrGasLimit error for out of gas
       case ComputeResultCode.ErrGasLimit:
@@ -57,31 +59,31 @@ export default function useExecute() {
 
       // ErrNotFound error for an entry not found in the store
       case ComputeResultCode.ErrNotFound:
-        throw new Error(`Contract not found: ${tx.rawLog}`);
+        throw new Error(`Contract not found: ${errorMsg}`);
 
       // ErrInvalidMsg error when we cannot process the error returned from the contract
       case ComputeResultCode.ErrInvalidMsg:
-        throw new Error(`Experienced invalid message error: ${tx.rawLog}`);
+        throw new Error(`Experienced invalid message error: ${errorMsg}`);
 
       // ErrEmpty error for empty content
       case ComputeResultCode.ErrEmpty:
-        throw new Error(`Empty Contract: ${tx.rawLog}`);
+        throw new Error(`Empty Contract: ${errorMsg}`);
 
       // ErrLimit error for content that exceeds a limit
       case ComputeResultCode.ErrLimit:
-        throw new Error(`Experienced Limit Exceeded error: ${tx.rawLog}`);
+        throw new Error(`Experienced Limit Exceeded error: ${errorMsg}`);
 
       // ErrInvalid error for content that is invalid in this context
       case ComputeResultCode.ErrInvalid:
-        throw new Error(`Invalid context: ${tx.rawLog}`);
+        throw new Error(`Invalid context: ${errorMsg}`);
 
       // ErrDuplicate error for content that exsists
       case ComputeResultCode.ErrDuplicate:
-        throw new Error(`Duplicate content: ${tx.rawLog}`);
+        throw new Error(`Duplicate content: ${errorMsg}`);
 
       // ErrSigFailed error for wasm code that has already been uploaded or failed
       case ComputeResultCode.ErrSigFailed:
-        throw new Error(`Experienced Sig Failed error: ${tx.rawLog}`);
+        throw new Error(`Experienced Sig Failed error: ${errorMsg}`);
 
       // case TxResultCode.ErrInsufficientFunds:
       //   //check if SCRT was sent
@@ -99,7 +101,7 @@ export default function useExecute() {
     if (!tx.code) return;
     console.log('Failed TX', tx);
     console.error(tx.rawLog);
-    if (tx.codespace === 'compute') parseComputeError(tx);
+    if (/*tx.codespace === 'compute' || */ tx.rawLog.includes('contract')) parseComputeError(tx);
     else parseCosmosError(tx);
   };
 
@@ -318,11 +320,11 @@ export default function useExecute() {
     );
     parseError(response as ComputeTx);
     queryCredits();
-    return response;
+    return response as ComputeTx;
   };
 
   interface PreloadProps {
-    data: PreloadData[];
+    data: PreLoad[];
     project_id: string;
     toast?: any;
   }
@@ -339,7 +341,7 @@ export default function useExecute() {
 
     logSizeInBytes('Preload Msg', preloadMsg);
     //todo: extimate gas based on number of participants
-    const response = await executeManager(preloadMsg, 65000, toast);
+    const response = await executeManager(preloadMsg, 85000, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
     queryCredits();
     return response;
@@ -421,8 +423,18 @@ export default function useExecute() {
     return response;
   };
 
-  const revokeAccessGlobal = async (tokenId: string) => {
-    // null
+  const revokeAccessGlobal = async (tokenId: string, toastRef?: any) => {
+    if (!Client) throw new Error('Client not available.');
+
+    const approveMsg = {
+      set_global_approval: {
+        token_id: tokenId,
+        view_private_metadata: 'revoke_token',
+      },
+    };
+
+    const response = await executeNft(approveMsg, 50000, toastRef);
+    return response;
   };
 
   interface allowAccessRequest {
@@ -506,5 +518,7 @@ export default function useExecute() {
     removeAccessCode,
     allowAddressAccess,
     removeAddressAccess,
+    approveAccessGlobal,
+    revokeAccessGlobal
   };
 }

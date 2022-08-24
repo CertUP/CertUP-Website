@@ -12,7 +12,7 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faDownload, faPaste, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faDownload, faPaste, faTimesCircle, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
 import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
@@ -47,7 +47,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
   const [allowButtonStyle, setAllowButtonStyle] = useState<any>({});
 
   const { queryNFTWhitelist, queryNFTDossier } = useQuery();
-  const { generateAccessCode, allowAddressAccess } = useExecute();
+  const { generateAccessCode, allowAddressAccess, approveAccessGlobal, revokeAccessGlobal } = useExecute();
   const { ProcessingTx } = useWallet();
 
   const { Dossiers, LoadingNfts, refreshInventory, refreshDossiers, findNft } = useNft();
@@ -88,7 +88,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
     // const newDossier = await queryNFTDossier(tokenId);
     // console.log('newdoss', newDossier);
     // setDossier(newDossier);
-    refreshDossiers();
+    await refreshDossiers();
     setLoadingApprovals(false);
   };
 
@@ -103,13 +103,30 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
     console.log(metadata);
   };
 
+  const handleAllowAll = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    try {
+      setLoading('allowAll');
+      e.preventDefault();
+      let response;
+      console.log(metadata.private_metadata_is_public)
+      if (metadata.private_metadata_is_public) response = await revokeAccessGlobal(tokenId);
+      else response = await approveAccessGlobal(tokenId);
+      console.log(response);
+      await refreshDossier();
+      setLoading('');
+    } catch (error) {
+      console.error(error);
+      setLoading('');
+    }
+  };
+
   const handleGenCode = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     try {
       setLoading('genCode');
       e.preventDefault();
       const response = await generateAccessCode({ tokenId });
       console.log(response);
-      refreshDossier();
+      await refreshDossier();
       setLoading('');
     } catch (error) {
       console.error(error);
@@ -128,7 +145,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
       }
       const response = await allowAddressAccess({ tokenId, address: whitelistAddr });
       console.log(response);
-      refreshDossier();
+      await refreshDossier();
       setLoading('');
     } catch (error) {
       console.error(error);
@@ -151,10 +168,20 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
                 certificate&apos;s URL.
               </p>
             </Row>
-            <Row className="justify-content-center">
+            <Row className="justify-content-center text-center">
               <Col md="auto">
-                <CUButton btnStyle="square" disabled={ProcessingTx}>
-                  Allow All
+              { metadata?.private_metadata_is_public ? 
+              <p className={styles.unlockedText}>Public Access Unlocked <FontAwesomeIcon icon={faUnlock} /></p>
+            : null }
+                <CUButton btnStyle="square" disabled={ProcessingTx} onClick={handleAllowAll}>
+                  {loading === 'allowAll' ? (
+                    <Spinner animation="border" variant="gray" size="sm" />
+                  ) : (
+                    metadata?.private_metadata_is_public ? 
+                    'Revoke Public Access'
+                    :
+                    'Allow All'
+                  )}
                 </CUButton>
               </Col>
             </Row>

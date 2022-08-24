@@ -16,7 +16,6 @@ import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
 import {
   BatchDossierResponse,
-  CertupExtension,
   NftDossier,
   PermitSignature,
 } from '../../interfaces';
@@ -42,6 +41,8 @@ import {
 } from 'react-share';
 import AllowModal from '../../components/Access/AllowModal';
 import { useNft } from '../../contexts/NftContext';
+import PreloadImage from '../../components/PreloadImage';
+import CopyButton from '../../components/CopyButton';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();
@@ -158,11 +159,14 @@ export default function ViewCert() {
             <>
               <Row style={{ marginBottom: '3rem' }}>
                 <Col md={{ span: 8, offset: 2 }}>
-                  <Image
-                    src={(cert?.private_metadata?.extension?.media || [])[0].url.replace(
-                      'ipfs.io',
-                      process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
-                    )}
+                  <h2>{(cert?.private_metadata || cert?.public_metadata)?.extension?.name}</h2>
+                  <PreloadImage
+                    // src={(cert?.private_metadata?.extension?.media || [])[0].url.replace(
+                    //   'ipfs.io',
+                    //   process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
+                    // )}
+                    url={(cert?.private_metadata?.extension?.media || [])[0]?.url}
+                    decryptionKey={(cert?.private_metadata?.extension?.media || [])[0]?.authentication?.key}
                     fluid={true}
                   />
                 </Col>
@@ -186,9 +190,12 @@ export default function ViewCert() {
                       </Col>
                     </Row>
                   </Col>
+                  <Col md={{span: 5}}>
+                    <span>Issued By</span>
+                  </Col>
                 </Row>
                 <Row className="mt-4">
-                  <Col md={{ span: 6, offset: 1 }}>
+                  <Col md={{ span: 10, offset: 1 }}>
                     <hr />
                     <Row className="mb-2">
                       <h2>Share on Social Media</h2>
@@ -206,20 +213,102 @@ export default function ViewCert() {
                       <Col>
                         <span>Facebook</span>
                       </Col>
+                      <Col>
+                        <span>Email</span>
+                      </Col>
+
                     </Row>
+                    <Row className="mb-4">
+                      <Col>
+                        <h5 style={{display: 'inline', marginRight: '.5rem'}}>Certificate Link</h5><CopyButton text={`https://certup.net/access/${cert.token_id}`}/><br />
+                        <span className={`${styles.accessText} mx-2`}>https://certup.net/access/{cert.token_id}</span>
+                      </Col>
+                    </Row>
+
                     <hr />
                   </Col>
                 </Row>
                 <Row>
                   <Col md={{ span: 10, offset: 1 }}>
-                    <h2>Certificate Metadata</h2>
-                    <ReactJson
-                      src={cert}
-                      name={`Certificate`}
-                      collapsed={true}
-                      displayObjectSize={false}
-                      displayDataTypes={false}
-                    />
+                    <h2 className="mb-4">Certificate Metadata</h2>
+                    <Row className="mx-4">
+                      <Col md={6}>
+                          <h4>Recipient</h4>
+                          <ul>
+                            <li>
+                            {cert.private_metadata.extension.certified_individual?.first_name} {cert.private_metadata.extension.certified_individual?.middle_name} {cert.private_metadata.extension.certified_individual?.last_name}
+
+                            </li>
+                          { cert.private_metadata.extension.certified_individual?.id ? <li>ID: {cert.private_metadata.extension.certified_individual?.id}</li> : null }
+
+                          { cert.private_metadata.extension.certified_individual?.date_of_birth ? <li>Birth Date: {(new Date(cert.private_metadata.extension.certified_individual?.date_of_birth).toLocaleDateString())}</li> : null }
+                            
+                          </ul>
+                      </Col>
+                      <Col md={6}>
+                        <h4>Issuers</h4>
+                        <Row>
+                        {cert.private_metadata.extension.issuing_organizations?.map(item=>{
+                              return (
+                                <Col xs="auto" key={item.name}>
+                                  <ul>
+                                    <li>
+                                      {item.name}
+                                    </li>
+                                    {item.url ? <li><a href={item.url}>{item.url}</a></li> : null }
+
+                                    {item.address ? <li>{item.address}</li> : null }
+                                  </ul>
+                                </Col>
+                              )
+                          })}
+                            {cert.private_metadata.extension.issuing_individuals?.map(item=>{
+                              return (
+                                <Col xs="auto" key={item.name}>
+                                  <ul>
+                                    <li>
+                                      {item.name}
+                                    </li>
+                                    {item.company ? <li>{item.company}</li> : null }
+
+                                    {item.title ? <li>{item.title}</li> : null }
+                                  </ul>
+                                </Col>
+                              )
+                          })}
+                        </Row>
+                      </Col>
+                    </Row>
+                    <Row className="mx-4 mb-4">
+                          <Col md={6}>
+                            <h4>Certificate Details</h4>
+                            <ul>
+                              <li>
+                                {cert.private_metadata.extension.certificate.name}
+                              </li>
+                              {cert.private_metadata.extension.certificate.cert_type ? <li>{cert.private_metadata.extension.certificate.cert_type}</li> : null }
+                              {cert.private_metadata.extension.certificate.cert_number ? <li>Certificate Number: {cert.private_metadata.extension.certificate.cert_number}</li> : null }
+                              {cert.private_metadata.extension.certificate.issue_date ? <li>Issued: {new Date(cert.private_metadata.extension.certificate.issue_date).toLocaleDateString()}</li> : null }
+                              {cert.private_metadata.extension.certificate.expire_date ? <li>Expires: {new Date(cert.private_metadata.extension.certificate.expire_date).toLocaleDateString()}</li> : null }
+                              {cert.private_metadata.extension.description ? <li>Description: {cert.private_metadata.extension.description}</li> : null }
+                            </ul>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <h4 className="mb-0">Raw Metadata</h4>
+                          <p className={`mx-1 ${styles.accessText}`}>The JSON data of your certificate on the blockchain.</p>
+                          <Col className="mx-4 px-4">
+                            <ReactJson
+                              src={cert}
+                              name={`Certificate JSON`}
+                              collapsed={true}
+                              displayObjectSize={false}
+                              displayDataTypes={false}
+                            />
+                          </Col>
+
+                        </Row>
+
                   </Col>
                 </Row>
               </Row>

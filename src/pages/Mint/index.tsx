@@ -14,7 +14,6 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { PreloadData } from '../../interfaces';
 import Project, { Participant, ProjectToCertList } from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -29,6 +28,7 @@ import { SuccessToast, ToastProps } from '../../utils/toastHelper';
 import dlExcel from '../../assets/dlExcel.svg';
 import * as XLSX from 'xlsx';
 import useExecute from '../../hooks/ExecuteHook';
+import { CertupExtension } from '../../interfaces/token';
 
 const participantsToWorksheet = (participants: Participant[]) => {
   const modified = participants.map((p: Participant) => {
@@ -62,7 +62,7 @@ const participantsToWorksheet = (participants: Participant[]) => {
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
-  const { findProject, LoadingProjects } = useProject();
+  const { findProject, LoadingPendingProjects } = useProject();
   const { preloadCerts } = useExecute();
 
   const [projectId, setProjectId] = useState();
@@ -81,7 +81,7 @@ export default function Mint() {
       navigate('/issuers');
       return;
     }
-    if (!Wallet || !Address || LoadingProjects) return;
+    if (!Wallet || !Address || LoadingPendingProjects) return;
 
     // TODO check for empty project fields
     const foundProject = findProject(location.state?.projectId);
@@ -90,7 +90,7 @@ export default function Mint() {
       toast.error("Didn't find a project to mint, please try again.");
       navigate('/issuers');
     }
-  }, [Wallet, Address, LoadingProjects]);
+  }, [Wallet, Address, LoadingPendingProjects]);
 
   const generate = async (projectInput: Project): Promise<string[]> => {
     //if (!project) return [];
@@ -127,6 +127,7 @@ export default function Mint() {
     e.preventDefault();
     if (!project) throw new Error('Project Data Not Found');
     if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
+    if (!project.certInfo.issue_date) throw new Error('Project must have an issue date.');
 
     setLoading(true);
 
@@ -137,131 +138,87 @@ export default function Mint() {
     let result;
     try {
       const newData = project?.participants.map((participant, i) => {
+        const pubMeta: CertupExtension = {
+          certificate: { cert_number: participant.cert_num },
+          description: project.certInfo.pub_description,
+          protected_attributes: [],
+        }
+
+        const privMeta: CertupExtension = {
+            description: project.certInfo.priv_description,
+            certificate: {
+              name: project.certInfo.cert_name,
+              cert_type: project.renderProps.certTitle,
+              issue_date: project.certInfo?.issue_date.toISOString() as string,
+              cert_number: participant.cert_num,
+            },
+            certified_individual: {
+              first_name: participant.name,
+              last_name: participant.surname,
+              date_of_birth: participant.dob?.toISOString(),
+            },
+            issuing_organizations: [
+              {
+                name: project.renderProps.companyName,
+                //url: 'https://cfi.org',
+              },
+            ],
+            issuing_individuals: [
+              {
+                name: project.renderProps.signer,
+                company: project.renderProps.companyName,
+                title: project.renderProps.signerTitle,
+              },
+            ],
+            // inclusions: [
+            //   {
+            //     type: 'Course',
+            //     name: 'Introduction to Finance',
+            //     value: '89.4',
+            //   },
+            //   {
+            //     type: 'Instructor',
+            //     name: 'Jane Smith',
+            //   },
+            // ],
+            attributes: [
+              {
+                trait_type: 'Certificate Number',
+                value: participant.cert_num,
+              },
+              {
+                trait_type: 'Certificate Name',
+                value: project.certInfo.cert_name,
+              },
+              {
+                trait_type: 'Issue Date',
+                value: project.certInfo.issue_date.toDateString(),
+              },
+            ],
+            media: [
+              {
+                file_type: 'image/png',
+                extension: 'png',
+                // authentication: {
+                //   key: 'TO DO',
+                // },
+                url: `https://ipfs.io/ipfs/${hashes[i]}`,
+              },
+            ],
+            protected_attributes: [],
+          };
+      
         return {
           name: `${participant.name} ${participant.surname}`,
           date: project.certInfo.issue_date?.toLocaleDateString(),
-          cert_type: 'test',
-          pub_metadata: {
-            extention: {
-              description: project.certInfo.pub_description,
-              certificate: {
-                name: project.project_name,
-                issue_date: project.certInfo.issue_date?.toISOString(),
-                cert_number: participant.cert_num?.toString(),
-              },
-              certified_individual: {
-                first_name: participant.name,
-                last_name: participant.surname,
-                date_of_birth: participant.dob?.toISOString(),
-              },
-              issuing_organizations: [
-                {
-                  name: 'Corporate Finance Institute',
-                  url: 'https://cfi.org',
-                },
-              ],
-              issuing_individuals: [
-                {
-                  name: project.renderProps.signer,
-                  company: 'Corporate Finance Institute',
-                  title: 'Director',
-                },
-              ],
-              inclusions: [
-                {
-                  type: 'Course',
-                  name: 'Introduction to Finance',
-                  value: '89.4',
-                },
-                {
-                  type: 'Instructor',
-                  name: 'Jane Smith',
-                },
-              ],
-              attributes: [
-                {
-                  trait_type: 'Certificate Number',
-                  value: participant.cert_num?.toString(),
-                },
-                {
-                  trait_type: 'Certificate Name',
-                  value: project.project_name,
-                },
-                {
-                  trait_type: 'Issue Date',
-                  value: project.certInfo.issue_date?.toDateString(),
-                },
-              ],
-            },
-          },
-          priv_metadata: {
-            extension: {
-              description: project.certInfo.priv_description,
-              certificate: {
-                name: project.project_name,
-                issue_date: project.certInfo.issue_date?.toISOString(),
-                cert_number: participant.cert_num.toString(),
-              },
-              certified_individual: {
-                first_name: participant.name,
-                last_name: participant.surname,
-                date_of_birth: participant.dob?.toISOString(),
-              },
-              issuing_organizations: [
-                {
-                  name: 'Corporate Finance Institute',
-                  url: 'https://cfi.org',
-                },
-              ],
-              issuing_individuals: [
-                {
-                  name: project.renderProps.signer,
-                  company: 'Corporate Finance Institute',
-                  title: 'Director',
-                },
-              ],
-              inclusions: [
-                {
-                  type: 'Course',
-                  name: 'Introduction to Finance',
-                  value: '89.4',
-                },
-                {
-                  type: 'Instructor',
-                  name: 'Jane Smith',
-                },
-              ],
-              attributes: [
-                {
-                  trait_type: 'Certificate Number',
-                  value: participant.cert_num.toString(),
-                },
-                {
-                  trait_type: 'Certificate Name',
-                  value: project.project_name,
-                },
-                {
-                  trait_type: 'Issue Date',
-                  value: project.certInfo.issue_date?.toDateString(),
-                },
-              ],
-              media: [
-                {
-                  file_type: 'image/png',
-                  extension: 'png',
-                  authentication: {
-                    key: 'TO DO',
-                  },
-                  url: `https://ipfs.io/ipfs/${hashes[i]}`,
-                },
-              ],
-            },
-          },
+          cert_type: project.renderProps.certTitle,
+          pub_metadata: { extension: pubMeta },
+          priv_metadata: { extension: privMeta}
         };
       });
 
       result = await preloadCerts({
-        data: newData as PreloadData[],
+        data: newData,
         toast: toastRef,
         project_id: project._id,
       });

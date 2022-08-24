@@ -42,3 +42,9 @@ export const logSizeInKilobytes = (description: string, obj: any) => {
   const kb = (bytes / 1000).toFixed(2);
   console.log(`${description} is approximately ${kb} kB`);
 };
+
+
+export const numDaysBetween = function(d1: Date, d2: Date) {
+  var diff = Math.abs(d1.getTime() - d2.getTime());
+  return diff / (1000 * 60 * 60 * 24);
+};
