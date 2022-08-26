@@ -22,27 +22,15 @@ export interface ItemContextState {
   updateItem: (id: string, data: Item) => void;
 }
 
-export interface WalletContextState {
-  Client: SecretNetworkClient | undefined;
-  Querier: SecretNetworkClient | undefined;
-  ClientIsSigner: boolean;
-  Wallet: Wallet | undefined;
-  Address: string;
-  LoginToken: LoginToken | undefined;
-  QueryPermit: PermitSignature | undefined;
-  RemainingCerts: number;
-  LoadingRemainingCerts: boolean;
-  ProcessingTx: boolean;
-  VerifiedIssuer: boolean;
-  updateClient: (
-    client: SecretNetworkClient,
-    wallet: Wallet,
-    address: string,
-    token: LoginToken,
-    permit: PermitSignature,
-  ) => void;
-  setProcessingTx: (newState: boolean) => void;
-  queryCredits: () => void;
+export interface IssuerData {
+  id: string;
+  name?: string;
+  website?: string;
+  logo_img_url?: string;
+  verified: boolean;
+  verified_name?: string;
+  certs_issued: string;
+  certs_remaining: string;
 }
 
 // export interface Project {
@@ -106,19 +94,21 @@ export interface NftDossier {
 }
 
 export interface PreLoad {
-  name: string,
-  date: string,
-  cert_type: string,
-  pub_metadata: CertupMetadata,
-  priv_metadata: CertupMetadata,
+  name: string;
+  date: string;
+  cert_type: string;
+  pub_metadata: CertupMetadata;
+  priv_metadata: CertupMetadata;
 }
 
-export interface RemainingCertsResponse {
+export interface RemainingCertsResponse extends QueryResponse {
   remaining_certs?: {
     certs: string;
   };
-  parse_err?: ErrorResponse;
-  generic_err?: ErrorResponse;
+}
+
+export interface IssuerDataResponse extends QueryResponse {
+  issuer_data: IssuerData;
 }
 
 export interface QueryResponse {
@@ -131,18 +121,18 @@ export interface ListProjectsResponse extends QueryResponse {
 }
 
 interface LPSub {
-  data_list: ExportProject[]
+  data_list: ExportProject[];
 }
 
 export interface ExportProject {
   /// Unique ID of the project
-  project_id: string,
-  project: ProjectOverview,
+  project_id: string;
+  project: ProjectOverview;
 }
 
 interface ProjectOverview {
-  pending_certs: string,
-  minted_certs: string,
+  pending_certs: string;
+  minted_certs: string;
 }
 
 interface ErrorResponse {

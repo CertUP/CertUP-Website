@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import { PermitSignature, RemainingCertsResponse, WalletContextState } from '../interfaces';
+import { IssuerData, IssuerDataResponse, PermitSignature, RemainingCertsResponse } from '../interfaces';
 import { SecretNetworkClient, Wallet } from 'secretjs';
 import {
   LoginToken,
@@ -8,6 +8,31 @@ import {
   permitName,
   getQueryPermit,
 } from '../utils/loginPermit';
+import useQuery from '../hooks/QueryHook';
+
+export interface WalletContextState {
+  Client?: SecretNetworkClient;
+  Querier: SecretNetworkClient | undefined;
+  ClientIsSigner: boolean;
+  Wallet: Wallet | undefined;
+  Address: string;
+  LoginToken: LoginToken | undefined;
+  QueryPermit: PermitSignature | undefined;
+  RemainingCerts: number;
+  IssuerProfile?: IssuerData;
+  LoadingRemainingCerts: boolean;
+  ProcessingTx: boolean;
+  VerifiedIssuer: boolean;
+  updateClient: (
+    client?: SecretNetworkClient,
+    wallet?: Wallet,
+    address?: string,
+    token?: LoginToken,
+    permit?: PermitSignature,
+  ) => void;
+  setProcessingTx: (newState: boolean) => void;
+  queryCredits: () => void;
+}
 
 interface Props {
   children: ReactNode;
@@ -23,6 +48,7 @@ const contextDefaultValues: WalletContextState = {
   LoginToken: undefined,
   QueryPermit: undefined,
   RemainingCerts: 0,
+  IssuerProfile: undefined,
   LoadingRemainingCerts: true,
   ProcessingTx: false,
   VerifiedIssuer: true,
@@ -63,6 +89,11 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   const [LoadingRemainingCerts, setLoadingRemainingCerts] = useState<boolean>(
     contextDefaultValues.LoadingRemainingCerts,
   );
+
+  const [IssuerProfile, setIssuerProfile] = useState<IssuerData | undefined>(
+    contextDefaultValues.IssuerProfile,
+  );
+
   const [ProcessingTx, setProcessingTx] = useState<boolean>(contextDefaultValues.ProcessingTx);
 
   const [VerifiedIssuer, setVerifiedIssuer] = useState<boolean>(
@@ -115,7 +146,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     const query = {
       with_permit: {
         query: {
-          remaining_certs: {
+          issuer_data: {
             viewer: {
               address: Address,
             },
@@ -133,22 +164,19 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       },
     };
 
-    const response: RemainingCertsResponse | undefined = await Client?.query.compute.queryContract({
+    const response = (await Client?.query.compute.queryContract({
       contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
-    });
+    })) as IssuerDataResponse;
     console.log('Remaining Certs Query Responseeeee', response);
 
     if (response?.parse_err || response?.generic_err) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
       if (response.generic_err?.msg === 'You are not a verified issuer.') setVerifiedIssuer(false);
       if (response.generic_err?.msg === 'Failed to verify signatures for the given permit') {
         await refreshQueryPermit();
         return;
       }
-
       setLoadingRemainingCerts(false);
       throw new Error(
         response?.parse_err?.msg ||
@@ -156,7 +184,9 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
           JSON.stringify(response, undefined, 2),
       );
     }
-    const result = parseInt(response?.remaining_certs?.certs || '0', 10);
+    setIssuerProfile(response.issuer_data);
+
+    const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
     setRemainingCerts(result);
     setLoadingRemainingCerts(false);
     return result;
@@ -171,6 +201,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     LoginToken,
     QueryPermit,
     RemainingCerts,
+    IssuerProfile,
     LoadingRemainingCerts,
     ProcessingTx,
     updateClient,

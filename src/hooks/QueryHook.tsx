@@ -5,6 +5,8 @@ import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
   DossierResponse,
+  IssuerData,
+  IssuerDataResponse,
   ListProjectsResponse,
   NftDossier,
   PermitSignature,
@@ -118,10 +120,46 @@ export default function useQuery() {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     });
-    
+
     checkError(response);
-    
+
     return parseInt(response.remaining_certs?.certs || '0', 10);
+  };
+
+  const queryIssuerData = async (): Promise<IssuerData> => {
+    if (!Querier) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    const query = {
+      with_permit: {
+        query: {
+          issuer_data: {
+            viewer: {
+              address: Address,
+            },
+          },
+        },
+        permit: {
+          params: {
+            permit_name: permitName,
+            allowed_tokens: allowedTokens,
+            chain_id: process.env.REACT_APP_CHAIN_ID,
+            permissions: permissions,
+          },
+          signature: QueryPermit,
+        },
+      },
+    };
+
+    const response = (await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    })) as IssuerDataResponse;
+
+    checkError(response);
+
+    return response?.issuer_data;
   };
 
   const queryProjects = async () => {
@@ -131,8 +169,7 @@ export default function useQuery() {
     const query = {
       with_permit: {
         query: {
-          list_projects: {
-          },
+          list_projects: {},
         },
         permit: {
           params: {
@@ -152,7 +189,7 @@ export default function useQuery() {
       query: query,
     });
     checkError(response);
-    console.log(response)
+    console.log(response);
 
     return response.list_projects?.data_list;
   };
@@ -301,6 +338,7 @@ export default function useQuery() {
 
   return {
     queryCredits,
+    queryIssuerData,
     getOwnedCerts,
     getCert,
     getSSCRTBalance,

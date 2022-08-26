@@ -13,6 +13,7 @@ import Issuers from './pages/Issuers';
 import AddCredit from './pages/AddCredit';
 import Mint from './pages/Mint';
 import { NftProvider } from './contexts/NftContext';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
                   <Route path="/access" element={<Access />} />
                   <Route path="/access/:tokenid" element={<ViewCert />} />
                   <Route path="/payment" element={<Payment />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="*" element={<Error />} />
                 </>
               ) : null}
