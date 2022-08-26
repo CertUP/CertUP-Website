@@ -56,6 +56,7 @@ import CsvModal from '../CsvModal';
 
 import ImportFile from '../../assets/importfile.svg';
 import { SaveExitModal } from '../Issuers';
+import { PreviewProvider, usePreview } from '../../contexts/PreviewContext';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -129,7 +130,7 @@ interface FormErrors {
   expire_date?: any;
   certTitle?: any;
   displayDob?: any;
-  dobFormat?: any;
+  dateFormat?: any;
   displayEmployer?: any;
   employerText?: any;
   companyName?: any;
@@ -159,28 +160,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const [previewImage, setPreviewImage] = useState<string>();
-  const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
-
-  // const [companyLogoFile, setCompanyLogoFile] = useState<File | undefined>(
-  //   projectInfo?.renderProps.company_logo_file,
-  // );
-  // const [companyLogoURI, setCompanyLogoURI] = useState<string | undefined>(
-  //   projectInfo?.renderProps.company_logo_uri,
-  // );
-
-  // const [signatureFile, setSignatureFile] = useState<File | undefined>(
-  //   projectInfo?.renderProps.signature_file,
-  // );
-  // const [signatureURI, setSignatureURI] = useState<string | undefined>(
-  //   projectInfo?.renderProps.signerSignature,
-  // );
+  const { Rendering, requestRender, LastRender } = usePreview();
 
   const [showCsvModal, setShowCsvModal] = useState<boolean>(false);
 
   const projectId = useRef<string | undefined>(projectInfo?._id || pid);
-
-  const rendering = useRef(false);
 
   const navigate = useNavigate();
 
@@ -189,7 +173,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     const {
       certTitle,
       displayDob,
-      dobFormat,
+      dateFormat,
       displayEmployer,
       employerText,
       companyName,
@@ -267,28 +251,29 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       expire_date: certInfo.expire_date,
     };
     const rprops: RenderProps = {
+      ...renderProps,
       template: '2',
-      templateBg: renderProps.templateBg,
-      templateLayout: renderProps.templateLayout,
-      certTitle: renderProps.certTitle,
-      line1Text: renderProps.line1Text,
-      line3Text: renderProps.line3Text,
-      displayDob: false,
-      //dobFormat: '',
-      displayEmployer: false,
-      employerText: '',
-      companyName: renderProps.companyName,
-      signer: renderProps.signer,
-      signerTitle: renderProps.signerTitle,
-      signerSignatureUri: renderProps.signerSignatureUri,
-      companyLogoUri: renderProps.companyLogoUri,
+      // templateBg: renderProps.templateBg,
+      // templateLayout: renderProps.templateLayout,
+      // certTitle: renderProps.certTitle,
+      // line1Text: renderProps.line1Text,
+      // line3Text: renderProps.line3Text,
+      // displayDob: renderProps.displayDob,
+      // dateFormat: renderProps.dateFormat,
+      // displayEmployer: false,
+      // employerText: '',
+      // companyName: renderProps.companyName,
+      // signer: renderProps.signer,
+      // signerTitle: renderProps.signerTitle,
+      // signerSignatureUri: renderProps.signerSignatureUri,
+      // companyLogoUri: renderProps.companyLogoUri,
     };
 
     return new Project({
       _id: projectId.current,
       owner: Address,
       project_name: projectName,
-      lastPreview: previewImage,
+      lastPreview: LastRender,
       participants: participants,
       certInfo: cinfo,
       renderProps: rprops,
@@ -308,16 +293,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   // Re-Render Peview when data changes
   useEffect(() => {
     const run = async () => {
-      setLoadingPreview(true);
-
-      //const participant = participants[0];
-      //const logoData = await fileToDataURI(companyLogoFile, companyLogoFile?.type || 'image/jpg');
-
-      // bufferToDataURI(
-      //   (await companyLogo?.arrayBuffer()) as ArrayBuffer,
-      //   companyLogo?.type as string,
-      // );
-
       const input: GenerateInput = {
         // logoData: renderProps.company_logo_uri as string,
         // fullName: `${participant.name} ${participant.surname}`,
@@ -334,20 +309,14 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         // templateBg: renderProps.templateBg || 1,
         renderProps: renderProps,
         certInfo: certInfo,
-        participant: participantToRender(participants[0]),
+        participant: participantToRender(),
       };
 
-      const preview = await generateWithWait({
+      requestRender({
         id: '2',
         layoutId: renderProps.templateLayout,
         input,
       });
-      if (!preview) {
-        return;
-      }
-      setPreviewImage(preview);
-      setLoadingPreview(false);
-      rendering.current = false;
     };
     run();
   }, [
@@ -372,6 +341,20 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     if (!dirty) backHandler();
     else setShowExitModal(true);
   };
+
+  function updateDobFormat(value: string): void {
+    if (!value) {
+      updateRenderProps({
+        displayDob: false,
+        dateFormat: value,
+      });
+    } else {
+      updateRenderProps({
+        displayDob: true,
+        dateFormat: value,
+      });
+    }
+  }
 
   function BackButton() {
     return (
@@ -506,7 +489,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   return (
     <>
-      <CsvModal show={showCsvModal} setShow={setShowCsvModal} setParticipants={setParticipants} />\
+      <CsvModal show={showCsvModal} setShow={setShowCsvModal} setParticipants={setParticipants} />
       <SaveExitModal
         show={showExitModal}
         handleClose={() => setShowExitModal(false)}
@@ -860,56 +843,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Certificate Title
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.certTitle}
-                      onChange={(e) => updateRenderProps({ certTitle: e.target.value })}
-                      type="text"
-                      placeholder="Certificate of Completion"
-                      isInvalid={!!errors.certTitle}
-                    />
-                    <Form.Control.Feedback type="invalid">{errors.certTitle}</Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Line 1 Text
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.line1Text}
-                      onChange={(e) => updateRenderProps({ line1Text: e.target.value })}
-                      type="text"
-                      placeholder="This certifies that"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Line 3 Text
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.line3Text}
-                      onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
-                      type="text"
-                      placeholder="has completed Advanced Financial Training"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
                   Company Name
                 </Col>
                 <Col>
@@ -934,6 +867,111 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 </Col>
                 <Col md="auto">
                   <ImageDropzone set={handleLogoChange} externalUri={renderProps.companyLogoUri} />
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Certificate Title
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={renderProps.certTitle}
+                      onChange={(e) => updateRenderProps({ certTitle: e.target.value })}
+                      type="text"
+                      placeholder="Certificate of Completion"
+                      isInvalid={!!errors.certTitle}
+                    />
+                    <Form.Control.Feedback type="invalid">{errors.certTitle}</Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Line 1 Text
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={renderProps.line1Text}
+                      onChange={(e) => updateRenderProps({ line1Text: e.target.value })}
+                      type="text"
+                      placeholder="This certifies that"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Display DOB
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="3" controlId="validationCustom02">
+                    {/* <Form.Control
+                      required
+                      value={'1'}
+                      onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
+                      type="select"
+                      //placeholder="has completed Advanced Financial Training"
+                    > */}
+                    <Form.Select
+                      aria-label="Select Date of Birth display format"
+                      value={renderProps.displayDob.toString()} 
+                      //onChange={(e) => updateDobFormat(e.target.value)}
+                      onChange={(e) => updateRenderProps({ displayDob: e.target.value === "true" ? true : false })}
+                    >
+                      <option value="true">Show</option>
+                      <option value="false">Hide</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Company Format
+                </Col>
+                <Col>
+                <Row>
+
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={renderProps.employerText}
+                      onChange={(e) => updateRenderProps({ employerText: e.target.value })}
+                      type="text"
+                      placeholder="Employed at: "
+                    />
+                  </Form.Group>
+                  <Form.Group as={Col} md="2" controlId="validationCustom02">
+                    <Form.Select
+                      aria-label="Select Date of Birth display format"
+                      value={renderProps.displayEmployer?.toString()} 
+                      onChange={(e) => updateRenderProps({ displayEmployer: e.target.value === "true" ? true : false })}
+                    >
+                      <option value="true">Show</option>
+                      <option value="false">Hide</option>
+                    </Form.Select>
+                  </Form.Group>
+                  </Row>
+                </Col>
+              </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Line 3 Text
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="6" controlId="validationCustom02">
+                    <Form.Control
+                      required
+                      value={renderProps.line3Text}
+                      onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
+                      type="text"
+                      placeholder="has completed Advanced Financial Training"
+                    />
+                  </Form.Group>
                 </Col>
               </Row>
               <Row className="mb-4 align-items-center">
@@ -985,8 +1023,34 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Form.Group>
                 </Col>
               </Row>
+              <Row className="mb-4 align-items-center">
+                <Col md={2} className={styles.participantLabels}>
+                  Date Format
+                </Col>
+                <Col>
+                  <Form.Group as={Col} md="3" controlId="validationCustom02">
+                    {/* <Form.Control
+                      required
+                      value={'1'}
+                      onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
+                      type="select"
+                      //placeholder="has completed Advanced Financial Training"
+                    > */}
+                    <Form.Select
+                      aria-label="Select Date of Birth display format"
+                      value={renderProps.dateFormat} 
+                      onChange={(e) => updateRenderProps({ dateFormat: e.target.value })}
+                    >
+                      <option value="en-US">MM/DD/YYYY</option>
+                      <option value="en-GB">DD/MM/YYYY</option>
+                      <option value="nl">YYYY/MM/DD</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
             </Col>
           </Row>
+
 
           {/* \/ Preview Section \/ */}
 
@@ -1005,8 +1069,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           <Row className="mb-5">
             <Col>
               <div className={styles.previewContainer}>
-                <Image src={previewImage} fluid={true} />
-                {loadingPreview ? (
+                <Image src={LastRender} fluid={true} />
+                {Rendering ? (
                   <div className={styles.previewLoading}>
                     <Spinner animation="border" variant="info" />
                   </div>
@@ -1057,3 +1121,4 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     </>
   );
 }
+

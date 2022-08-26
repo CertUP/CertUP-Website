@@ -16,6 +16,7 @@ import ProjectForm from '../../components/ProjectForm';
 import Project from '../../interfaces/Project';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { PreviewProvider } from '../../contexts/PreviewContext';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
@@ -95,7 +96,10 @@ export default function Issuers() {
       <Layout>
         <Spacer height={100} />
         {showProject ? (
-          <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
+          
+          <PreviewProvider>
+            <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
+          </PreviewProvider>
         ) : (
           <ProjectList setProjectId={setProject} />
         )}

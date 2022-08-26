@@ -40,6 +40,14 @@ $gradient3: #a659f3;
   border-color: vars.$certupBtnGradient;
 }
 
+.certupInputForm select {
+  background-color: #f2f2f2;
+  border-radius: 38px;
+}
+.certupInputForm select:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
 .inputStyle {
   padding: 6px 12px;
   border: 1px solid #ced4da;

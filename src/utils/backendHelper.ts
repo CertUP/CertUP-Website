@@ -46,10 +46,15 @@ interface GIProps {
 }
 
 export const generateWithWait = async ({ id, layoutId, input }: GIProps) => {
+  //update pending render queue with latest request
   const time = new Date();
   pendingRender = { id, layoutId, input, time };
 
+  // skip if already waiting on a render
   if (waiting) return false;
+  console.log('Rendering', pendingRender)
+
+  //otherwise continue and make sure no others will render simulataniously
   waiting = true;
 
   let wait = true;

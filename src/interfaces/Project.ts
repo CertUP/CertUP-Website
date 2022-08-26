@@ -35,7 +35,7 @@ export interface RenderProps {
   line1Text: string;
   line3Text: string;
   displayDob: boolean;
-  dobFormat?: string;
+  dateFormat: string;
   displayEmployer: boolean;
   employerText: string;
   companyName: string;
@@ -52,6 +52,7 @@ export const defaultRenderProps: RenderProps = {
   certTitle: '',
   line1Text: '',
   line3Text: '',
+  dateFormat: 'en-US',
   displayDob: false,
   displayEmployer: false,
   employerText: '',
@@ -184,7 +185,8 @@ export class Participant {
   }
 }
 
-export const participantToRender = (participant: Participant): RenderParticipant => {
+export const participantToRender = (participant?: Participant): RenderParticipant => {
+  if (!participant) participant = new Participant("John", "Doe", new Date('1/1/1970'), 'CERT123');
   return {
     ...participant,
     dob: participant.dob ? participant.dob.toLocaleDateString() : '',
