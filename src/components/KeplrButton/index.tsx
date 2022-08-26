@@ -58,7 +58,7 @@ const truncateAddress = (address: string) => {
 };
 
 export default function KeplrButton(): ReactElement {
-  const { Address, updateClient } = useWallet();
+  const { Address, updateClient, IssuerProfile } = useWallet();
   const [loading, setLoading] = useState(false);
 
   const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr']);
@@ -200,9 +200,11 @@ export default function KeplrButton(): ReactElement {
       </Dropdown.Toggle>
 
       <Dropdown.Menu align="end" as={CustomMenu}>
-        <Dropdown.Item eventKey="1" onClick={() => handleProfile()}>
-          Issuer Profile
-        </Dropdown.Item>
+        {IssuerProfile ? (
+          <Dropdown.Item eventKey="1" onClick={() => handleProfile()}>
+            Issuer Profile
+          </Dropdown.Item>
+        ) : null}
         <Dropdown.Item eventKey="2" onClick={() => handleLogout()}>
           Logout
         </Dropdown.Item>

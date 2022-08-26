@@ -172,24 +172,26 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     console.log('Remaining Certs Query Responseeeee', response);
 
     if (response?.parse_err || response?.generic_err) {
-      if (response.generic_err?.msg === 'You are not a verified issuer.') setVerifiedIssuer(false);
-      if (response.generic_err?.msg === 'Failed to verify signatures for the given permit') {
+      if (response.generic_err?.msg.includes('not a verified issuer')) setVerifiedIssuer(false);
+      else if (response.generic_err?.msg.includes('Failed to verify signatures for the given permit')) {
         await refreshQueryPermit();
         return;
+      } else {
+        throw new Error(
+          response?.parse_err?.msg ||
+            response?.generic_err?.msg ||
+            JSON.stringify(response, undefined, 2),
+        );
       }
       setLoadingRemainingCerts(false);
-      throw new Error(
-        response?.parse_err?.msg ||
-          response?.generic_err?.msg ||
-          JSON.stringify(response, undefined, 2),
-      );
-    }
-    setIssuerProfile(response.issuer_data);
+    } else {
+      const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
 
-    const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
-    setRemainingCerts(result);
-    setLoadingRemainingCerts(false);
-    return result;
+      setIssuerProfile(response.issuer_data);
+      setRemainingCerts(result);
+      setLoadingRemainingCerts(false);
+      return result;
+    };
   };
 
   const values = {

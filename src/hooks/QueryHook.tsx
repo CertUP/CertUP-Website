@@ -65,6 +65,8 @@ export class WithPermit {
 
 const checkError = (queryResponse: any) => {
   if (queryResponse.parse_err || queryResponse.generic_err) {
+    if (queryResponse.generic_err?.msg.includes('not a verified issuer')) return;
+
     console.error(queryResponse.parse_err || queryResponse.generic_err);
     throw new Error(
       queryResponse.parse_err.msg || queryResponse.generic_err.msg || queryResponse.parse_err

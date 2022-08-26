@@ -80,12 +80,12 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   const { queryProjects } = useQuery();
 
-  const { Address, LoginToken } = useWallet();
+  const { Address, LoginToken, QueryPermit } = useWallet();
 
   useEffect(() => {
-    if (!Address || !LoginToken) return;
+    if (!Address || !LoginToken || !QueryPermit) return;
     refreshProjects();
-  }, [LoginToken, Address]);
+  }, [LoginToken, Address, QueryPermit]);
 
   const refreshProjects = () => {
     refreshPendingProjects();
@@ -132,12 +132,10 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   };
 
   const refreshMintedProjects = async () => {
-    
     setLoadingMinted(true);
     console.log('Getting Minted Projects from Contract', LoginToken, Address);
 
     const result = await queryProjects();
-    console.log(result);
 
     if (result) setMintedProjects(result);
     setLoadingMinted(false);
