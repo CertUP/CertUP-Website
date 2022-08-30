@@ -125,7 +125,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
     worksheet['!cols'][1] = { wch: 20 };
     worksheet['!cols'][2] = { wch: 15 };
     worksheet['!cols'][3] = { wch: 15 };
-    worksheet['!cols'][4] = { wch: 50 };
+    worksheet['!cols'][4] = { wch: 75 };
     worksheet['!cols'][5] = { wch: 15 };
     XLSX.utils.sheet_add_aoa(
       worksheet,

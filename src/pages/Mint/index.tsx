@@ -30,36 +30,6 @@ import * as XLSX from 'xlsx';
 import useExecute from '../../hooks/ExecuteHook';
 import { CertupExtension } from '../../interfaces/token';
 
-const participantsToWorksheet = (participants: Participant[]) => {
-  const modified = participants.map((p: Participant) => {
-    return {
-      name: p.name,
-      surname: p.surname,
-      dob: p.dob,
-      cert_num: p.cert_num,
-      claim_code: p.claim_code || 'Not yet Generated',
-    };
-  });
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet(modified);
-  console.log(worksheet);
-  worksheet['!cols'] = [];
-  //worksheet['!cols'][0] = { hidden: true };
-  worksheet['!cols'][0] = { wch: 20 };
-  worksheet['!cols'][1] = { wch: 20 };
-  worksheet['!cols'][2] = { wch: 15 };
-  worksheet['!cols'][3] = { wch: 15 };
-  worksheet['!cols'][4] = { wch: 50 };
-  XLSX.utils.sheet_add_aoa(
-    worksheet,
-    [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code']],
-    { origin: 'A1' },
-  );
-
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Codes');
-  XLSX.writeFile(workbook, `CertUP.xlsx`);
-};
-
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
   const { findProject, LoadingPendingProjects } = useProject();
@@ -91,6 +61,36 @@ export default function Mint() {
       navigate('/issuers');
     }
   }, [Wallet, Address, LoadingPendingProjects]);
+
+  const participantsToWorksheet = (participants: Participant[]) => {
+    const modified = participants.map((p: Participant) => {
+      return {
+        name: p.name,
+        surname: p.surname,
+        dob: p.dob,
+        cert_num: p.cert_num,
+        claim_code: p.claim_code || 'Not yet Generated',
+      };
+    });
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(modified);
+    console.log(worksheet);
+    worksheet['!cols'] = [];
+    //worksheet['!cols'][0] = { hidden: true };
+    worksheet['!cols'][0] = { wch: 20 };
+    worksheet['!cols'][1] = { wch: 20 };
+    worksheet['!cols'][2] = { wch: 15 };
+    worksheet['!cols'][3] = { wch: 15 };
+    worksheet['!cols'][4] = { wch: 75 };
+    XLSX.utils.sheet_add_aoa(
+      worksheet,
+      [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code']],
+      { origin: 'A1' },
+    );
+  
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Codes');
+    XLSX.writeFile(workbook, `CertUP Claim Codes - ${project?.project_name}.xlsx`);
+  };
 
   const generate = async (projectInput: Project): Promise<string[]> => {
     //if (!project) return [];
