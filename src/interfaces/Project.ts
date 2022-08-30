@@ -175,13 +175,15 @@ export class Participant {
   dob?: Date;
   cert_num: string;
   claim_code?: string;
+  claimed?: boolean;
 
-  constructor(name?: string, surname?: string, dob?: Date, certNum?: string, claimCode?: string) {
+  constructor(name?: string, surname?: string, dob?: Date, certNum?: string, claimCode?: string, claimed?: boolean) {
     this.name = name || '';
     this.surname = surname || '';
     this.dob = dob;
     this.cert_num = certNum || '';
     this.claim_code = claimCode;
+    this.claimed = claimed;
   }
 }
 

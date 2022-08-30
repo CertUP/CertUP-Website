@@ -10,6 +10,8 @@ import {
   ListProjectsResponse,
   NftDossier,
   PermitSignature,
+  ProjectDataResponse,
+  ProjectToken,
   RemainingCertsResponse,
 } from '../interfaces';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
@@ -196,6 +198,41 @@ export default function useQuery() {
     return response.list_projects?.data_list;
   };
 
+  const queryProjectData = async (projectId: string): Promise<ProjectToken[]> => {
+    if (!Querier) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    const query = {
+      with_permit: {
+        query: {
+          project_contents: {
+            project_id: projectId,
+            viewer: Address,
+          },
+        },
+        permit: {
+          params: {
+            permit_name: permitName,
+            allowed_tokens: allowedTokens,
+            chain_id: process.env.REACT_APP_CHAIN_ID,
+            permissions: permissions,
+          },
+          signature: QueryPermit,
+        },
+      },
+    };
+
+    const response = (await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    })) as ProjectDataResponse;
+    console.log(response);
+    checkError(response);
+
+    return response?.project_contents.data_list;
+  };
+
   const getOwnedCerts = async () => {
     if (!Querier) throw new Error('Querier not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -346,6 +383,7 @@ export default function useQuery() {
     getSSCRTBalance,
     getSCRTBalance,
     queryProjects,
+    queryProjectData,
     queryNFTContract,
     queryPermitNFTContract,
     queryNFTWhitelist,

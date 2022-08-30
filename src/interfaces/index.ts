@@ -3,7 +3,7 @@ import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
 import { Tx } from 'secretjs';
 import { classicNameResolver } from 'typescript';
 import { LoginToken } from '../utils/loginPermit';
-import { CertupMetadata } from './token';
+import { CertupExtension, CertupMetadata } from './token';
 
 export * as Project from './Project';
 
@@ -101,6 +101,12 @@ export interface PreLoad {
   priv_metadata: CertupMetadata;
 }
 
+export interface PendingToken extends PreLoad {
+  cert_num: string;
+  issuer_id: string;
+  issuer_name?: string;
+}
+
 export interface RemainingCertsResponse extends QueryResponse {
   remaining_certs?: {
     certs: string;
@@ -109,6 +115,18 @@ export interface RemainingCertsResponse extends QueryResponse {
 
 export interface IssuerDataResponse extends QueryResponse {
   issuer_data: IssuerData;
+}
+
+export interface ProjectDataResponse extends QueryResponse {
+  project_contents: {
+    data_list: ProjectToken[];
+  };
+}
+
+export interface ProjectToken {
+  preload_data: PendingToken;
+  claim_code: string;
+  minted: boolean;
 }
 
 export interface QueryResponse {

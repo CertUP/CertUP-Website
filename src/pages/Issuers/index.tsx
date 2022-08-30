@@ -17,9 +17,11 @@ import Project from '../../interfaces/Project';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { PreviewProvider } from '../../contexts/PreviewContext';
+import ProjectReview from '../../components/ProjectReview';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   //const [projectInfo, setProjectInfo] = useState<Project | undefined>();
   const [projectId, setProjectId] = useState<string>();
   const [projectStep, setProjectStep] = useState();
@@ -67,9 +69,15 @@ export default function Issuers() {
     setShowProject(true);
   };
 
+  const setReview = (projectId?: string) => {
+    setProjectId(projectId);
+    setShowReview(true);
+  };
+
   const showList = () => {
     setProjectId(undefined);
     setShowProject(false);
+    setShowReview(false);
   };
 
   if (!Wallet || !Address || !LoginToken)
@@ -91,19 +99,29 @@ export default function Issuers() {
         </Layout>
       </>
     );
-  return (
-    <>
+
+  if (showProject)
+    return (
       <Layout>
         <Spacer height={100} />
-        {showProject ? (
-          
-          <PreviewProvider>
-            <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
-          </PreviewProvider>
-        ) : (
-          <ProjectList setProjectId={setProject} />
-        )}
+        <PreviewProvider>
+          <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
+        </PreviewProvider>
       </Layout>
-    </>
+    );
+
+  if (showReview)
+    return (
+      <Layout>
+        <Spacer height={100} />
+        <ProjectReview pid={projectId} backHandler={showList} step={projectStep} />
+      </Layout>
+    );
+
+  return (
+    <Layout>
+      <Spacer height={100} />
+      <ProjectList setProjectIdForm={setProject} setProjectIdReview={setReview} />
+    </Layout>
   );
 }

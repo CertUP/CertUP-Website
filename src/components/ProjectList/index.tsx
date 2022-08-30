@@ -18,10 +18,11 @@ import { Link } from 'react-router-dom';
 import { RestrictedAccess } from '../RestrictedAccess';
 
 interface Props {
-  setProjectId: (projectId?: string) => void;
+  setProjectIdForm: (projectId?: string) => void;
+  setProjectIdReview: (projectId?: string) => void;
 }
 
-export default function ProjectList({ setProjectId }: Props) {
+export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Props) {
   //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
   const { PendingProjects, LoadingPendingProjects } = useProject();
   const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
@@ -58,7 +59,7 @@ export default function ProjectList({ setProjectId }: Props) {
             <span className={styles.aboutTitle}>For Issuers</span>
 
             <Col xs={'auto'}>
-              <CUButton onClick={() => setProjectId()} disabled={true}>
+              <CUButton onClick={() => setProjectIdForm()} disabled={true}>
                 New Certificate
               </CUButton>
             </Col>
@@ -78,7 +79,7 @@ export default function ProjectList({ setProjectId }: Props) {
           <span className={styles.aboutTitle}>Issue Certificate</span>
 
           <Col xs={'auto'}>
-            <CUButton onClick={() => setProjectId()} disabled={LoadingRemainingCerts}>
+            <CUButton onClick={() => setProjectIdForm()} disabled={LoadingRemainingCerts}>
               New Certificate
             </CUButton>
           </Col>
@@ -96,7 +97,12 @@ export default function ProjectList({ setProjectId }: Props) {
         ) : PendingProjects.length ? (
           <Row className="">
             {PendingProjects.map((p, i) => (
-              <ProjectTile projectIn={p} setProjectId={setProjectId} key={`project-list-${i}`} />
+              <ProjectTile
+                projectIn={p}
+                setProjectIdForm={setProjectIdForm}
+                setProjectIdReview={setProjectIdReview}
+                key={`project-list-${i}`}
+              />
             ))}
           </Row>
         ) : (

@@ -89,8 +89,8 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   const refreshProjects = () => {
     refreshPendingProjects();
-    refreshMintedProjects();
-  }
+    refreshMintedProjects(true);
+  };
 
   const refreshPendingProjects = async () => {
     if (!LoginToken || !Address) return;
@@ -131,8 +131,10 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     setLoadingPending(false);
   };
 
-  const refreshMintedProjects = async () => {
-    if (LoadingMintedProjects) return;
+  const refreshMintedProjects = async (force = false) => {
+    // only run one query at a time, no need to send it again if we're already waiting.
+    if (LoadingMintedProjects && !force) return;
+    console.log('running')
     setLoadingMinted(true);
     console.log('Getting Minted Projects from Contract', LoginToken, Address);
 
@@ -142,14 +144,12 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     setLoadingMinted(false);
   };
 
+
   const addProject = async (newProject: Project) => {
     if (!newProject.project_name) {
       throw new Error("Please enter a 'Project Name'");
       return;
     }
-
-    // add item with new id generated
-    setPendingProjects((PendingProjects) => [...PendingProjects, { ...newProject }]);
 
     const token = `Permit ${JSON.stringify(LoginToken)}`;
     console.log('Saving Project:', newProject);
@@ -159,6 +159,10 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
         Authorization: token,
       },
     });
+
+    // add item with new id generated
+    newProject._id = response.data.data._id;
+    setPendingProjects((PendingProjects) => [...PendingProjects, { ...newProject }]);
 
     console.log(response.data.data._id);
     return response.data.data._id;

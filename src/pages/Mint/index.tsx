@@ -142,78 +142,78 @@ export default function Mint() {
           certificate: { cert_number: participant.cert_num },
           description: project.certInfo.pub_description,
           protected_attributes: [],
-        }
+        };
 
         const privMeta: CertupExtension = {
-            description: project.certInfo.priv_description,
-            certificate: {
-              name: project.certInfo.cert_name,
-              cert_type: project.renderProps.certTitle,
-              issue_date: project.certInfo?.issue_date.toISOString() as string,
-              cert_number: participant.cert_num,
+          description: project.certInfo.priv_description,
+          certificate: {
+            name: project.certInfo.cert_name,
+            cert_type: project.renderProps.certTitle,
+            issue_date: project.certInfo?.issue_date.toISOString() as string,
+            cert_number: participant.cert_num,
+          },
+          certified_individual: {
+            first_name: participant.name,
+            last_name: participant.surname,
+            date_of_birth: participant.dob?.toISOString(),
+          },
+          issuing_organizations: [
+            {
+              name: project.renderProps.companyName,
+              //url: 'https://cfi.org',
             },
-            certified_individual: {
-              first_name: participant.name,
-              last_name: participant.surname,
-              date_of_birth: participant.dob?.toISOString(),
+          ],
+          issuing_individuals: [
+            {
+              name: project.renderProps.signer,
+              company: project.renderProps.companyName,
+              title: project.renderProps.signerTitle,
             },
-            issuing_organizations: [
-              {
-                name: project.renderProps.companyName,
-                //url: 'https://cfi.org',
-              },
-            ],
-            issuing_individuals: [
-              {
-                name: project.renderProps.signer,
-                company: project.renderProps.companyName,
-                title: project.renderProps.signerTitle,
-              },
-            ],
-            // inclusions: [
-            //   {
-            //     type: 'Course',
-            //     name: 'Introduction to Finance',
-            //     value: '89.4',
-            //   },
-            //   {
-            //     type: 'Instructor',
-            //     name: 'Jane Smith',
-            //   },
-            // ],
-            attributes: [
-              {
-                trait_type: 'Certificate Number',
-                value: participant.cert_num,
-              },
-              {
-                trait_type: 'Certificate Name',
-                value: project.certInfo.cert_name,
-              },
-              {
-                trait_type: 'Issue Date',
-                value: project.certInfo.issue_date.toDateString(),
-              },
-            ],
-            media: [
-              {
-                file_type: 'image/png',
-                extension: 'png',
-                // authentication: {
-                //   key: 'TO DO',
-                // },
-                url: `https://ipfs.io/ipfs/${hashes[i]}`,
-              },
-            ],
-            protected_attributes: [],
-          };
-      
+          ],
+          // inclusions: [
+          //   {
+          //     type: 'Course',
+          //     name: 'Introduction to Finance',
+          //     value: '89.4',
+          //   },
+          //   {
+          //     type: 'Instructor',
+          //     name: 'Jane Smith',
+          //   },
+          // ],
+          attributes: [
+            {
+              trait_type: 'Certificate Number',
+              value: participant.cert_num,
+            },
+            {
+              trait_type: 'Certificate Name',
+              value: project.certInfo.cert_name,
+            },
+            {
+              trait_type: 'Issue Date',
+              value: project.certInfo.issue_date.toDateString(),
+            },
+          ],
+          media: [
+            {
+              file_type: 'image/png',
+              extension: 'png',
+              // authentication: {
+              //   key: 'TO DO',
+              // },
+              url: `https://ipfs.io/ipfs/${hashes[i]}`,
+            },
+          ],
+          protected_attributes: [],
+        };
+
         return {
           name: `${participant.name} ${participant.surname}`,
           date: project.certInfo.issue_date?.toLocaleDateString(),
           cert_type: project.renderProps.certTitle,
           pub_metadata: { extension: pubMeta },
-          priv_metadata: { extension: privMeta}
+          priv_metadata: { extension: privMeta },
         };
       });
 
