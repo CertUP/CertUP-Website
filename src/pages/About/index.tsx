@@ -48,7 +48,13 @@ export default function About() {
 
         <Container>
           <span className={styles.aboutSubtitle}>Team</span>
+          <Row className="justify-content-around">
+            <Col xs={6} md={4}>Trivium</Col>
+            <Col xs={6} md={4}>Alter</Col>
+          </Row>
         </Container>
+
+        <Spacer height={150} />
 
         <Container>
           <span className={styles.aboutSubtitle}>Product</span>
