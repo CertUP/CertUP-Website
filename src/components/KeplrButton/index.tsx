@@ -11,7 +11,7 @@ import { useCookies } from 'react-cookie';
 import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
-import { getErrorMessage, numDaysBetween, reportError } from '../../utils/helpers';
+import { getErrorMessage, numDaysBetween, reportError, sleep } from '../../utils/helpers';
 import getPermits, { getCachedQueryPermit, LoginToken } from '../../utils/loginPermit';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
@@ -57,7 +57,12 @@ const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;
 };
 
-export default function KeplrButton(): ReactElement {
+interface KeplrButtonProps {
+  // Determines if the button will attempt to autoconnect if a recent logon cookie is found.
+  autoConnect?: boolean;
+}
+
+export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactElement {
   const { Address, updateClient, IssuerProfile } = useWallet();
   const [loading, setLoading] = useState(false);
 
@@ -93,7 +98,12 @@ export default function KeplrButton(): ReactElement {
   );
 
   useEffect(() => {
-    if (!window.keplr) return;
+    if (!autoConnect) return;
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(100);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(300);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(500);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) return;
+
     if (cookies.ConnectedKeplr) {
       if (
         numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) <
@@ -105,6 +115,7 @@ export default function KeplrButton(): ReactElement {
   }, [window.keplr]);
 
   const handleConnect = async () => {
+    if (loading) return;
     try {
       setLoading(true);
       if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
@@ -142,6 +153,7 @@ export default function KeplrButton(): ReactElement {
       setLoading(false);
       reportError({ message: getErrorMessage(error) });
     }
+    setLoading(false);
   };
 
   const handleLogout = async () => {

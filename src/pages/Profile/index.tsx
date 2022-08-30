@@ -32,6 +32,7 @@ import useQuery from '../../hooks/QueryHook';
 import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
+import { RestrictedAccess } from '../../components/RestrictedAccess';
 
 export default function Profile() {
   const {
@@ -42,6 +43,7 @@ export default function Profile() {
     LoginToken,
     QueryPermit,
     IssuerProfile,
+    VerifiedIssuer,
     LoadingRemainingCerts,
     queryCredits,
     ProcessingTx,
@@ -135,6 +137,24 @@ export default function Profile() {
         </Layout>
       </>
     );
+  else if (!VerifiedIssuer)
+    return (
+      <Layout>
+        <Spacer height={100} />
+
+        <Container>
+          <Row>
+            <span className={styles.aboutTitle}>Issuer Profile</span>
+          </Row>
+        </Container>
+        <Spacer height={50} />
+
+          <RestrictedAccess     />
+
+        <Spacer height={150} />
+      </Layout>
+    );
+
   return (
     <>
       <Layout>
@@ -165,8 +185,12 @@ export default function Profile() {
               <>
                 <Row className="justify-content-around">
                   <Col md="auto">
-                    <div className={`${styles.largeLabel} mb-2`} style={{fontWeight: '600'}}>Logo:</div>
-                    <div className="mx-4"><Image src={newIssuerData?.logo_img_url} fluid/></div>
+                    <div className={`${styles.largeLabel} mb-2`} style={{ fontWeight: '600' }}>
+                      Logo:
+                    </div>
+                    <div className="mx-4">
+                      <Image src={newIssuerData?.logo_img_url} fluid />
+                    </div>
                   </Col>
                   <Col md="auto">
                     <h6 className={`d-inline ${styles.smallLabel}`}>Address:</h6> {Address}
@@ -192,7 +216,7 @@ export default function Profile() {
                     <Row className="justify-content-center mt-4 pt-4">
                       <Form.Group as={Col} md="12" controlId="validationCustom01">
                         <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{span: 2, offset: 1}}>
+                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
                             <Form.Label className={`${styles.largeLabel} mb-0`}>Name</Form.Label>
                           </Col>
                           <Col style={{ paddingTop: '0vh' }} xs={8}>
@@ -220,7 +244,7 @@ export default function Profile() {
                     <Row className="justify-content-center">
                       <Form.Group as={Col} md="12" controlId="validationCustom01">
                         <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{span: 2, offset: 1}}>
+                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
                             <Form.Label className={`${styles.largeLabel} mb-0`}>Website</Form.Label>
                           </Col>
                           <Col style={{ paddingTop: '0vh' }} xs={8}>
@@ -248,7 +272,7 @@ export default function Profile() {
                     <Row className="justify-content-center">
                       <Form.Group as={Col} md="12" controlId="validationCustom01">
                         <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{span: 2, offset: 1}}>
+                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
                             <Form.Label className={`${styles.largeLabel} mb-0`}>
                               Logo URL
                             </Form.Label>
@@ -291,3 +315,4 @@ export default function Profile() {
     </>
   );
 }
+

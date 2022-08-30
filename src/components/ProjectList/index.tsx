@@ -15,6 +15,7 @@ import Project from '../../interfaces/Project';
 import CUButton from '../CUButton';
 import { useProject } from '../../contexts/ProjectContext';
 import { Link } from 'react-router-dom';
+import { RestrictedAccess } from '../RestrictedAccess';
 
 interface Props {
   setProjectId: (projectId?: string) => void;
@@ -66,13 +67,7 @@ export default function ProjectList({ setProjectId }: Props) {
 
         <Spacer height={50} />
 
-        <Container>
-          <Row className="text-center">
-            <h4>
-              You are not a verified issuer. Please <Link to="/">Contact Us</Link> for access.
-            </h4>
-          </Row>
-        </Container>
+        <RestrictedAccess />
       </>
     );
 

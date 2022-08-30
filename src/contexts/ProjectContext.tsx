@@ -132,6 +132,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   };
 
   const refreshMintedProjects = async () => {
+    if (LoadingMintedProjects) return;
     setLoadingMinted(true);
     console.log('Getting Minted Projects from Contract', LoginToken, Address);
 

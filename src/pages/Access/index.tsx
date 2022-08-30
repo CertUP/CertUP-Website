@@ -14,11 +14,7 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import {
-  BatchDossierResponse,
-  NftDossier,
-  PermitSignature,
-} from '../../interfaces';
+import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfaces';
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -170,7 +166,7 @@ export default function Access() {
               >
                 <Spinner animation="border" />
               </div>
-            ) : (
+            ) : Dossiers.length ? (
               Dossiers.map((cert, index) => {
                 console.log('aaa', cert);
 
@@ -223,7 +219,9 @@ export default function Access() {
                           //   process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
                           // )}
                           url={(cert?.private_metadata?.extension?.media || [])[0]?.url}
-                          decryptionKey={(cert?.private_metadata?.extension?.media || [])[0]?.authentication?.key}
+                          decryptionKey={
+                            (cert?.private_metadata?.extension?.media || [])[0]?.authentication?.key
+                          }
                           fluid={true}
                         />
                       }
@@ -253,6 +251,12 @@ export default function Access() {
                   </Col>
                 );
               })
+            ) : (
+              <Container>
+                <Row className="text-center mt-4">
+                  <h4>You haven&apos;t claimed any certificates yet.</h4>
+                </Row>
+              </Container>
             )}
           </Row>
         </Container>
