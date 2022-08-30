@@ -14,7 +14,6 @@ import DatePicker from 'react-datepicker';
 import ImagePicker, { PickImage } from '../ImagePicker';
 //import 'react-image-picker/dist/index.css';
 
-
 import dlExcel from '../../assets/dlExcel.svg';
 
 import * as XLSX from 'xlsx';
@@ -70,6 +69,8 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
   const [selectedParticipant, setSelectedParticipant] = useState<number>(0);
   const [selectedDossier, setSelectedDossier] = useState<NftDossier>();
 
+  const [loading, setLoading] = useState(true);
+
   if (mintedInfo.length) console.log('Project Token Single!!!', mintedInfo[0]);
 
   useEffect(() => {
@@ -93,12 +94,15 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
 
   const refreshProjectInfo = async () => {
     if (!pid) return;
+    setLoading(true);
+
     setProjectInfo(findProject(pid));
     const mintedInfo = await queryProjectData(pid);
     console.log(mintedInfo);
     setMintedInfo(mintedInfo);
     setSelectedParticipant(0);
-    //handleSelect(0, mintedInfo);
+
+    setLoading(false);
   };
 
   const participantsToWorksheet = (participants: Participant[]) => {
@@ -128,7 +132,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
       [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code', 'Claimed']],
       { origin: 'A1' },
     );
-  
+
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Project');
     XLSX.writeFile(workbook, `CertUP Project Review - ${projectInfo?.project_name}.xlsx`);
   };
@@ -140,13 +144,16 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
       return;
     }
 
-    const projectParticipants: Participant[] = mintedInfo.map(item=>{
+    const projectParticipants: Participant[] = mintedInfo.map((item) => {
       return {
         claim_code: item.claim_code,
         minted: item.minted,
         name: item.preload_data.priv_metadata.extension.certified_individual?.first_name as string,
-        surname: item.preload_data.priv_metadata.extension.certified_individual?.last_name as string,
-        dob: item.preload_data.priv_metadata.extension.certified_individual?.date_of_birth? new Date(item.preload_data.priv_metadata.extension.certified_individual?.date_of_birth) : undefined,
+        surname: item.preload_data.priv_metadata.extension.certified_individual
+          ?.last_name as string,
+        dob: item.preload_data.priv_metadata.extension.certified_individual?.date_of_birth
+          ? new Date(item.preload_data.priv_metadata.extension.certified_individual?.date_of_birth)
+          : undefined,
         cert_num: item.preload_data.priv_metadata.extension.certificate.cert_number,
       };
     });
@@ -231,18 +238,29 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
                     <td>{token.claim_code}</td>
 
                     {token.minted ? <td style={{ color: 'green' }}>True</td> : <td>False</td>}
+                    {loading ? <Spinner animation="border" /> : null}
                   </tr>
                 );
               })}
             </tbody>
           </Table>
         </Row>
-        <Row className="justify-content-end">
-          <Col xs={2}>
-            <Image src={dlExcel} fluid={true} style={{ cursor: 'pointer' }} onClick={handleDl} />
-          </Col>
-        </Row>
+        {selectedDossier ? (
+          <Row className="justify-content-end">
+            <Col xs={2}>
+              <Image src={dlExcel} fluid={true} style={{ cursor: 'pointer' }} onClick={handleDl} />
+            </Col>
+          </Row>
+        ) : null}
 
+        {loading ? (
+          <Row className="justify-content-center mt-4">
+            <Col xs="auto" className="text-center">
+              <Spinner animation="border" variant='info' />
+              <h3>Loading Project Details</h3>
+            </Col>
+          </Row>
+        ) : null}
         {selectedDossier ? (
           <>
             <ImageRow cert={selectedDossier} noTitle={true} />
