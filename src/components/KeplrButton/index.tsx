@@ -6,6 +6,8 @@ import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';
 import { toast } from 'react-toastify';
 
+import { useCookies } from "react-cookie";
+
 import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
@@ -24,6 +26,8 @@ const truncateAddress = (address: string) => {
 export default function KeplrButton(): ReactElement {
   const { Address, updateClient } = useWallet();
   const [loading, setLoading] = useState(false);
+
+  const [cookies, setCookie] = useCookies(["ConnectedKeplr"]);
 
   //const [secretJs, setSecretJs] = useGlobalState('secretJs');
   //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
