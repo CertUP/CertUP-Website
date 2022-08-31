@@ -65,12 +65,12 @@ export default function Clients() {
                 <Row>
                   <p className={styles.aboutInfoText}>
                     Using the power of SNIP721 on the worlds only production ready encrypted
-                    blockchain, we give you the power to upgrade your certification systems with
-                    ease! Simply register yourself as an issuer, and purchase a package of
+                    blockchain, we give you the ability to upgrade your certification systems with
+                    ease! Simply register yourself as an issuer and purchase a package of
                     certificates. When filling in the data, decide which data is allowed to remain
-                    public, and which must be private. Then, when the data is submitted, you may
+                    public and which must be private. Then, when the data is submitted, you may
                     give the recipient the redemption key our system provides to you. When they
-                    redeem this key, the certificate will be permanently associated with them, and
+                    redeem this key the certificate will be permanently associated with them and
                     have a digital signiture attached proving you were the true issuer.
                   </p>
                 </Row>
