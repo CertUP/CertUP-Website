@@ -52,7 +52,7 @@ export const NftProvider = ({ children }: Props): ReactElement => {
   const refreshDossiers = async () => {
     setLoading(true);
     const response = await getOwnedCerts();
-    console.log('dossiers response', response);
+    console.log('Owned Cert Dossiers', response);
     setDossiers(response);
     setLoading(false);
   };

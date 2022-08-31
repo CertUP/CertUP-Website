@@ -73,19 +73,28 @@ const ProjectContext = createContext<ProjectContextState>(contextDefaultValues);
 
 export const ProjectProvider = ({ children }: Props): ReactElement => {
   // set default values
-  const [PendingProjects, setPendingProjects] = useState<Project[]>(contextDefaultValues.PendingProjects);
-  const [MintedProjects, setMintedProjects] = useState<ExportProject[]>(contextDefaultValues.MintedProjects);
-  const [LoadingPendingProjects, setLoadingPending] = useState<boolean>(contextDefaultValues.LoadingPendingProjects);
-  const [LoadingMintedProjects, setLoadingMinted] = useState<boolean>(contextDefaultValues.LoadingMintedProjects);
+  const [PendingProjects, setPendingProjects] = useState<Project[]>(
+    contextDefaultValues.PendingProjects,
+  );
+  const [MintedProjects, setMintedProjects] = useState<ExportProject[]>(
+    contextDefaultValues.MintedProjects,
+  );
+  const [LoadingPendingProjects, setLoadingPending] = useState<boolean>(
+    contextDefaultValues.LoadingPendingProjects,
+  );
+  const [LoadingMintedProjects, setLoadingMinted] = useState<boolean>(
+    contextDefaultValues.LoadingMintedProjects,
+  );
 
   const { queryProjects } = useQuery();
 
-  const { Address, LoginToken, QueryPermit } = useWallet();
+  const { Address, LoginToken, QueryPermit, VerifiedIssuer } = useWallet();
 
   useEffect(() => {
-    if (!Address || !LoginToken || !QueryPermit) return;
+    console.log('Verified Issuer?', VerifiedIssuer);
+    if (!Address || !LoginToken || !QueryPermit || !VerifiedIssuer) return;
     refreshProjects();
-  }, [LoginToken, Address, QueryPermit]);
+  }, [LoginToken, Address, QueryPermit, VerifiedIssuer]);
 
   const refreshProjects = () => {
     refreshPendingProjects();
@@ -134,16 +143,15 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   const refreshMintedProjects = async (force = false) => {
     // only run one query at a time, no need to send it again if we're already waiting.
     if (LoadingMintedProjects && !force) return;
-    console.log('running')
+
     setLoadingMinted(true);
-    console.log('Getting Minted Projects from Contract', LoginToken, Address);
+    console.log('Getting Minted Projects from Contract');
 
     const result = await queryProjects();
 
     if (result) setMintedProjects(result);
     setLoadingMinted(false);
   };
-
 
   const addProject = async (newProject: Project) => {
     if (!newProject.project_name) {
@@ -220,7 +228,9 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   // Firstly, check if there any value exists in the list.
   // If does exist, set item list to an empty array otherwise, give alert to inform user.
   const removeAll = () =>
-    PendingProjects.length === 0 ? alert('There are no tasks found in the list!') : setPendingProjects([]);
+    PendingProjects.length === 0
+      ? alert('There are no tasks found in the list!')
+      : setPendingProjects([]);
 
   // Update item with id and item values.
   const updateProject = async (id: string, project: Project) => {

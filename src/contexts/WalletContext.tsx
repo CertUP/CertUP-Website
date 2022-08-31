@@ -1,5 +1,10 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import { IssuerData, IssuerDataResponse, PermitSignature, RemainingCertsResponse } from '../interfaces';
+import {
+  IssuerData,
+  IssuerDataResponse,
+  PermitSignature,
+  RemainingCertsResponse,
+} from '../interfaces';
 import { SecretNetworkClient, Wallet } from 'secretjs';
 import {
   LoginToken,
@@ -9,6 +14,8 @@ import {
   getQueryPermit,
 } from '../utils/loginPermit';
 import useQuery from '../hooks/QueryHook';
+
+import { toast } from 'react-toastify';
 
 export interface WalletContextState {
   Client?: SecretNetworkClient;
@@ -51,7 +58,7 @@ const contextDefaultValues: WalletContextState = {
   IssuerProfile: undefined,
   LoadingRemainingCerts: true,
   ProcessingTx: false,
-  VerifiedIssuer: true,
+  VerifiedIssuer: false,
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
@@ -107,7 +114,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     token: LoginToken | undefined,
     permit: PermitSignature | undefined,
   ) => {
-    console.log('updating', token, permit);
     setClient(client);
     setWallet(wallet);
     setAddress(address);
@@ -131,7 +137,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   };
 
   const getQuerier = async () => {
-    console.log('getting querier');
+    console.log('Getting Querier');
     const querier = await SecretNetworkClient.create({
       grpcWebUrl: process.env.REACT_APP_GRPC_URL,
       chainId: process.env.REACT_APP_CHAIN_ID,
@@ -142,6 +148,8 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   const queryCredits = async (queryPermit = QueryPermit): Promise<number | undefined> => {
     if (!queryPermit) return;
     setLoadingRemainingCerts(true);
+
+    console.log('Updating Remaining Certs...');
 
     const query = {
       with_permit: {
@@ -169,29 +177,43 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     })) as IssuerDataResponse;
-    console.log('Remaining Certs Query Responseeeee', response);
+
+    console.log('Remaining Certs Query Response', response);
 
     if (response?.parse_err || response?.generic_err) {
-      if (response.generic_err?.msg.includes('not a verified issuer')) setVerifiedIssuer(false);
-      else if (response.generic_err?.msg.includes('Failed to verify signatures for the given permit')) {
+      if (response.generic_err?.msg.includes('not a verified issuer')) {
+        setVerifiedIssuer(false);
+        return;
+      } else if (
+        response.generic_err?.msg.includes('Failed to verify signatures for the given permit')
+      ) {
         await refreshQueryPermit();
         return;
       } else {
-        throw new Error(
+        const errorMsg =
           response?.parse_err?.msg ||
-            response?.generic_err?.msg ||
-            JSON.stringify(response, undefined, 2),
-        );
+          response?.generic_err?.msg ||
+          JSON.stringify(response, undefined, 2);
+
+        toast.error(errorMsg);
+        // throw new Error(
+        //   response?.parse_err?.msg ||
+        //     response?.generic_err?.msg ||
+        //     JSON.stringify(response, undefined, 2),
+        // );
       }
+
       setLoadingRemainingCerts(false);
     } else {
       const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
-
       setIssuerProfile(response.issuer_data);
       setRemainingCerts(result);
+      setVerifiedIssuer(true);
       setLoadingRemainingCerts(false);
       return result;
-    };
+    }
+
+    setLoadingRemainingCerts(false);
   };
 
   const values = {
