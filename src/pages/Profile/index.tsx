@@ -149,7 +149,7 @@ export default function Profile() {
         </Container>
         <Spacer height={50} />
 
-          <RestrictedAccess     />
+        <RestrictedAccess />
 
         <Spacer height={150} />
       </Layout>
@@ -179,7 +179,7 @@ export default function Profile() {
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
               >
-                <Spinner animation="border" />
+                <Spinner animation="border" variant="info" />
               </div>
             ) : (
               <>
@@ -206,107 +206,115 @@ export default function Profile() {
                     <br />
                   </Col>
                 </Row>
-                <Form
-                  noValidate
-                  as={Row}
-                  className={`justify-content-center ${styles.certupInputForm}`}
-                  onSubmit={handleUpdate}
-                >
-                  <Col md={8} xs={12}>
-                    <Row className="justify-content-center mt-4 pt-4">
-                      <Form.Group as={Col} md="12" controlId="validationCustom01">
-                        <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
-                            <Form.Label className={`${styles.largeLabel} mb-0`}>Name</Form.Label>
-                          </Col>
-                          <Col style={{ paddingTop: '0vh' }} xs={8}>
-                            <Form.Control
-                              required
-                              value={newIssuerData?.name}
-                              onChange={(e) => {
-                                updateIssuerData({ name: e.target.value });
-                                //setDirty(true);
-                              }}
-                              type="text"
-                              placeholder="Corporate Finance Institute"
-                              className="mt-1"
-                              disabled={loadingUpdate}
-                              //isInvalid={!!errors.projectName}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                              {/* {errors.projectName} */}
-                            </Form.Control.Feedback>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    </Row>
-
-                    <Row className="justify-content-center">
-                      <Form.Group as={Col} md="12" controlId="validationCustom01">
-                        <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
-                            <Form.Label className={`${styles.largeLabel} mb-0`}>Website</Form.Label>
-                          </Col>
-                          <Col style={{ paddingTop: '0vh' }} xs={8}>
-                            <Form.Control
-                              required
-                              value={newIssuerData?.website}
-                              onChange={(e) => {
-                                updateIssuerData({ website: e.target.value });
-                                //setDirty(true);
-                              }}
-                              type="text"
-                              placeholder="https://cfi.org"
-                              className="mt-1"
-                              disabled={loadingUpdate}
-                              //isInvalid={!!errors.projectName}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                              {/* {errors.projectName} */}
-                            </Form.Control.Feedback>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                    </Row>
-
-                    <Row className="justify-content-center">
-                      <Form.Group as={Col} md="12" controlId="validationCustom01">
-                        <Row className="mb-4" style={{ width: '100%' }}>
-                          <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
-                            <Form.Label className={`${styles.largeLabel} mb-0`}>
-                              Logo URL
-                            </Form.Label>
-                          </Col>
-                          <Col style={{ paddingTop: '0vh' }} xs={8}>
-                            <Form.Control
-                              required
-                              value={newIssuerData?.logo_img_url}
-                              onChange={(e) => {
-                                updateIssuerData({ logo_img_url: e.target.value });
-                                //setDirty(true);
-                              }}
-                              type="text"
-                              placeholder="https://cfi.org/logo.png"
-                              className="mt-1"
-                              disabled={loadingUpdate}
-                              //isInvalid={!!errors.projectName}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                              {/* {errors.projectName} */}
-                            </Form.Control.Feedback>
-                          </Col>
-                        </Row>
-                      </Form.Group>
-                      <Row className="justify-content-center">
-                        <Col xs={3}>
-                          <CUButton btnStyle="square" type="submit" disabled={ProcessingTx}>
-                            {loadingUpdate ? <Spinner animation="border" /> : 'Update Profile'}
-                          </CUButton>
-                        </Col>
+                <Row className={`justify-content-center`}>
+                  <Form
+                    noValidate
+                    //as={Row}
+                    className={`justify-content-center ${styles.certupInputForm}`}
+                    onSubmit={handleUpdate}
+                  >
+                    <Col md={{ span: 8, offset: 2 }} xs={12}>
+                      <Row className="justify-content-center mt-4 pt-4">
+                        <Form.Group as={Col} md="12" controlId="validationCustom01">
+                          <Row className="mb-4" style={{ width: '100%' }}>
+                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                              <Form.Label className={`${styles.largeLabel} mb-0`}>Name</Form.Label>
+                            </Col>
+                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                              <Form.Control
+                                required
+                                value={newIssuerData?.name}
+                                onChange={(e) => {
+                                  updateIssuerData({ name: e.target.value });
+                                  //setDirty(true);
+                                }}
+                                type="text"
+                                placeholder="Corporate Finance Institute"
+                                className="mt-1"
+                                disabled={loadingUpdate}
+                                //isInvalid={!!errors.projectName}
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {/* {errors.projectName} */}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Row>
+                        </Form.Group>
                       </Row>
-                    </Row>
-                  </Col>
-                </Form>
+
+                      <Row className="justify-content-center">
+                        <Form.Group as={Col} md="12" controlId="validationCustom01">
+                          <Row className="mb-4" style={{ width: '100%' }}>
+                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                              <Form.Label className={`${styles.largeLabel} mb-0`}>
+                                Website
+                              </Form.Label>
+                            </Col>
+                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                              <Form.Control
+                                required
+                                value={newIssuerData?.website}
+                                onChange={(e) => {
+                                  updateIssuerData({ website: e.target.value });
+                                  //setDirty(true);
+                                }}
+                                type="text"
+                                placeholder="https://cfi.org"
+                                className="mt-1"
+                                disabled={loadingUpdate}
+                                //isInvalid={!!errors.projectName}
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {/* {errors.projectName} */}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                      </Row>
+
+                      <Row className="justify-content-center">
+                        <Form.Group as={Col} md="12" controlId="validationCustom01">
+                          <Row className="mb-4" style={{ width: '100%' }}>
+                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                              <Form.Label className={`${styles.largeLabel} mb-0`}>
+                                Logo URL
+                              </Form.Label>
+                            </Col>
+                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                              <Form.Control
+                                required
+                                value={newIssuerData?.logo_img_url}
+                                onChange={(e) => {
+                                  updateIssuerData({ logo_img_url: e.target.value });
+                                  //setDirty(true);
+                                }}
+                                type="text"
+                                placeholder="https://cfi.org/logo.png"
+                                className="mt-1"
+                                disabled={loadingUpdate}
+                                //isInvalid={!!errors.projectName}
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {/* {errors.projectName} */}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Row>
+                        </Form.Group>
+                        <Row className="justify-content-center">
+                          <Col xs={3}>
+                            <CUButton btnStyle="square" type="submit" disabled={ProcessingTx}>
+                              {loadingUpdate ? (
+                                <Spinner animation="border" variant="info" />
+                              ) : (
+                                'Update Profile'
+                              )}
+                            </CUButton>
+                          </Col>
+                        </Row>
+                      </Row>
+                    </Col>
+                  </Form>
+                </Row>
               </>
             )}
           </Row>
@@ -315,4 +323,3 @@ export default function Profile() {
     </>
   );
 }
-

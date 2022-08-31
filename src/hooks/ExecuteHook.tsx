@@ -341,7 +341,7 @@ export default function useExecute() {
 
     logSizeInBytes('Preload Msg', preloadMsg);
     //todo: extimate gas based on number of participants
-    const response = await executeManager(preloadMsg, 85000, toast);
+    const response = await executeManager(preloadMsg, 100000, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
     queryCredits();
     return response;

@@ -47,14 +47,11 @@ export default function Clients() {
 
                 <Row>
                   <p className={styles.aboutInfoText}>
-                    You get certificates as proof of completing your school education, high school,
-                    college, and university education. Furthermore, certificates help you find jobs
-                    with potential employers when you need to show off your skills. Unfortunately,
-                    Most certificate platforms only make use of publicly accessible information with
-                    little to no consideration for sensitive and personal data held within. With
-                    secretNFT Certificates you will be able to make finetune your usage of public
-                    and private data to perfectly meet your needs. Use-cases include: events,
-                    education, manufacturing, space, military and more!{' '}
+                    Upgrade your certificates to keep pace with your rapidly evolving field. The
+                    digital age is making else more convenient, but certification and important
+                    documents systems have remained shackled to the past, creating serious
+                    bottlenecks for all of us. Our mission is to break those shackles, bringing
+                    these items into the digital age without sacrificing security.
                   </p>
                 </Row>
               </div>
@@ -67,14 +64,14 @@ export default function Clients() {
 
                 <Row>
                   <p className={styles.aboutInfoText}>
-                    You get certificates as proof of completing your school education, high school,
-                    college, and university education. Furthermore, certificates help you find jobs
-                    with potential employers when you need to show off your skills. Unfortunately,
-                    Most certificate platforms only make use of publicly accessible information with
-                    little to no consideration for sensitive and personal data held within. With
-                    secretNFT Certificates you will be able to make finetune your usage of public
-                    and private data to perfectly meet your needs. Use-cases include: events,
-                    education, manufacturing, space, military and more!{' '}
+                    Using the power of SNIP721 on the worlds only production ready encrypted
+                    blockchain, we give you the power to upgrade your certification systems with
+                    ease! Simply register yourself as an issuer, and purchase a package of
+                    certificates. When filling in the data, decide which data is allowed to remain
+                    public, and which must be private. Then, when the data is submitted, you may
+                    give the recipient the redemption key our system provides to you. When they
+                    redeem this key, the certificate will be permanently associated with them, and
+                    have a digital signiture attached proving you were the true issuer.
                   </p>
                 </Row>
               </div>

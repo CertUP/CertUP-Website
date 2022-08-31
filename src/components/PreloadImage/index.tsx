@@ -42,7 +42,7 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
       <div className={styles.centered}>
         {loading ? (
           <>
-            <Spinner animation="border" variant="primary" />
+            <Spinner animation="border" variant="info" />
             <span>{status}</span>
           </>
         ) : null}

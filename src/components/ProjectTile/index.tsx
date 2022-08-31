@@ -59,7 +59,7 @@ export default function ProjectTile({ projectIn, setProjectIdForm, setProjectIdR
             </Col>
             {LoadingMintedProjects ? (
               <Col xs={'auto'}>
-                <Spinner animation="border" variant="gray" size="sm" />
+                <Spinner animation="border" variant="info" size="sm" />
               </Col>
             ) : minted ? (
               <>

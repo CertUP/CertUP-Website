@@ -50,7 +50,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
   const { generateAccessCode, allowAddressAccess, approveAccessGlobal, revokeAccessGlobal } = useExecute();
   const { ProcessingTx } = useWallet();
 
-  const { Dossiers, LoadingNfts, refreshInventory, refreshDossiers, findNft } = useNft();
+  const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
 
   const handleClose = () => setShow(false);
 
@@ -175,7 +175,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             : null }
                 <CUButton btnStyle="square" disabled={ProcessingTx} onClick={handleAllowAll}>
                   {loading === 'allowAll' ? (
-                    <Spinner animation="border" variant="gray" size="sm" />
+                    <Spinner animation="border" variant="info" size="sm" />
                   ) : (
                     metadata?.private_metadata_is_public ? 
                     'Revoke Public Access'
@@ -200,7 +200,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
               <Col md="auto">
                 <CUButton btnStyle="square" onClick={handleGenCode} disabled={ProcessingTx}>
                   {loading === 'genCode' ? (
-                    <Spinner animation="border" variant="gray" size="sm" />
+                    <Spinner animation="border" variant="info" size="sm" />
                   ) : (
                     'Generate New Code'
                   )}
@@ -257,7 +257,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             </Row>
             <Row>
               {loadingApprovals || !metadata ? (
-                <Spinner animation="border" />
+                <Spinner animation="border" variant="info" />
               ) : metadata.token_code_approvals.length ? (
                 <ul>
                   {metadata.token_code_approvals.map((wl, i) => {
@@ -293,11 +293,11 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
 
           <Col className="d-flex flex-column">
             <Row>
-              <h5>Whitelisted Addresses:</h5>
+              <h5>Whitelisted Addresses:</h5> 
             </Row>
             <Row>
               {loadingApprovals ? (
-                <Spinner animation="border" />
+                <Spinner animation="border" variant="info" />
               ) : metadata?.token_approvals && metadata.token_approvals.length ? (
                 <ul style={{ padding: '0px 3px' }}>
                   {metadata.token_approvals.map((wl, i) => {

@@ -66,7 +66,7 @@ export default function SaveModal({ show, setShow, metadata }: props) {
   //const [files, setFiles] = useState<File[]>([]);
 
   const handleDlImage = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault;
+    e.preventDefault();
     const imageUrl = (metadata?.private_metadata?.extension?.media || [])[0].url.replace(
       'ipfs.io',
       process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',

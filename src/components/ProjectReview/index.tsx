@@ -49,7 +49,7 @@ import {
   faFileArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
 import useQuery from '../../hooks/QueryHook';
-import { NftDossier, ProjectToken } from '../../interfaces';
+import { BatchNftDossier, NftDossier, ProjectToken } from '../../interfaces';
 import MetadataRow from '../MetadataRow';
 import ImageRow from '../ImageRow';
 import { Participant } from '../../interfaces/Project';
@@ -79,7 +79,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
 
   useEffect(() => {
     if (!mintedInfo.length) return;
-    const tempDossier: NftDossier = {
+    const tempDossier: BatchNftDossier = {
       token_id: mintedInfo[selectedParticipant].claim_code,
       public_metadata: mintedInfo[selectedParticipant].preload_data.pub_metadata,
       private_metadata: mintedInfo[selectedParticipant].preload_data.priv_metadata,
@@ -238,7 +238,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
                     <td>{token.claim_code}</td>
 
                     {token.minted ? <td style={{ color: 'green' }}>True</td> : <td>False</td>}
-                    {loading ? <Spinner animation="border" /> : null}
+                    {loading ? <Spinner animation="border" variant="info" /> : null}
                   </tr>
                 );
               })}

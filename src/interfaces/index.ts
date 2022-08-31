@@ -79,11 +79,10 @@ export interface BatchDossierResponse {
 }
 
 export interface _BatchDossiers {
-  nft_dossiers: NftDossier[];
+  nft_dossiers: BatchNftDossier[];
 }
 
 export interface NftDossier {
-  token_id: string;
   display_private_metadata_error: string | null;
   owner: string | null;
   private_metadata: CertupMetadata;
@@ -91,6 +90,10 @@ export interface NftDossier {
   public_metadata: CertupMetadata;
   token_approvals: any[];
   token_code_approvals: any[];
+}
+
+export interface BatchNftDossier extends NftDossier {
+  token_id: string;
 }
 
 export interface PreLoad {
@@ -115,6 +118,19 @@ export interface RemainingCertsResponse extends QueryResponse {
 
 export interface IssuerDataResponse extends QueryResponse {
   issuer_data: IssuerData;
+}
+
+export interface GetIssuerResponse extends QueryResponse {
+  get_issuer: PubIssuerData;
+}
+
+export interface PubIssuerData {
+  id: string;
+  name?: string;
+  website?: string;
+  logo_img_url?: string;
+  verified: boolean;
+  verified_name?: string;
 }
 
 export interface ProjectDataResponse extends QueryResponse {

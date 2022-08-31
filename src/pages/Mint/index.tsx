@@ -301,7 +301,7 @@ export default function Mint() {
                 disabled={ProcessingTx || loading}
               >
                 {ProcessingTx || loading ? (
-                  <Spinner animation="border" size="sm" variant="light" />
+                  <Spinner animation="border" variant="info" size="sm" />
                 ) : (
                   'Generate'
                 )}

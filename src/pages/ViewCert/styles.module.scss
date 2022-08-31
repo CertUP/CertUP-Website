@@ -14,6 +14,15 @@ $gradient3: #a659f3;
   text-align: center;
 }
 
+.aboutSubTitle {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 32px;
+  //line-height: 108px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
 .payInFont {
   font-family: 'Poppins';
   font-style: normal;
@@ -65,4 +74,50 @@ $gradient3: #a659f3;
   line-height: 24px;
 
   color: #676767;
+}
+
+
+.bannerContainer {
+  background-color: #fafafa;
+  padding: 5vh 15vw;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .bannerContainer {
+    padding: 5vh 5vw;
+  }
+}
+
+.bannerTitle {
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 42px;
+  color: #353535;
+  margin-bottom: 5px;
+}
+
+.bannerSubtitle {
+  font-weight: 400;
+  font-size: 18px;
+  //line-height: 177.5%;
+  color: #676767;
+}
+
+.bannerLink {
+  color: #4148ff !important;
+}
+
+.certupInputForm input {
+  background: #f2f2f2;
+  border-radius: 38px;
+}
+.certupInputForm input:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.bannerCol {
+  display: flex;
+  flex-direction: column;
 }

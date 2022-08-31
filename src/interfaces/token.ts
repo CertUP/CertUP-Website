@@ -19,6 +19,7 @@ export interface CertificateInfo {
   issue_date?: string;
   expire_date?: string;
   cert_number: string;
+  issuer_id?: string;
 }
 
 export interface CertifiedIndividual {

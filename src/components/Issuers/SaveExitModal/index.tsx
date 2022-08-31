@@ -27,13 +27,13 @@ export default function SaveExitModal({ show, handleClose, handleSave, handleCon
   //const [files, setFiles] = useState<File[]>([]);
 
   const saveExit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault;
+    e.preventDefault();
     handleSave();
     handleContinue();
   };
 
   const noSave = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault;
+    e.preventDefault();
     handleContinue();
   };
 

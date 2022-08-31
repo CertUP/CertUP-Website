@@ -39,7 +39,7 @@ export default function Access() {
   const [accessCode, setAccessCode] = useState<string>('');
 
   const { getOwnedCerts } = useQuery();
-  const { Dossiers, LoadingNfts, refreshInventory, refreshDossiers, findNft } = useNft();
+  const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,10 +50,10 @@ export default function Access() {
     //if (QueryPermit) queryOwnedCerts();
   }, []);
 
-  useEffect(() => {
-    if (!QueryPermit || !Client || !Address) return;
-    refreshDossiers();
-  }, [QueryPermit]);
+  // useEffect(() => {
+  //   if (!QueryPermit || !Client || !Address) return;
+  //   refreshDossiers();
+  // }, [QueryPermit]);
 
   const handleView = (tokenId: string) => {
     navigate(`/access/${tokenId}`, { state: { tokenId: tokenId } });
@@ -78,7 +78,7 @@ export default function Access() {
           msg: mintMsg,
         },
         {
-          gasLimit: 85_000,
+          gasLimit: 100_000,
         },
       );
       console.log('Mint Result:', result);
@@ -147,7 +147,7 @@ export default function Access() {
                     type="text"
                     placeholder="a1b2c3..."
                     value={accessCode}
-                    onChange={(e) => setAccessCode(e.target.value)}
+                    onChange={(e) => setAccessCode(e.target.value.trim())}
                   />
                 </Form.Group>
               </Form>
@@ -164,7 +164,7 @@ export default function Access() {
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
               >
-                <Spinner animation="border" />
+                <Spinner animation="border" variant="info" />
               </div>
             ) : Dossiers.length ? (
               Dossiers.map((cert, index) => {

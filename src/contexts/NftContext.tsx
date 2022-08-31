@@ -6,16 +6,14 @@ import { useWallet } from '.';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { dataURLtoFile } from '../utils/fileHelper';
-import { NftDossier } from '../interfaces';
+import { BatchNftDossier, NftDossier } from '../interfaces';
 import useQuery from '../hooks/QueryHook';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
 export interface NftContextState {
-  Inventory: string[];
-  Dossiers: NftDossier[];
+  Dossiers: BatchNftDossier[];
   LoadingNfts: boolean;
-  refreshInventory: () => Promise<void>;
   refreshDossiers: () => Promise<void>;
   findNft: (tokenId: string) => NftDossier | undefined;
 }
@@ -26,12 +24,8 @@ interface Props {
 
 // set default values for initializing
 const contextDefaultValues: NftContextState = {
-  Inventory: [],
   Dossiers: [],
   LoadingNfts: true,
-  refreshInventory: async function (): Promise<void> {
-    throw new Error('Function not implemented.');
-  },
   refreshDossiers: async function (): Promise<void> {
     throw new Error('Function not implemented.');
   },
@@ -44,24 +38,16 @@ const contextDefaultValues: NftContextState = {
 const NftContext = createContext<NftContextState>(contextDefaultValues);
 
 export const NftProvider = ({ children }: Props): ReactElement => {
-  const [Inventory, setInventory] = useState<string[]>(contextDefaultValues.Inventory);
-  const [Dossiers, setDossiers] = useState<NftDossier[]>(contextDefaultValues.Dossiers);
+  const [Dossiers, setDossiers] = useState<BatchNftDossier[]>(contextDefaultValues.Dossiers);
   const [Loading, setLoading] = useState<boolean>(contextDefaultValues.LoadingNfts);
 
   const { Address, QueryPermit, Querier } = useWallet();
   const { getOwnedCerts } = useQuery();
 
-  // useEffect(() => {
-  //   if (!Address || !QueryPermit) return;
-  //   refreshProjects();
-  // }, [LoginToken, Address]);
-
-  const refreshInventory = async () => {
-    setLoading(true);
-    const response = await getOwnedCerts();
-    setDossiers(response);
-    setLoading(false);
-  };
+  useEffect(() => {
+    if (!Address || !QueryPermit) return;
+    refreshDossiers();
+  }, [QueryPermit, Address]);
 
   const refreshDossiers = async () => {
     setLoading(true);
@@ -72,16 +58,14 @@ export const NftProvider = ({ children }: Props): ReactElement => {
   };
 
   // find item by using id value
-  const findNft = (tokenId: string): NftDossier | undefined => {
+  const findNft = (tokenId: string): BatchNftDossier | undefined => {
     const dossier = Dossiers.find((token) => token.token_id === tokenId);
     return dossier;
   };
 
   const values = {
-    Inventory,
     Dossiers,
     LoadingNfts: Loading,
-    refreshInventory,
     refreshDossiers,
     findNft,
   };

@@ -235,7 +235,7 @@ export default function Payment() {
             </Col>
           </Row>
           {loading ? (
-            <Spinner animation="border" />
+            <Spinner animation="border" variant="info" />
           ) : paid ? (
             <>
               {confirmation ? (

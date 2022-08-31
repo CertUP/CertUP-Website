@@ -91,7 +91,7 @@ export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Pr
       <Container>
         <h3 className={styles.certsLabel}>Your Certificates</h3>
         {LoadingPendingProjects || LoadingRemainingCerts ? (
-          <Spinner animation="border" role="status">
+          <Spinner animation="border" variant="info" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
         ) : PendingProjects.length ? (

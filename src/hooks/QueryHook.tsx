@@ -5,6 +5,7 @@ import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
   DossierResponse,
+  GetIssuerResponse,
   IssuerData,
   IssuerDataResponse,
   ListProjectsResponse,
@@ -12,6 +13,7 @@ import {
   PermitSignature,
   ProjectDataResponse,
   ProjectToken,
+  PubIssuerData,
   RemainingCertsResponse,
 } from '../interfaces';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
@@ -166,6 +168,26 @@ export default function useQuery() {
     return response?.issuer_data;
   };
 
+  const queryPubIssuerData = async (issuerId: string): Promise<PubIssuerData> => {
+    if (!Querier) throw new Error('Client not available.');
+
+    const query = {
+      get_issuer: {
+        issuer_id: issuerId,
+      },
+    };
+
+    const response = (await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    })) as GetIssuerResponse;
+    console.log(query, response)
+    checkError(response);
+
+    return response?.get_issuer;
+  };
+
   const queryProjects = async () => {
     if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -270,6 +292,22 @@ export default function useQuery() {
     };
 
     const response = (await queryPermitNFTContract(dossierQuery)) as DossierResponse;
+
+    return response.nft_dossier;
+  };
+
+  const getCertAccessCode = async (token_id: string, access_code: string) => {
+    if (!Querier) throw new Error('Querier not available.');
+
+    // query NFT metadata
+    const dossierQuery = {
+      nft_dossier: {
+        token_id,
+        access_code,
+      },
+    };
+
+    const response = (await queryNFTContract(dossierQuery)) as DossierResponse;
 
     return response.nft_dossier;
   };
@@ -388,5 +426,7 @@ export default function useQuery() {
     queryPermitNFTContract,
     queryNFTWhitelist,
     queryNFTDossier,
+    getCertAccessCode,
+    queryPubIssuerData
   };
 }
