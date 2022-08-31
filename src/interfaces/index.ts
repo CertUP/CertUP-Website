@@ -1,7 +1,6 @@
 import { ArrayLog, JsonLog, SecretNetworkClient, TxContent, TxResultCode, Wallet } from 'secretjs';
 import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
 import { Tx } from 'secretjs';
-import { classicNameResolver } from 'typescript';
 import { LoginToken } from '../utils/loginPermit';
 
 export * as Project from './Project';
