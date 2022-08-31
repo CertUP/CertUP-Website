@@ -70,7 +70,7 @@ export default function About() {
           <Row className="mx-2 mt-2">
             <p className={styles.productText}>
               The product works on a SNIP-721 smart contract technology provided by Secret Network.
-              Having the possibility to have private and public meta-data enables any industry to
+              Having the ability to store private and public meta-data enables any industry to
               easily setup the certificate as a non-fungible token and issue to the relevant party.
             </p>
           </Row>
@@ -88,11 +88,11 @@ export default function About() {
           <span className={styles.aboutSubtitle}>Use-cases</span>
           <Row className="mx-2 mt-2">
             <p className={styles.productText}>
-              Many schools, educational events and manufacturing sectors are facing the reality of
-              tracking issued certificates and proof of certification from that particular industry.
-              The secretNFT Certificate resolves the consensus side between the issuer with
-              real-time track recording, for the certificate receiver can easily proof the
-              certificate and verification.
+              Many schools, events, and manufacturing sectors are facing the problems with
+              tracking and verifying certificates using old systems in their rapidly evolving industries.
+              The SecretNFT Certificate resolves the consensus side between all parties with real-time
+              track recording, as the certificate holder can verify the authenticity easily with a digital 
+              signiture attached to every document.
             </p>
           </Row>
           <Row className="justify-content-center">
