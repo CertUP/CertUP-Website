@@ -17,7 +17,7 @@
 // }
 
 import axios from 'axios';
-import crypto from 'crypto';
+import { createDecipheriv } from 'browser-crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -71,7 +71,7 @@ export const decryptFile = (input: Uint8Array, key: string) => {
     const ivSize = dataBuffer.readUInt8(0);
     const iv = dataBuffer.slice(1, ivSize + 1);
     const authTag = dataBuffer.slice(ivSize + 1, ivSize + 17);
-    const decipher = crypto.createDecipheriv(ALGORITHM, cipherKey, iv);
+    const decipher = createDecipheriv(ALGORITHM, cipherKey, iv);
     decipher.setAuthTag(authTag);
     return Buffer.concat([decipher.update(dataBuffer.slice(ivSize + 17)), decipher.final()]);
   } catch (error: any) {
