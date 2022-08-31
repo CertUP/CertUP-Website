@@ -11,7 +11,7 @@ export const RestrictedAccess = () => {
           <h4>
             <p>
               You are not a verified certificate issuer. Early access is restricted to verified
-              issuers. Please <Link to="/">Contact Us</Link> for access.
+              issuers. Please <Link to="/contact">Contact Us</Link> for access.
             </p>
           </h4>
         </Col>

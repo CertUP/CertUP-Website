@@ -5,7 +5,7 @@ import {
   PermitSignature,
   RemainingCertsResponse,
 } from '../interfaces';
-import { SecretNetworkClient, Wallet } from 'secretjs';
+import { SecretNetworkClient, Wallet as SJSWallet } from 'secretjs';
 import {
   LoginToken,
   permissions,
@@ -17,11 +17,17 @@ import useQuery from '../hooks/QueryHook';
 
 import { toast } from 'react-toastify';
 
+interface DummyWallet {
+  wallet: SJSWallet;
+  client: SecretNetworkClient;
+  address: string;
+}
+
 export interface WalletContextState {
   Client?: SecretNetworkClient;
   Querier: SecretNetworkClient | undefined;
   ClientIsSigner: boolean;
-  Wallet: Wallet | undefined;
+  Wallet: SJSWallet | undefined;
   Address: string;
   LoginToken: LoginToken | undefined;
   QueryPermit: PermitSignature | undefined;
@@ -30,9 +36,10 @@ export interface WalletContextState {
   LoadingRemainingCerts: boolean;
   ProcessingTx: boolean;
   VerifiedIssuer: boolean;
+  DummyWallet?: DummyWallet;
   updateClient: (
     client?: SecretNetworkClient,
-    wallet?: Wallet,
+    wallet?: SJSWallet,
     address?: string,
     token?: LoginToken,
     permit?: PermitSignature,
@@ -59,6 +66,7 @@ const contextDefaultValues: WalletContextState = {
   LoadingRemainingCerts: true,
   ProcessingTx: false,
   VerifiedIssuer: false,
+  DummyWallet: undefined,
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
@@ -84,7 +92,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   const [ClientIsSigner, setClientIsSigner] = useState<boolean>(
     contextDefaultValues.ClientIsSigner,
   );
-  const [Wallet, setWallet] = useState<Wallet | undefined>(contextDefaultValues.Wallet);
+  const [Wallet, setWallet] = useState<SJSWallet | undefined>(contextDefaultValues.Wallet);
   const [Address, setAddress] = useState<string>(contextDefaultValues.Address);
   const [LoginToken, setLoginToken] = useState<LoginToken | undefined>(
     contextDefaultValues.LoginToken,
@@ -107,9 +115,11 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.VerifiedIssuer,
   );
 
+  const [DummyWallet, setDummyWallet] = useState<DummyWallet>();
+
   const updateClient = (
     client: SecretNetworkClient | undefined,
-    wallet: Wallet | undefined,
+    wallet: SJSWallet | undefined,
     address = '',
     token: LoginToken | undefined,
     permit: PermitSignature | undefined,
@@ -128,6 +138,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
   useEffect(() => {
     getQuerier();
+    getDummy();
   }, []);
 
   const refreshQueryPermit = async () => {
@@ -143,6 +154,25 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       chainId: process.env.REACT_APP_CHAIN_ID,
     });
     setQuerier(querier);
+  };
+
+  const getDummy = async () => {
+    console.log('Getting Simulator');
+    const dWallet = new SJSWallet('dont use this wallet');
+    const dAddress = dWallet.address;
+    console.log('Simulation Wallet:', dAddress);
+    const dClient = await SecretNetworkClient.create({
+      grpcWebUrl: process.env.REACT_APP_GRPC_URL,
+      chainId: process.env.REACT_APP_CHAIN_ID,
+      wallet: dWallet,
+      walletAddress: dAddress,
+    });
+
+    setDummyWallet({
+      wallet: dWallet,
+      client: dClient,
+      address: dAddress,
+    });
   };
 
   const queryCredits = async (queryPermit = QueryPermit): Promise<number | undefined> => {
@@ -234,6 +264,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     IssuerProfile,
     LoadingRemainingCerts,
     ProcessingTx,
+    DummyWallet,
     updateClient,
     queryCredits,
     setProcessingTx,

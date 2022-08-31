@@ -23,7 +23,8 @@ import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 import { ToastProps } from '../utils/toastHelper';
 
 export default function useExecute() {
-  const { Client, Address, QueryPermit, queryCredits, ProcessingTx, setProcessingTx } = useWallet();
+  const { Client, Address, QueryPermit, queryCredits, ProcessingTx, setProcessingTx, DummyWallet } =
+    useWallet();
   const querier = useRef<SecretNetworkClient>();
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function useExecute() {
   const parseComputeError = (tx: ComputeTx) => {
     if (!tx.code) return;
 
-    const errorMsg = tx.jsonLog?.generic_err?.msg || tx.jsonLog?.parse_err?.msg || tx.rawLog
+    const errorMsg = tx.jsonLog?.generic_err?.msg || tx.jsonLog?.parse_err?.msg || tx.rawLog;
 
     switch (tx.code) {
       case ComputeResultCode.ErrExecuteFailed:
@@ -341,7 +342,10 @@ export default function useExecute() {
 
     logSizeInBytes('Preload Msg', preloadMsg);
     //todo: extimate gas based on number of participants
-    const response = await executeManager(preloadMsg, 100000, toast);
+    const simulationGas = await simulateManager(preloadMsg);
+    console.log('Sim result', simulationGas);
+
+    const response = await executeManager(preloadMsg, simulationGas, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
     queryCredits();
     return response;
@@ -374,6 +378,30 @@ export default function useExecute() {
     } catch (err: any) {
       setProcessingTx(false);
       toast.update(toastRef, new ToastProps(err.toString(), 'error'));
+      throw err;
+    }
+  };
+
+  const simulateManager = async (msg: any) => {
+    if (!DummyWallet) throw new Error('Client not available.');
+
+    try {
+      const response = await DummyWallet.client.tx.compute.executeContract.simulate({
+        contractAddress: process.env.REACT_APP_MANAGER_ADDR,
+        codeHash: process.env.REACT_APP_MANAGER_HASH,
+        sender: DummyWallet.address,
+        msg: msg,
+      });
+      parseError(response as ComputeTx);
+
+      if (!response) throw new Error(); //todo handle this
+
+      console.log('Simulation Used:', response.gasInfo?.gasUsed);
+
+      //return gas used with some overhead
+      return parseInt(response.gasInfo?.gasUsed || '500000', 10) * 1.08;
+    } catch (err: any) {
+      console.error('TX Simulation Error', err);
       throw err;
     }
   };
@@ -519,6 +547,6 @@ export default function useExecute() {
     allowAddressAccess,
     removeAddressAccess,
     approveAccessGlobal,
-    revokeAccessGlobal
+    revokeAccessGlobal,
   };
 }

@@ -106,7 +106,7 @@ export default function CertUpNavbar() {
           {/* </Navbar.Collapse> */}
           <Nav>
             <Navbar.Text>
-              <div className="d-none d-md-block">
+              <div>
                 <KeplrButton autoConnect={true} />
               </div>
               {/* <Web3AuthButton /> */}
