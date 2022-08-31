@@ -131,7 +131,7 @@ export default function Profile() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner text="Connect a wallet to edit your profile." />
 
           <Spacer height={150} />
         </Layout>

@@ -7,7 +7,11 @@ import Container from 'react-bootstrap/Container';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 
-export default function ConnectBanner() {
+interface Props {
+  text?: string;
+}
+
+export default function ConnectBanner({ text }: Props) {
   return (
     <Container fluid={true} className={styles.bannerContainer}>
       <Container>
@@ -16,28 +20,26 @@ export default function ConnectBanner() {
         </Row>
         <Row>
           <span className={styles.bannerSubtitle}>
-            To create certificates you must be connected with Keplr Wallet.
+            {text || 'Connect a wallet to use this function.'}
           </span>
         </Row>
         <Col xs={'auto'}>
-        <Row>
-          <Col xs={'auto'} className="text-end">
-            <KeplrButton/>
-            <div className="mt-1">
-              <a
-                href="https://keplr.app"
-                className={`${styles.bannerLink}`}
-                target="blank"
-                rel="noopener noreferrer"
-              >
-                Get Keplr Wallet →
-              </a>
-            </div>
-
-          </Col>
-        </Row>
+          <Row>
+            <Col xs={'auto'} className="text-end">
+              <KeplrButton />
+              <div className="mt-1">
+                <a
+                  href="https://keplr.app"
+                  className={`${styles.bannerLink}`}
+                  target="blank"
+                  rel="noopener noreferrer"
+                >
+                  Get Keplr Wallet →
+                </a>
+              </div>
+            </Col>
+          </Row>
         </Col>
-
       </Container>
     </Container>
   );

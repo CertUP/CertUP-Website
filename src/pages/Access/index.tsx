@@ -120,7 +120,7 @@ export default function Access() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner text="Connect your wallet to view your certificates." />
 
           <Spacer height={150} />
         </Layout>

@@ -93,7 +93,7 @@ export default function Issuers() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner text="Connect a wallet to start issuing certifificates." />
 
           <Spacer height={150} />
         </Layout>
