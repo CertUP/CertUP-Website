@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import Image, { ImageProps } from 'react-bootstrap/Image';
-import { arrayBufferToDataURI, decryptFile, ipfsDownload } from '../../utils/fileHelper';
+import { arrayBufferToDataURI, /*decryptFile,*/ ipfsDownload } from '../../utils/fileHelper';
 
 import styles from './styles.module.scss';
 
@@ -25,10 +25,10 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
     setLoading(true);
     setStatus('Downloading...');
     let result = await ipfsDownload(url);
-    if (decryptionKey) {
-      setStatus('Decrypting...');
-      result = decryptFile(result, decryptionKey);
-    }
+    // if (decryptionKey) {
+    //   setStatus('Decrypting...');
+    //   result = decryptFile(result, decryptionKey);
+    // }
     setStatus('Processing...');
     result = arrayBufferToDataURI(result, 'image/png');
     setSrc(result);

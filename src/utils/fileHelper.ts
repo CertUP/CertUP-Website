@@ -17,7 +17,7 @@
 // }
 
 import axios from 'axios';
-import crypto from 'crypto';
+//import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -62,23 +62,23 @@ const download = async (url: string, timeout = 10000) => {
   });
 };
 
-export const decryptFile = (input: Uint8Array, key: string) => {
-  try {
-    //console.log("key is ", key);
-    const dataBuffer = Buffer.from(input);
-    const data32 = dataBuffer.toString('utf-8').substring(0, 32);
-    const cipherKey = Buffer.from(key);
-    const ivSize = dataBuffer.readUInt8(0);
-    const iv = dataBuffer.slice(1, ivSize + 1);
-    const authTag = dataBuffer.slice(ivSize + 1, ivSize + 17);
-    const decipher = crypto.createDecipheriv(ALGORITHM, cipherKey, iv);
-    decipher.setAuthTag(authTag);
-    return Buffer.concat([decipher.update(dataBuffer.slice(ivSize + 17)), decipher.final()]);
-  } catch (error: any) {
-    if (error.toString().includes('invalid key length')) return input;
-    else throw error;
-  }
-};
+// export const decryptFile = (input: Uint8Array, key: string) => {
+//   try {
+//     //console.log("key is ", key);
+//     const dataBuffer = Buffer.from(input);
+//     const data32 = dataBuffer.toString('utf-8').substring(0, 32);
+//     const cipherKey = Buffer.from(key);
+//     const ivSize = dataBuffer.readUInt8(0);
+//     const iv = dataBuffer.slice(1, ivSize + 1);
+//     const authTag = dataBuffer.slice(ivSize + 1, ivSize + 17);
+//     const decipher = crypto.createDecipheriv(ALGORITHM, cipherKey, iv);
+//     decipher.setAuthTag(authTag);
+//     return Buffer.concat([decipher.update(dataBuffer.slice(ivSize + 17)), decipher.final()]);
+//   } catch (error: any) {
+//     if (error.toString().includes('invalid key length')) return input;
+//     else throw error;
+//   }
+// };
 
 export const fileToDataURI = async (file: File | undefined, type: string): Promise<string> => {
   if (!file) return '';
