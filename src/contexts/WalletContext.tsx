@@ -172,46 +172,51 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       },
     };
 
-    const response = (await Client?.query.compute.queryContract({
-      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
-      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
-      query: query,
-    })) as IssuerDataResponse;
+    try {
+      const response = (await Client?.query.compute.queryContract({
+        contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+        codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+        query: query,
+      })) as IssuerDataResponse;
 
-    console.log('Remaining Certs Query Response', response);
+      console.log('Remaining Certs Query Response', response);
 
-    if (response?.parse_err || response?.generic_err) {
-      if (response.generic_err?.msg.includes('not a verified issuer')) {
+      if (response?.parse_err || response?.generic_err) {
+        if (response.generic_err?.msg.includes('not a verified issuer')) {
+          setLoadingRemainingCerts(false);
+          setVerifiedIssuer(false);
+          return;
+        } else if (
+          response.generic_err?.msg.includes('Failed to verify signatures for the given permit')
+        ) {
+          await refreshQueryPermit();
+          return;
+        } else {
+          const errorMsg =
+            response?.parse_err?.msg ||
+            response?.generic_err?.msg ||
+            JSON.stringify(response, undefined, 2);
+
+          toast.error(errorMsg);
+          // throw new Error(
+          //   response?.parse_err?.msg ||
+          //     response?.generic_err?.msg ||
+          //     JSON.stringify(response, undefined, 2),
+          // );
+        }
+
         setLoadingRemainingCerts(false);
-        setVerifiedIssuer(false);
-        return;
-      } else if (
-        response.generic_err?.msg.includes('Failed to verify signatures for the given permit')
-      ) {
-        await refreshQueryPermit();
-        return;
       } else {
-        const errorMsg =
-          response?.parse_err?.msg ||
-          response?.generic_err?.msg ||
-          JSON.stringify(response, undefined, 2);
-
-        toast.error(errorMsg);
-        // throw new Error(
-        //   response?.parse_err?.msg ||
-        //     response?.generic_err?.msg ||
-        //     JSON.stringify(response, undefined, 2),
-        // );
+        const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
+        setIssuerProfile(response.issuer_data);
+        setRemainingCerts(result);
+        setVerifiedIssuer(true);
+        setLoadingRemainingCerts(false);
+        return result;
       }
-
-      setLoadingRemainingCerts(false);
-    } else {
-      const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
-      setIssuerProfile(response.issuer_data);
-      setRemainingCerts(result);
-      setVerifiedIssuer(true);
-      setLoadingRemainingCerts(false);
-      return result;
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.toString());
     }
 
     setLoadingRemainingCerts(false);

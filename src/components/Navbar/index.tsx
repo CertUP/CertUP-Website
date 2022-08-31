@@ -85,7 +85,10 @@ export default function CertUpNavbar() {
 
           {/* <Navbar.Collapse id="responsive-navbar-nav" className="d-none d-lg-block"> */}
           {/* <Nav className="me-auto" style={{width: '100%'}}> */}
-          <div className="d-lg-flex justify-content-around text-center" style={{ width: '100%' }}>
+          <div
+            className="d-none d-lg-flex justify-content-around text-center"
+            style={{ width: '100%' }}
+          >
             <Link to="/about">
               <Navbar.Text className={styles.navItem}>About</Navbar.Text>
             </Link>
