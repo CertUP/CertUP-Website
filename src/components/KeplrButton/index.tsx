@@ -6,7 +6,7 @@ import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';
 import { toast } from 'react-toastify';
 
-import { useCookies } from 'react-cookie';
+// import { useCookies } from 'react-cookie';
 
 import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
@@ -66,7 +66,7 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
   const { Address, updateClient, IssuerProfile } = useWallet();
   const [loading, setLoading] = useState(false);
 
-  const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr']);
+  // const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr']);
 
   const navigate = useNavigate();
 
@@ -104,14 +104,14 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
     if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(500);
     if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) return;
 
-    if (cookies.ConnectedKeplr) {
-      if (
-        numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) <
-        15 /* && getCachedQueryPermit(Address) */
-      ) {
-        handleConnect();
-      }
-    }
+    // if (cookies.ConnectedKeplr) {
+    //   if (
+    //     numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) <
+    //     15 /* && getCachedQueryPermit(Address) */
+    //   ) {
+    //     handleConnect();
+    //   }
+    // }
   }, [window.keplr]);
 
   const handleConnect = async () => {
@@ -147,7 +147,7 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
         expDate,
       );
       updateClient(secretjs, keplrOfflineSigner as Wallet, myAddress, token, permit);
-      setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
+      //setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -166,7 +166,7 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
       }
 
       updateClient(undefined, undefined, undefined, undefined, undefined);
-      removeCookie('ConnectedKeplr', { path: '/' });
+      //removeCookie('ConnectedKeplr', { path: '/' });
       setLoading(false);
     } catch (error) {
       setLoading(false);

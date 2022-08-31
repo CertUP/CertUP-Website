@@ -43,9 +43,15 @@ export default function IssuerInfo({ issuerId }: Props) {
             />
           ) : null}
           {issuerData.name ? (
-            <h5 style={{ fontWeight: '700', marginBottom: '2px', marginLeft: '1vw' }}>{issuerData.name}</h5>
+            <h5 style={{ fontWeight: '700', marginBottom: '2px', marginLeft: '1vw' }}>
+              {issuerData.name}
+            </h5>
           ) : null}
-          {issuerData.website ? <a href={issuerData.website} style={{ marginLeft: '1vw' }}>{issuerData.website}</a> : null}
+          {issuerData.website ? (
+            <a href={issuerData.website} style={{ marginLeft: '1vw' }}>
+              {issuerData.website}
+            </a>
+          ) : null}
         </Col>
       </div>
     );

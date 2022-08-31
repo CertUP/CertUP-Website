@@ -3,15 +3,15 @@ import ReactDOM from 'react-dom';
 import './global/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { CookiesProvider } from "react-cookie";
+// import { CookiesProvider } from "react-cookie";
 
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <CookiesProvider>
+    {/* <CookiesProvider> */}
     <App />
-    </CookiesProvider>
+    {/* </CookiesProvider> */}
   </React.StrictMode>,
   document.getElementById('root'),
 );
