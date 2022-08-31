@@ -99,7 +99,7 @@ export default function useExecute() {
     if (!tx.code) return;
     console.log('Failed TX', tx);
     console.error(tx.rawLog);
-    if (tx.codespace === 'compute') parseComputeError(tx);
+    if (/*tx.codespace === 'compute' || */ tx.rawLog.includes('contract')) parseComputeError(tx);
     else parseCosmosError(tx);
   };
 

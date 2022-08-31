@@ -138,7 +138,7 @@ export interface RemainingCertsResponse {
 interface ErrorResponse {
   msg: string;
 }
-export declare enum ComputeResultCode {
+export enum ComputeResultCode {
   // ErrInstantiateFailed error for rust instantiate contract failure
   ErrInstantiateFailed = 2, // "instantiate contract failed")
 
@@ -187,14 +187,14 @@ export declare enum ComputeResultCode {
   Success = 0,
 }
 
-export declare type ComputeTx = {
+export type ComputeTx = {
   readonly height: number;
   /** Transaction hash (might be used as transaction ID). Guaranteed to be non-empty upper-case hex */
   readonly transactionHash: string;
   /** Transaction execution error code. 0 on success. See {@link TxResultCode}. */
   readonly code: TxResultCode | ComputeResultCode;
-  /** Transaction execution error codespace. Empty or compute */
-  readonly codespace: string;
+  // /** Transaction execution error codespace. Empty or compute */
+  // readonly codespace: string;
   /**
    * If code != 0, rawLog contains the error.
    *
@@ -202,7 +202,7 @@ export declare type ComputeTx = {
    */
   readonly rawLog: string;
   /** If code = 0, `jsonLog = JSON.parse(rawLow)`. Values are decrypted if possible. */
-  readonly jsonLog?: JsonLog;
+  readonly jsonLog?: any;
   /** If code = 0, `arrayLog` is a flattened `jsonLog`. Values are decrypted if possible. */
   readonly arrayLog?: ArrayLog;
   /** Return value (if there's any) for each input message */
