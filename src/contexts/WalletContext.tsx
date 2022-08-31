@@ -182,6 +182,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
     if (response?.parse_err || response?.generic_err) {
       if (response.generic_err?.msg.includes('not a verified issuer')) {
+        setLoadingRemainingCerts(false);
         setVerifiedIssuer(false);
         return;
       } else if (

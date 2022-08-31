@@ -91,7 +91,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   const { Address, LoginToken, QueryPermit, VerifiedIssuer } = useWallet();
 
   useEffect(() => {
-    console.log('Verified Issuer?', VerifiedIssuer);
     if (!Address || !LoginToken || !QueryPermit || !VerifiedIssuer) return;
     refreshProjects();
   }, [LoginToken, Address, QueryPermit, VerifiedIssuer]);
