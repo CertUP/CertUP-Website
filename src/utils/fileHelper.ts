@@ -24,15 +24,18 @@ const IV_LENGTH = 16;
 
 const ipfsMirrors = [
   'infura-ipfs.io',
-  //'dweb.link',
+  'dweb.link',
+  'ipfs.fleek.co',
   'cloudflare-ipfs.com',
   'gateway.pinata.cloud',
   'cf-ipfs.com',
+  'ipfs.io',
+  'gateway.ipfs.io',
   'nftstorage.link',
   'storry.tv',
 ];
 
-export const ipfsDownload = async (url: string) => {
+export const ipfsDownloadOrig = async (url: string) => {
   if (!url.includes('ipfs.io')) return await download(url);
   let final;
 
@@ -41,7 +44,7 @@ export const ipfsDownload = async (url: string) => {
     console.log('trying ', mirror);
     const newUrl = url.replace('ipfs.io', mirror);
     try {
-      const response = await download(newUrl, 4500);
+      const response = await download(newUrl, 8000);
       console.log(response);
       if (response.data) {
         final = response.data;
@@ -51,6 +54,36 @@ export const ipfsDownload = async (url: string) => {
       null; //just continue
     }
   }
+
+  if (final) return final;
+  else throw new Error('Unable to download file from IPFS.');
+};
+
+export const ipfsDownload = async (url: string) => {
+  if (!url.includes('ipfs.io')) return await download(url);
+
+  const promises = [];
+  for (let i = 0; i < ipfsMirrors.length; i++) {
+    const mirror = ipfsMirrors[i];
+
+    const newUrl = url.replace('ipfs.io', mirror);
+    try {
+      const promise = download(newUrl, 10000);
+      promises.push(promise);
+      // console.log(response);
+      // if (response.data) {
+      //   final = response.data;
+      //   break;
+      // }
+    } catch (error: any) {
+      null; //just continue
+    }
+  }
+
+  const result = await Promise.any(promises);
+  console.log(result);
+  const final = result.data;
+
   if (final) return final;
   else throw new Error('Unable to download file from IPFS.');
 };

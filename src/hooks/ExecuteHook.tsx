@@ -10,6 +10,7 @@ import {
 } from 'secretjs';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
 import { useWallet } from '../contexts';
+import { useNft } from '../contexts/NftContext';
 import {
   BatchDossierResponse,
   ComputeResultCode,
@@ -25,6 +26,8 @@ import { ToastProps } from '../utils/toastHelper';
 export default function useExecute() {
   const { Client, Address, QueryPermit, queryCredits, ProcessingTx, setProcessingTx, DummyWallet } =
     useWallet();
+
+  const { refreshDossiers } = useNft();
   const querier = useRef<SecretNetworkClient>();
 
   useEffect(() => {
@@ -351,6 +354,25 @@ export default function useExecute() {
     return response;
   };
 
+  const claimCert = async (claim_code: string, toast: any) => {
+    if (!Client) throw new Error('Client not available.');
+
+    const mintMsg = {
+      mint_cert: {
+        cert_key: claim_code,
+        recipient: Address,
+      },
+    };
+
+    const simulationGas = await simulateManager(mintMsg);
+    console.log('Sim result', simulationGas);
+
+    const response = await executeManager(mintMsg, simulationGas, toast);
+    console.log('Mint used', response.gasUsed, 'gas.');
+    refreshDossiers();
+    return response;
+  };
+
   const executeManager = async (msg: any, gas = 50000, toastRef?: any) => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -548,5 +570,6 @@ export default function useExecute() {
     removeAddressAccess,
     approveAccessGlobal,
     revokeAccessGlobal,
+    claimCert,
   };
 }

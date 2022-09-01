@@ -32,14 +32,18 @@ import useQuery from '../../hooks/QueryHook';
 import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
+import useExecute from '../../hooks/ExecuteHook';
 
 export default function Access() {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit } = useWallet();
+  const [loadingMint, setLoadingMint] = useState(false);
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, ProcessingTx } =
+    useWallet();
 
   const [accessCode, setAccessCode] = useState<string>('');
 
   const { getOwnedCerts } = useQuery();
   const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
+  const { claimCert } = useExecute();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -61,41 +65,43 @@ export default function Access() {
 
   const handleMint = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    setLoadingMint(true);
     const toastRef = toast.loading('Transaction Processing...');
     try {
-      const mintMsg = {
-        mint_cert: {
-          cert_key: accessCode,
-          recipient: Address,
-        },
-      };
+      // const mintMsg = {
+      //   mint_cert: {
+      //     cert_key: accessCode,
+      //     recipient: Address,
+      //   },
+      // };
 
-      const result = await Client?.tx.compute.executeContract(
-        {
-          sender: Address,
-          contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
-          codeHash: process.env.REACT_APP_MANAGER_HASH as string,
-          msg: mintMsg,
-        },
-        {
-          gasLimit: 100_000,
-        },
-      );
+      // const result = await Client?.tx.compute.executeContract(
+      //   {
+      //     sender: Address,
+      //     contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      //     codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      //     msg: mintMsg,
+      //   },
+      //   {
+      //     gasLimit: 100_000,
+      //   },
+      // );
+
+      const result = await claimCert(accessCode, toastRef);
       console.log('Mint Result:', result);
       if (!result) throw new Error('Something went wrong');
       console.log('OK');
-      if (result.code) {
-        console.log(result);
-        throw new Error(result.rawLog);
-      }
 
-      toast.update(toastRef, {
-        render: 'Success!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 5000,
-      });
-      refreshDossiers();
+      // toast.update(toastRef, {
+      //   render: 'Success!',
+      //   type: 'success',
+      //   isLoading: false,
+      //   autoClose: 5000,
+      // });
+      // refreshDossiers();
+
+      //navigate to cert page
+      handleView(accessCode);
     } catch (error: any) {
       toast.update(toastRef, {
         render: error.toString(),
@@ -105,6 +111,8 @@ export default function Access() {
       });
       console.error(error);
     }
+
+    setLoadingMint(false);
   };
 
   if (!Wallet || !Address || !LoginToken)
@@ -151,8 +159,12 @@ export default function Access() {
                   />
                 </Form.Group>
               </Form>
-              <button className={styles.cancelBtn} onClick={handleMint}>
-                Mint
+              <button
+                className={styles.cancelBtn}
+                onClick={handleMint}
+                disabled={ProcessingTx || loadingMint}
+              >
+                Mint {loadingMint ? <Spinner animation="border" variant="info" size="sm" /> : null}
               </button>
             </Col>
           </Row>

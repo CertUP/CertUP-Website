@@ -23,15 +23,20 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
   const getImage = async () => {
     console.log('Key', decryptionKey);
     setLoading(true);
+    setSrc(undefined);
     setStatus('Downloading...');
-    let result = await ipfsDownload(url);
-    // if (decryptionKey) {
-    //   setStatus('Decrypting...');
-    //   result = decryptFile(result, decryptionKey);
-    // }
-    setStatus('Processing...');
-    result = arrayBufferToDataURI(result, 'image/png');
-    setSrc(result);
+    try {
+      let result = await ipfsDownload(url);
+      // if (decryptionKey) {
+      //   setStatus('Decrypting...');
+      //   result = decryptFile(result, decryptionKey);
+      // }
+      setStatus('Processing...');
+      result = arrayBufferToDataURI(result, 'image/png');
+      setSrc(result);
+    } catch (error) {
+      setStatus('Failed to Download');
+    }
     setLoading(false);
   };
 

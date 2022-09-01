@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactElement, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
 // import { getRandom } from '../utils/helpers';
 import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { generateImage, GenerateInput } from '../utils/backendHelper';
@@ -40,15 +40,34 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
 
   const requestRender = (renderData: RenderRequest) => {
     setNextRender(renderData);
-    render(renderData)
-  }
+    //render(renderData);
+  };
 
-  const render = async(renderData?: RenderRequest) => {
-    if (!renderData) renderData = NextRender;
-    if (!renderData || Rendering) {
+  useEffect(() => {
+    console.log('Effect', Rendering, NextRender);
+    if (Rendering) return;
+    if (NextRender) {
+      render(NextRender);
+      setNextRender(undefined);
+    }
+  }, [Rendering]);
+
+  useEffect(() => {
+    if (!Rendering && NextRender) {
+      render(NextRender);
+      setNextRender(undefined);
+    }
+  }, [NextRender]);
+
+  const render = async (renderData: RenderRequest) => {
+    // if (!renderData && NextRender) {
+    //   renderData = NextRender;
+    //   setNextRender(undefined);
+    // }
+    if (Rendering) {
       console.log('Skipping render');
       return;
-    };
+    }
     setRendering(true);
 
     const limit = 3;
@@ -59,29 +78,28 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
           // id: NextRender.id,
           // layoutId: NextRender.layoutId,
           // input: NextRender.input,
-          ...renderData
+          ...renderData,
         });
         setLastRender(result);
         setRendering(false);
         return;
       } catch (error: any) {
-        console.error('Error Rendering Preview: ', error)
+        console.error('Error Rendering Preview: ', error);
         i++;
         if (i === limit) {
           toast.error(`Render Error: ${error.toString()}`);
+          setRendering(false);
         }
       }
     }
-
-
     setRendering(false);
-  }
+  };
 
   const values = {
     requestRender,
     NextRender,
     LastRender,
-    Rendering
+    Rendering,
   };
 
   // add values to provider to reach them out from another component

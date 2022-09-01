@@ -40,14 +40,16 @@ const xlsToParticipants = (input: string[][]): Participant[] => {
     if (!i) continue;
 
     const row = input[i];
-    const participant = new Participant(
-      row[nameColumn],
-      row[surnameColumn],
-      new Date(row[dobColumn]),
-      row[certnumColumn],
-    );
-    console.log(participant);
-    participants.push(participant);
+    if (row[nameColumn] || row[surnameColumn] || row[dobColumn] || row[certnumColumn]) {
+      const participant = new Participant(
+        row[nameColumn],
+        row[surnameColumn],
+        row[nameColumn] ? new Date(row[dobColumn]) : undefined,
+        row[certnumColumn],
+      );
+      console.log(participant);
+      participants.push(participant);
+    }
   }
 
   return participants;
