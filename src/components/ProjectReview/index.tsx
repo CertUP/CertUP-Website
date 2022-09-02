@@ -60,18 +60,22 @@ interface FormProps {
   backHandler: () => void;
 }
 
+interface MintOverview {
+  minted_certs: string;
+  pending_certs: string;
+}
+
 export default function ProjectReview({ pid, step, backHandler }: FormProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const { findProject, findMintedProject } = useProject();
   const { queryProjectData } = useQuery();
   const [projectInfo, setProjectInfo] = useState(pid ? findProject(pid) : undefined);
   const [mintedInfo, setMintedInfo] = useState<ProjectToken[]>([]);
+  const [mintOverview, setMintOverview] = useState<MintOverview>();
   const [selectedParticipant, setSelectedParticipant] = useState<number>(0);
   const [selectedDossier, setSelectedDossier] = useState<NftDossier>();
 
   const [loading, setLoading] = useState(true);
-
-  if (mintedInfo.length) console.log('Project Token Single!!!', mintedInfo[0]);
 
   useEffect(() => {
     refreshProjectInfo();
@@ -97,6 +101,10 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
     setLoading(true);
 
     setProjectInfo(findProject(pid));
+
+    const overview = findMintedProject(pid);
+    setMintOverview(overview?.project);
+
     const mintedInfo = await queryProjectData(pid);
     console.log(mintedInfo);
     setMintedInfo(mintedInfo);
@@ -195,78 +203,106 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
         <BackButton />
         <div style={{ height: '3vh' }} />
       </Container>
-      <Container>
-        <Row>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Cert #</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>DOB</th>
-                <th>Claim Code</th>
-                <th>Claimed</th>
-              </tr>
-            </thead>
-            <tbody className={styles.reviewTable}>
-              {mintedInfo.map((token: ProjectToken, index: number) => {
-                const selected = index === selectedParticipant ? true : false;
-                return (
-                  <tr
-                    key={`claim-row-${index}-${token.claim_code}`}
-                    className={selected ? styles.selectedRow : styles.unselectedRow}
-                    onClick={() => setSelectedParticipant(index)}
-                  >
-                    <td>
-                      {token.preload_data.pub_metadata?.extension?.certificate?.cert_number ||
-                        token.preload_data.priv_metadata.extension.certificate.cert_number}
-                    </td>
-                    <td>
-                      {token.preload_data.priv_metadata.extension.certified_individual?.first_name}
-                    </td>
-                    <td>
-                      {token.preload_data.priv_metadata.extension.certified_individual?.last_name}
-                    </td>
-                    <td>
-                      {token.preload_data.priv_metadata.extension.certified_individual
-                        ?.date_of_birth
-                        ? new Date(
-                            token.preload_data.priv_metadata.extension.certified_individual?.date_of_birth,
-                          ).toLocaleDateString()
-                        : null}
-                    </td>
-                    <td>{token.claim_code}</td>
-
-                    {token.minted ? <td style={{ color: 'green' }}>True</td> : <td>False</td>}
-                    {loading ? <Spinner animation="border" variant="info" /> : null}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
-        </Row>
-        {selectedDossier ? (
-          <Row className="justify-content-end">
-            <Col xs={2}>
-              <Image src={dlExcel} fluid={true} style={{ cursor: 'pointer' }} onClick={handleDl} />
-            </Col>
-          </Row>
-        ) : null}
-
-        {loading ? (
-          <Row className="justify-content-center mt-4">
+      {loading && (
+        <Container>
+          <Row className="justify-content-center mb-4">
             <Col xs="auto" className="text-center">
-              <Spinner animation="border" variant='info' />
+              <Spinner animation="border" variant="info" />
               <h3>Loading Project Details</h3>
             </Col>
           </Row>
-        ) : null}
-        {selectedDossier ? (
+        </Container>
+      )}
+      <Container>
+        <Row className="text-center mb-4">
+          <h2>
+            <span style={{ fontWeight: '700' }}>Project: </span>
+            {projectInfo?.project_name}
+          </h2>
+          <h4>
+            {loading ? (
+              <Spinner animation="border" variant="info" size="sm" />
+            ) : (
+              <>
+                {mintOverview?.minted_certs} /{' '}
+                {parseInt(mintOverview?.pending_certs || '0') +
+                  parseInt(mintOverview?.minted_certs || '0')}{' '}
+              </>
+            )}{' '}
+            certs have been claimed.
+          </h4>
+        </Row>
+        {/* <Row style={{maxHeight: '50vh'}}> */}
+        <Table striped bordered hover className={styles.fixed_header}>
+          <thead>
+            <tr>
+              <th style={{ width: '6.8%' }}>Cert #</th>
+              <th style={{ width: '12.8%' }}>First Name</th>
+              <th style={{ width: '12.8%' }}>Last Name</th>
+              <th style={{ width: '10%' }}>DOB</th>
+              <th style={{ width: '50.2%' }}>Claim Code</th>
+              <th style={{ width: '7%' }}>Claimed</th>
+            </tr>
+          </thead>
+          <tbody className={styles.reviewTable}>
+            {mintedInfo.map((token: ProjectToken, index: number) => {
+              const selected = index === selectedParticipant ? true : false;
+              return (
+                <tr
+                  key={`claim-row-${index}-${token.claim_code}`}
+                  className={selected ? styles.selectedRow : styles.unselectedRow}
+                  onClick={() => setSelectedParticipant(index)}
+                >
+                  <td style={{ width: '7%' }}>
+                    {token.preload_data.pub_metadata?.extension?.certificate?.cert_number ||
+                      token.preload_data.priv_metadata.extension.certificate.cert_number}
+                  </td>
+                  <td style={{ width: '13%' }}>
+                    {token.preload_data.priv_metadata.extension.certified_individual?.first_name}
+                  </td>
+                  <td style={{ width: '13%' }}>
+                    {token.preload_data.priv_metadata.extension.certified_individual?.last_name}
+                  </td>
+                  <td style={{ width: '10%' }}>
+                    {token.preload_data.priv_metadata.extension.certified_individual?.date_of_birth
+                      ? new Date(
+                          token.preload_data.priv_metadata.extension.certified_individual?.date_of_birth,
+                        ).toLocaleDateString()
+                      : null}
+                  </td>
+                  <td style={{ width: '50%' }}>{token.claim_code}</td>
+
+                  {loading ? (
+                    <td style={{ width: '7%' }} className="text-center">
+                      <Spinner animation="border" variant="info" size="sm" />
+                    </td>
+                  ) : token.minted ? (
+                    <td style={{ color: 'green', width: '7%' }}>True</td>
+                  ) : (
+                    <td style={{ width: '7%' }}>False</td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        {/* </Row> */}
+        {selectedDossier && (
           <>
+            <Row className="justify-content-end">
+              <Col xs={2}>
+                <Image
+                  src={dlExcel}
+                  fluid={true}
+                  style={{ cursor: 'pointer' }}
+                  onClick={handleDl}
+                />
+              </Col>
+            </Row>
             <ImageRow cert={selectedDossier} noTitle={true} />
             <MetadataRow cert={selectedDossier} />
           </>
-        ) : null}
+        )}
       </Container>
     </>
   );

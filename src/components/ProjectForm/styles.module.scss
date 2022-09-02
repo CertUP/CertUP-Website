@@ -188,3 +188,8 @@ $gradient3: #a659f3;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.participantList {
+  overflow-y: scroll;
+  max-height: 50vh;
+}

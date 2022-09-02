@@ -73,6 +73,7 @@
   },
   "devDependencies": {
     "@keplr-wallet/types": "^0.10.13",
+    "@types/coinbase-commerce-node": "^1.0.6",
     "@types/react-datepicker": "^4.4.1",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",

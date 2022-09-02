@@ -2484,6 +2484,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/coinbase-commerce-node@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@types/coinbase-commerce-node/-/coinbase-commerce-node-1.0.6.tgz#7c0f4140ffda80d9099b399b39ca53780a4a5692"
+  integrity sha512-GuDFd6Ht/dOZUUbUrJWCxoNwOmMt1sLmn8kY7AkF7x3Np5B0Xy40DVv6SPeFcdL4lO3TAeHI8sogix0D01NJOg==
+
 "@types/connect@^3.4.33":
   version "3.4.35"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.35.tgz#5fcf6ae445e4021d1fc2219a4873cc73a3bb2ad1"

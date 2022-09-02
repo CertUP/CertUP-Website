@@ -581,76 +581,81 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   Certificate Number
                 </Col>
               </Row>
-              {participants.map((item, index) => {
-                let pErrors;
-                if (errors.participants) pErrors = errors.participants[index];
-                return (
-                  <Row key={`participant-${index}`} className="mb-2">
-                    <Form.Group as={Col} md="3" controlId="validationCustom02">
-                      <Form.Control
-                        required
-                        value={participants[index].name}
-                        onChange={(e) => changeParticipant(index, 'name', e.target.value)}
-                        type="text"
-                        placeholder="First name"
-                        isInvalid={!!pErrors?.name}
-                      />
-                    </Form.Group>
+              <Row className={styles.participantList}>
+                {participants.map((item, index) => {
+                  let pErrors;
+                  if (errors.participants) pErrors = errors.participants[index];
+                  return (
+                    <Row key={`participant-${index}`} className="mb-2">
+                      <Form.Group as={Col} md="3" controlId="validationCustom02">
+                        <Form.Control
+                          required
+                          value={participants[index].name}
+                          onChange={(e) => changeParticipant(index, 'name', e.target.value)}
+                          type="text"
+                          placeholder="First name"
+                          isInvalid={!!pErrors?.name}
+                        />
+                      </Form.Group>
 
-                    <Form.Group as={Col} md="3" controlId="validationCustom02">
-                      <Form.Control
-                        required
-                        value={participants[index].surname}
-                        onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
-                        type="text"
-                        placeholder="Last name"
-                        isInvalid={!!pErrors?.surname}
-                      />
-                    </Form.Group>
+                      <Form.Group as={Col} md="3" controlId="validationCustom02">
+                        <Form.Control
+                          required
+                          value={participants[index].surname}
+                          onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
+                          type="text"
+                          placeholder="Last name"
+                          isInvalid={!!pErrors?.surname}
+                        />
+                      </Form.Group>
 
-                    <Form.Group as={Col} md="2" controlId="validationCustom02">
-                      <DatePicker
-                        selected={participants[index].dob}
-                        onChange={(date: Date) => changeParticipant(index, 'dob', undefined, date)}
-                        className={
-                          pErrors?.dob
-                            ? `${styles.inputStyle} ${styles.invalidDate}`
-                            : styles.inputStyle
-                        }
-                        //customInput={<ExampleCustomInput />}
-                      />
-                    </Form.Group>
+                      <Form.Group as={Col} md="2" controlId="validationCustom02">
+                        <DatePicker
+                          selected={participants[index].dob}
+                          onChange={(date: Date) =>
+                            changeParticipant(index, 'dob', undefined, date)
+                          }
+                          className={
+                            pErrors?.dob
+                              ? `${styles.inputStyle} ${styles.invalidDate}`
+                              : styles.inputStyle
+                          }
+                          //customInput={<ExampleCustomInput />}
+                        />
+                      </Form.Group>
 
-                    <Form.Group as={Col} md="2" controlId="validationCustom02">
-                      <Form.Control
-                        required
-                        value={participants[index].cert_num}
-                        onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
-                        type="text"
-                        placeholder="123456"
-                        isInvalid={!!pErrors?.cert_num}
-                      />
-                    </Form.Group>
+                      <Form.Group as={Col} md="2" controlId="validationCustom02">
+                        <Form.Control
+                          required
+                          value={participants[index].cert_num}
+                          onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
+                          type="text"
+                          placeholder="123456"
+                          isInvalid={!!pErrors?.cert_num}
+                        />
+                      </Form.Group>
 
-                    <Col md="auto" className="d-flex align-items-center">
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => deleteParticipant(index)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') deleteParticipant(index);
-                        }}
-                      >
-                        <div>
-                          <img src={trashImg} alt="trash" />
-                          <span className="d-none d-lg-inline-block">Delete</span>
+                      <Col md="auto" className="d-flex align-items-center">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => deleteParticipant(index)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') deleteParticipant(index);
+                          }}
+                        >
+                          <div>
+                            <img src={trashImg} alt="trash" />
+                            <span className="d-none d-lg-inline-block">Delete</span>
+                          </div>
                         </div>
-                      </div>
-                    </Col>
-                  </Row>
-                );
-              })}
+                      </Col>
+                    </Row>
+                  );
+                })}
+              </Row>
+
               <Row className="mt-2">
                 <Col xs={'auto'}>
                   <button className={styles.addBtn} onClick={addParticipant}>
@@ -919,9 +924,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                     > */}
                     <Form.Select
                       aria-label="Select Date of Birth display format"
-                      value={renderProps.displayDob.toString()} 
+                      value={renderProps.displayDob.toString()}
                       //onChange={(e) => updateDobFormat(e.target.value)}
-                      onChange={(e) => updateRenderProps({ displayDob: e.target.value === "true" ? true : false })}
+                      onChange={(e) =>
+                        updateRenderProps({ displayDob: e.target.value === 'true' ? true : false })
+                      }
                     >
                       <option value="true">Show</option>
                       <option value="false">Hide</option>
@@ -934,27 +941,30 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   Company Format
                 </Col>
                 <Col>
-                <Row>
-
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.employerText}
-                      onChange={(e) => updateRenderProps({ employerText: e.target.value })}
-                      type="text"
-                      placeholder="Employed at: "
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col} md="2" controlId="validationCustom02">
-                    <Form.Select
-                      aria-label="Select Date of Birth display format"
-                      value={renderProps.displayEmployer?.toString()} 
-                      onChange={(e) => updateRenderProps({ displayEmployer: e.target.value === "true" ? true : false })}
-                    >
-                      <option value="true">Show</option>
-                      <option value="false">Hide</option>
-                    </Form.Select>
-                  </Form.Group>
+                  <Row>
+                    <Form.Group as={Col} md="6" controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        value={renderProps.employerText}
+                        onChange={(e) => updateRenderProps({ employerText: e.target.value })}
+                        type="text"
+                        placeholder="Employed at: "
+                      />
+                    </Form.Group>
+                    <Form.Group as={Col} md="2" controlId="validationCustom02">
+                      <Form.Select
+                        aria-label="Select Date of Birth display format"
+                        value={renderProps.displayEmployer?.toString()}
+                        onChange={(e) =>
+                          updateRenderProps({
+                            displayEmployer: e.target.value === 'true' ? true : false,
+                          })
+                        }
+                      >
+                        <option value="true">Show</option>
+                        <option value="false">Hide</option>
+                      </Form.Select>
+                    </Form.Group>
                   </Row>
                 </Col>
               </Row>
@@ -1038,7 +1048,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                     > */}
                     <Form.Select
                       aria-label="Select Date of Birth display format"
-                      value={renderProps.dateFormat} 
+                      value={renderProps.dateFormat}
                       onChange={(e) => updateRenderProps({ dateFormat: e.target.value })}
                     >
                       <option value="en-US">MM/DD/YYYY</option>
@@ -1050,7 +1060,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
             </Col>
           </Row>
-
 
           {/* \/ Preview Section \/ */}
 
@@ -1121,4 +1130,3 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     </>
   );
 }
-

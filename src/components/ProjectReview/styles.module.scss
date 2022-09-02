@@ -5,16 +5,15 @@ $gradient1: #9094ff;
 $gradient2: #55f4c5;
 $gradient3: #a659f3;
 
-
 .selectedRow {
   //background-color: #55f4c5;
   background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
-  vars.$certupGradient;
+    vars.$certupGradient;
 }
 .selectedRow:hover {
   //background-color: #55f4c5;
   background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
-  vars.$certupGradient !important;
+    vars.$certupGradient !important;
 }
 
 .unselectedRow:hover {
@@ -218,3 +217,44 @@ $gradient3: #a659f3;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.participantList {
+  overflow-y: scroll;
+  max-height: 50vh;
+}
+
+.fixed_header {
+  // width: 400px;
+  // table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fixed_header tbody {
+  display: block;
+  overflow: auto;
+  height: 50vh;
+  width: 100%;
+}
+
+.fixed_header thead tr {
+  display: block;
+}
+
+// .fixed_header thead {
+//   background: black;
+//   color:#fff;
+// }
+
+// .fixed_header th, .fixed_header td {
+//   padding: 5px;
+//   text-align: left;
+//   width: 200px;
+// }
+
+// .reviewTable {
+//   display: block;
+//   overflow-y: auto;    /* Trigger vertical scroll    */
+//   overflow-x: hidden;  /* Hide the horizontal scroll */
+//   height: 100%;
+// }
