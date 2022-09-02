@@ -290,13 +290,12 @@ export default function useExecute() {
     }
   };
 
-  const paySSCRT = async (numCerts: number): Promise<ComputeTx> => {
+  const paySSCRT = async (numCerts: number, amount: string): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
-    const price = 3; // uSSCRT
-    const total: string = (numCerts * price).toString();
-    // const total2: Coin = { }
+    // const price = 3; // uSSCRT
+    // const total: string = (numCerts * price).toString();
 
     const addCertsMsg = {
       add_certs: {
@@ -312,13 +311,13 @@ export default function useExecute() {
         msg: {
           send: {
             recipient: process.env.REACT_APP_MANAGER_ADDR,
-            amount: total,
+            amount: amount,
             msg: btoa(JSON.stringify(addCertsMsg)),
           },
         },
       },
       {
-        gasLimit: 45000,
+        gasLimit: 100000,
         gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
       },
     );

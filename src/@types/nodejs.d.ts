@@ -16,5 +16,7 @@ declare namespace NodeJS {
     REACT_APP_HOME_ONLY: string;
 
     REACT_APP_BACKEND: string;
+
+    REACT_APP_USCRT_PRICE: string;
   }
 }

@@ -28,7 +28,7 @@ import { ToastProps } from '../../utils/toastHelper';
 //@ts-ignore
 import CoinbaseCommerceButton from 'react-coinbase-commerce';
 
-const certPriceSCRT = 5; //uscrt
+const certPriceSCRT = parseInt(process.env.REACT_APP_USCRT_PRICE, 10); //uscrt
 const certPriceUSD = 10; //cents
 
 interface Confirmation {
@@ -153,7 +153,7 @@ export default function Payment() {
       e.preventDefault();
       if (!numCerts) throw new Error('Number of Certs is undefined.');
 
-      const response = await paySSCRT(parseInt(numCerts, 10));
+      const response = await paySSCRT(parseInt(numCerts, 10), totaluSCRT.toString());
       console.log(response);
 
       toast.update(toastRef, new ToastProps('Success', 'success'));
