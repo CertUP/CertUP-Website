@@ -29,7 +29,6 @@ import { ToastProps } from '../../utils/toastHelper';
 import CoinbaseCommerceButton from 'react-coinbase-commerce';
 
 const certPriceSCRT = parseInt(process.env.REACT_APP_USCRT_PRICE, 10); //uscrt
-const certPriceUSD = 10; //cents
 
 interface Confirmation {
   string: string;
@@ -38,25 +37,28 @@ interface Confirmation {
 
 export default function Payment() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, queryCredits } = useWallet();
+  const location = useLocation();
+
   const [loading, setLoading] = useState<boolean>(true);
+  const [certPriceUsd, setCertPriceUsd] = useState(0);
   const [paid, setPaid] = useState<boolean>(false);
-  const [numCerts, setNumCerts] = useState<string>();
+  const [numCerts, setNumCerts] = useState<number>(location.state?.num_certificates || 0);
   const [totalString, setTotalString] = useState<string>('0 SCRT');
   const [totalUSDString, setTotalUSDString] = useState<string>('$0.00');
   const [totaluSCRT, setTotaluSCRT] = useState<number>(0);
   const [totalUSD, setTotalUSD] = useState<number>(0);
-  const [paymentAddr, setPaymentAddr] = useState<string>();
   const [gotError, setGotError] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>();
   const [chargeId, setChargeId] = useState<string>();
-
+  console.log('ajbhjbh', location.state?.num_certificates);
   const navigate = useNavigate();
-  const location = useLocation();
+
   //const numCerts = location.state?.num_certificates || undefined;
 
   const { paySSCRT } = useExecute();
 
   useEffect(() => {
+    getPaymentInfo();
     if (!Address) return;
     console.log('Passed State', location.state);
     if (!location.state?.projectId) {
@@ -66,6 +68,17 @@ export default function Payment() {
     init();
   }, [Address]);
 
+  useEffect(() => {
+    if (!numCerts) return;
+    calculateTotalSCRT(numCerts);
+    calculateTotalUSD(numCerts);
+  }, [numCerts]);
+
+  useEffect(() => {
+    if (!numCerts) return;
+    calculateTotalUSD(numCerts);
+  }, [certPriceUsd]);
+
   const init = async () => {
     const credits = await queryCredits();
     console.log('Credits', credits);
@@ -73,28 +86,39 @@ export default function Payment() {
       navigate('/generate', { state: { projectId: location.state.projectId } });
       return;
     }
-    calculateTotalSCRT(location.state.num_certificates.toString() || '0');
-    calculateTotalUSD(location.state.num_certificates.toString() || '0');
+    await getPaymentInfo();
+    setNumCerts(location.state.num_certificates);
     getCharge(location.state.num_certificates.toString());
     setLoading(false);
   };
 
-  const calculateTotalSCRT = (numCerts: string) => {
-    numCerts = numCerts.replace(/\D/g, '');
-    const price = certPriceSCRT; //uscrt
-    const total = price * parseInt(numCerts, 10);
-    setTotalString(`${total / 10e5} SCRT`);
-    setTotaluSCRT(total);
-    setNumCerts(numCerts);
+  const getPaymentInfo = async () => {
+    const url = new URL('/payment', process.env.REACT_APP_BACKEND).toString();
+    const {
+      data: { usd_price_cents },
+    } = await axios.get(url);
+    console.log(usd_price_cents);
+    setCertPriceUsd(usd_price_cents);
+    return usd_price_cents;
   };
 
-  const calculateTotalUSD = (numCerts: string) => {
-    numCerts = numCerts.replace(/\D/g, '');
-    const price = certPriceUSD; //uscrt
-    const total = price * parseInt(numCerts, 10);
+  const calculateTotalSCRT = (_numCerts: number) => {
+    console.log('bdgjkbnfchjkbn', _numCerts);
+    //_numCerts = _numCerts.replace(/\D/g, '');
+    const price = certPriceSCRT; //uscrt
+    const total = price * _numCerts;
+    setTotalString(`${total / 10e5} SCRT`);
+    setTotaluSCRT(total);
+    setNumCerts(_numCerts);
+  };
+
+  const calculateTotalUSD = (_numCerts: number, price?: number) => {
+    //_numCerts = _numCerts.replace(/\D/g, '');
+    if (!price) price = certPriceUsd;
+    const total = price * _numCerts; //cents
     setTotalUSDString(`$${(total / 10e1).toFixed(2)}`);
     setTotalUSD(total);
-    setNumCerts(numCerts);
+    setNumCerts(_numCerts);
   };
 
   const getCharge = async (numCert: string) => {
@@ -153,7 +177,7 @@ export default function Payment() {
       e.preventDefault();
       if (!numCerts) throw new Error('Number of Certs is undefined.');
 
-      const response = await paySSCRT(parseInt(numCerts, 10), totaluSCRT.toString());
+      const response = await paySSCRT(numCerts, totaluSCRT.toString());
       console.log(response);
 
       toast.update(toastRef, new ToastProps('Success', 'success'));
