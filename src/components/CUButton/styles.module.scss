@@ -24,7 +24,7 @@ $gradient3: #a659f3;
   box-shadow: 0 0 6px 0 transparent;
   background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
     vars.$lightCertupGradient;
-  width: fit-content;
+  //width: fit-content;
   transition: box-shadow 0.2s ease-in-out;
 }
 

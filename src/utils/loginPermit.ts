@@ -1,5 +1,6 @@
 import { Permission } from 'secretjs';
 import { PermitSignature } from '../interfaces';
+import { addHours } from './helpers';
 
 export const permitName = 'CertUP-Query-Permit';
 export const allowedTokens: string[] = [
@@ -18,6 +19,17 @@ export interface GetPermitResponse {
   loginPermit: LoginToken;
   queryPermit: PermitSignature;
 }
+
+const queryPermitString = `Certup-Query-Permit-v1-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`;
+const loginPermitString = `Certup-Login-Token-v1`;
+
+const getQueryString = (address: string) => {
+  return `${queryPermitString}-${address}`;
+};
+
+const getLoginString = (address: string) => {
+  return `${loginPermitString}-${address}`;
+};
 
 // export default async function getLoginPermit(
 //   address: string,
@@ -65,9 +77,68 @@ export interface GetPermitResponse {
 //   return { permit: signature, issued: issueDate, expires: expDate };
 // }
 
-export function getCachedQueryPermit(address: string): string | undefined {
-  const cachedPermit = localStorage.getItem(`Certup-Query-Permit-v1-${address}-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`);
-  return cachedPermit ? cachedPermit : undefined;
+export function getCachedQueryPermit(address: string): PermitSignature | undefined {
+  const cachedPermit = localStorage.getItem(getQueryString(address));
+  return cachedPermit ? JSON.parse(cachedPermit) : undefined;
+}
+
+export function getCachedLoginToken(address: string): LoginToken | undefined {
+  const cachedToken = localStorage.getItem(getLoginString(address));
+  return cachedToken ? JSON.parse(cachedToken) : undefined;
+}
+
+export async function getLoginToken(
+  address: string,
+  issueDate?: Date,
+  expDate?: Date,
+  refresh = false,
+): Promise<LoginToken> {
+  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+    throw new Error('Keplr Extension Not Found');
+  }
+
+  let cachedToken = getCachedLoginToken(address);
+  if (cachedToken) {
+    //console.log('found cached token', cachedToken);
+    if (!cachedToken.expires || new Date(cachedToken.expires) < new Date()) cachedToken = undefined;
+  }
+  if (!refresh && cachedToken) return cachedToken;
+
+  if (!issueDate) issueDate = new Date();
+  if (!expDate) expDate = addHours(new Date(), 12);
+
+  const unsignedToken = {
+    chain_id: process.env.REACT_APP_CHAIN_ID as string,
+    account_number: '0', // Must be 0
+    sequence: '0', // Must be 0
+    fee: {
+      amount: [{ denom: 'uscrt', amount: '0' }], // Must be 0 uscrt
+      gas: '1', // Must be 1
+    },
+    msgs: [
+      {
+        type: 'CertUP-Login-Token',
+        value: {
+          issued: issueDate,
+          expires: expDate,
+        },
+      },
+    ],
+    memo: '', // Must be empty
+  };
+
+  const { signature } = await window.keplr.signAmino(
+    process.env.REACT_APP_CHAIN_ID as string,
+    address,
+    unsignedToken,
+    {
+      preferNoSetFee: true, // Fee must be 0, so hide it from the user
+      preferNoSetMemo: true, // Memo must be empty, so hide it from the user
+    },
+  );
+  const loginToken = { permit: signature, issued: issueDate, expires: expDate };
+  localStorage.setItem(getLoginString(address), JSON.stringify(loginToken));
+  return loginToken;
 }
 
 export default async function getPermits(
@@ -80,7 +151,7 @@ export default async function getPermits(
   }
 
   // Begin LOGIN TOKEN
-  const cachedToken: string | null = localStorage.getItem(`Certup-Login-Token-v1-${address}`);
+  const cachedToken: string | null = localStorage.getItem(getLoginString(address));
   let finalToken: LoginToken | undefined;
 
   if (cachedToken) {
@@ -119,7 +190,7 @@ export default async function getPermits(
       },
     );
     finalToken = { permit: signature, issued: issueDate, expires: expDate };
-    localStorage.setItem(`Certup-Login-Token-v1-${address}`, JSON.stringify(finalToken));
+    localStorage.setItem(getLoginString(address), JSON.stringify(finalToken));
     //console.log(`Certup-Login-Token-v1-${address}`, JSON.stringify(finalToken, undefined, 2));
   }
 
@@ -146,7 +217,7 @@ export const getQueryPermit = async (
 
   const cachedPermit = getCachedQueryPermit(address);
 
-  if (!refresh && cachedPermit) return JSON.parse(cachedPermit);
+  if (!refresh && cachedPermit) return cachedPermit;
 
   const unsignedQueryPermit = {
     chain_id: process.env.REACT_APP_CHAIN_ID as string,
@@ -179,6 +250,6 @@ export const getQueryPermit = async (
     },
   );
 
-  localStorage.setItem(`Certup-Query-Permit-v1-${address}-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`, JSON.stringify(signature));
+  localStorage.setItem(getQueryString(address), JSON.stringify(signature));
   return signature;
 };

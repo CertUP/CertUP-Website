@@ -8,6 +8,7 @@ import CUButton from '../CUButton';
 import styles from './styles.module.scss';
 import CertUpNavbar from '../Navbar';
 import Footer from '../Footer';
+import LoginModal from '../Access/LoginModal';
 
 interface Props {
   children: ReactNode;
@@ -16,6 +17,7 @@ interface Props {
 export default function Layout({ children }: Props): ReactElement {
   return (
     <>
+      <LoginModal />
       <CertUpNavbar />
       {children}
       <Footer />

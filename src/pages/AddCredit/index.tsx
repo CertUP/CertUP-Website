@@ -113,7 +113,7 @@ export default function AddCredit() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner text="Connect a wallet to buy certificate credits." />
+          <ConnectBanner text="Connect a wallet to buy certificate credits." issuer={true} />
 
           <Spacer height={150} />
         </Layout>

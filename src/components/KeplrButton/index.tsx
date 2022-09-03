@@ -48,11 +48,6 @@ const CustomMenu = React.forwardRef<HTMLDivElement, DivProps>((props, ref) => {
   );
 });
 
-const addHours = (date: Date, hours: number): Date => {
-  date.setTime(date.getTime() + hours * 60 * 60 * 1000);
-  return date;
-};
-
 const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;
 };
@@ -62,8 +57,8 @@ interface KeplrButtonProps {
   autoConnect?: boolean;
 }
 
-export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactElement {
-  const { Address, updateClient, IssuerProfile } = useWallet();
+export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactElement {
+  const { Address, updateClient, IssuerProfile, toggleLoginModal } = useWallet();
   const [loading, setLoading] = useState(false);
 
   const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr']);
@@ -99,10 +94,14 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
 
   useEffect(() => {
     if (!autoConnect) return;
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(100);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(300);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(500);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) return;
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(100);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(300);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(500);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      return;
 
     if (cookies.ConnectedKeplr) {
       if (
@@ -139,14 +138,32 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
         encryptionUtils: window.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
       });
 
-      const issueDate = new Date();
-      const expDate = addHours(new Date(), 12);
-      const { loginPermit: token, queryPermit: permit } = await getPermits(
-        myAddress,
-        issueDate,
-        expDate,
-      );
-      updateClient(secretjs, keplrOfflineSigner as Wallet, myAddress, token, permit);
+      //check for QUERY permit from storage, use modal if it isnt there
+      const cachedPermit = getCachedQueryPermit(myAddress);
+      if (!cachedPermit) {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+        });
+        toggleLoginModal('true');
+        setLoading(false);
+        return; //modal will handle the rest
+      }
+
+      // const issueDate = new Date();
+      // const expDate = addHours(new Date(), 12);
+      // const { loginPermit: token, queryPermit: permit } = await getPermits(
+      //   myAddress,
+      //   issueDate,
+      //   expDate,
+      // );
+      updateClient({
+        client: secretjs,
+        wallet: keplrOfflineSigner as Wallet,
+        address: myAddress,
+        permit: cachedPermit,
+      });
       setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
       setLoading(false);
     } catch (error) {
@@ -165,7 +182,7 @@ export default function KeplrButton({autoConnect}: KeplrButtonProps): ReactEleme
         return;
       }
 
-      updateClient(undefined, undefined, undefined, undefined, undefined);
+      updateClient({ force: true });
       removeCookie('ConnectedKeplr', { path: '/' });
       setLoading(false);
     } catch (error) {

@@ -115,7 +115,7 @@ export default function Access() {
     setLoadingMint(false);
   };
 
-  if (!Wallet || !Address || !LoginToken)
+  if (!Wallet || !Address || !QueryPermit)
     return (
       <>
         <Layout>

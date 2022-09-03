@@ -87,7 +87,7 @@ export default function Mint() {
       [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code']],
       { origin: 'A1' },
     );
-  
+
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Codes');
     XLSX.writeFile(workbook, `CertUP Claim Codes - ${project?.project_name}.xlsx`);
   };
@@ -274,7 +274,7 @@ export default function Mint() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner issuer={true} />
 
           <Spacer height={150} />
         </Layout>

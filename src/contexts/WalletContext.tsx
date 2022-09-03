@@ -23,6 +23,15 @@ interface DummyWallet {
   address: string;
 }
 
+interface UpdateClientProps {
+  client?: SecretNetworkClient;
+  wallet?: SJSWallet;
+  address?: string;
+  token?: LoginToken;
+  permit?: PermitSignature;
+  force?: boolean;
+}
+
 export interface WalletContextState {
   Client?: SecretNetworkClient;
   Querier: SecretNetworkClient | undefined;
@@ -37,13 +46,9 @@ export interface WalletContextState {
   ProcessingTx: boolean;
   VerifiedIssuer: boolean;
   DummyWallet?: DummyWallet;
-  updateClient: (
-    client?: SecretNetworkClient,
-    wallet?: SJSWallet,
-    address?: string,
-    token?: LoginToken,
-    permit?: PermitSignature,
-  ) => void;
+  ShowLoginModal: string;
+  toggleLoginModal: (state?: string) => void;
+  updateClient: (props: UpdateClientProps) => void;
   setProcessingTx: (newState: boolean) => void;
   queryCredits: () => void;
 }
@@ -67,6 +72,10 @@ const contextDefaultValues: WalletContextState = {
   ProcessingTx: false,
   VerifiedIssuer: false,
   DummyWallet: undefined,
+  ShowLoginModal: '',
+  toggleLoginModal: function (): void {
+    throw new Error('Function not implemented.');
+  },
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
@@ -117,19 +126,35 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
   const [DummyWallet, setDummyWallet] = useState<DummyWallet>();
 
-  const updateClient = (
-    client: SecretNetworkClient | undefined,
-    wallet: SJSWallet | undefined,
-    address = '',
-    token: LoginToken | undefined,
-    permit: PermitSignature | undefined,
-  ) => {
-    setClient(client);
-    setWallet(wallet);
-    setAddress(address);
-    setLoginToken(token);
-    setQueryPermit(permit);
-    setClientIsSigner(wallet ? true : false);
+  const [ShowLoginModal, setShowLoginModal] = useState(contextDefaultValues.ShowLoginModal);
+
+  const toggleLoginModal = (state?: string) => {
+    if (state) setShowLoginModal(state);
+    else setShowLoginModal(ShowLoginModal ? '' : 'true');
+  };
+
+  const updateClient = ({
+    client,
+    wallet,
+    address,
+    token,
+    permit,
+    force = false,
+  }: UpdateClientProps) => {
+    console.log('Update Client', {
+      client,
+      wallet,
+      address,
+      token,
+      permit,
+      force,
+    });
+    if (client || force) setClient(client);
+    if (wallet || force) setWallet(wallet);
+    if (address || force) setAddress(address || '');
+    if (token || force) setLoginToken(token);
+    if (permit || force) setQueryPermit(permit);
+    if (wallet) setClientIsSigner(wallet ? true : false);
   };
 
   useEffect(() => {
@@ -265,6 +290,8 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     LoadingRemainingCerts,
     ProcessingTx,
     DummyWallet,
+    ShowLoginModal,
+    toggleLoginModal,
     updateClient,
     queryCredits,
     setProcessingTx,

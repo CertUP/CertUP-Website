@@ -88,7 +88,7 @@ export default function Payment() {
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner issuer={true} />
 
           <Spacer height={150} />
         </Layout>
