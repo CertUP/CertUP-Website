@@ -99,7 +99,7 @@ export default function Mint() {
     console.log('toGenerate', inputs);
     const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
     console.log('hashes');
-    hashes.map((e: string) => console.log(`https://cloudflare-ipfs.io/ipfs/${e}`));
+    hashes.map((e: string) => console.log(`https://ipfs.trivium.network/ipfs/${e}`));
 
     //setHashes(hashes);
     return hashes;

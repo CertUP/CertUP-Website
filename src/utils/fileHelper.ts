@@ -23,6 +23,7 @@ const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
 
 const ipfsMirrors = [
+  'ipfs.trivium.network',
   'infura-ipfs.io',
   'dweb.link',
   'ipfs.fleek.co',
@@ -35,7 +36,7 @@ const ipfsMirrors = [
   'storry.tv',
 ];
 
-export const ipfsDownloadOrig = async (url: string) => {
+export const ipfsDownload = async (url: string) => {
   if (!url.includes('ipfs.io')) return await download(url);
   let final;
 
@@ -59,7 +60,7 @@ export const ipfsDownloadOrig = async (url: string) => {
   else throw new Error('Unable to download file from IPFS.');
 };
 
-export const ipfsDownload = async (url: string) => {
+export const ipfsDownloadSimul = async (url: string) => {
   if (!url.includes('ipfs.io')) return await download(url);
 
   const promises = [];
