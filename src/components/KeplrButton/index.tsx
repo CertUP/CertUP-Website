@@ -48,6 +48,15 @@ const CustomMenu = React.forwardRef<HTMLDivElement, DivProps>((props, ref) => {
   );
 });
 
+const handleCopy = async (address: string) => {
+  navigator.clipboard.writeText(address);
+  toast.success(`Address copied to clipboard.`, {
+    autoClose: 1500,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+  });
+};
+
 const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;
 };
@@ -228,13 +237,16 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
         Custom toggle
       </Dropdown.Toggle>
 
-      <Dropdown.Menu align="end" as={CustomMenu}>
+      <Dropdown.Menu align="end" as={CustomMenu} className="text-center">
+        <Dropdown.Item eventKey="1" onClick={() => handleCopy(Address)}>
+          Copy Wallet Address
+        </Dropdown.Item>
         {IssuerProfile ? (
-          <Dropdown.Item eventKey="1" onClick={() => handleProfile()}>
+          <Dropdown.Item eventKey="2" onClick={() => handleProfile()}>
             Issuer Profile
           </Dropdown.Item>
         ) : null}
-        <Dropdown.Item eventKey="2" onClick={() => handleLogout()}>
+        <Dropdown.Item eventKey="3" onClick={() => handleLogout()}>
           Logout
         </Dropdown.Item>
       </Dropdown.Menu>

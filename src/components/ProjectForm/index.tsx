@@ -57,6 +57,7 @@ import CsvModal from '../CsvModal';
 import ImportFile from '../../assets/importfile.svg';
 import { SaveExitModal } from '../Issuers';
 import { PreviewProvider, usePreview } from '../../contexts/PreviewContext';
+import CUTooltip from '../Tooltip';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -708,7 +709,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4">
                 <Col md={2} className={styles.participantLabels}>
-                  Public Certificate Description
+                  <Col xs="auto">Public Certificate Description</Col>
+                  <Col xs="auto">
+                    <CUTooltip text="An optional description that will be embedded in the public metadata of the certificate. This description will be visible to anyone with the certificate's unique ID." />
+                  </Col>
                 </Col>
                 <Col>
                   <Form.Group as={Col} md="12" controlId="validationCustom02">
@@ -724,7 +728,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4">
                 <Col md={2} className={styles.participantLabels}>
-                  Private Certificate Description
+                  <Col xs="auto">Private Certificate Description</Col>
+                  <Col xs="auto">
+                    <CUTooltip text="An optional description that will be embedded in the private metadata of the certificate. This description will only be visible to the recipient and anyone the recipient has granted access to." />
+                  </Col>
                 </Col>
                 <Col>
                   <Form.Group as={Col} md="12" controlId="validationCustom02">
@@ -911,46 +918,55 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Display DOB
+                  <Row>
+                    <Col xs="auto">Display DOB</Col>
+                    <Col xs="auto">
+                      <CUTooltip text="Choose if you want to display the participant's date of birth on the certificate image." />
+                    </Col>
+                  </Row>
                 </Col>
                 <Col>
-                  <Form.Group as={Col} md="3" controlId="validationCustom02">
-                    {/* <Form.Control
+                  <Row>
+                    <Form.Group as={Col} md="2" controlId="validationCustom02">
+                      {/* <Form.Control
                       required
                       value={'1'}
                       onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
                       type="select"
                       //placeholder="has completed Advanced Financial Training"
                     > */}
-                    <Form.Select
-                      aria-label="Select Date of Birth display format"
-                      value={renderProps.displayDob.toString()}
-                      //onChange={(e) => updateDobFormat(e.target.value)}
-                      onChange={(e) =>
-                        updateRenderProps({ displayDob: e.target.value === 'true' ? true : false })
-                      }
-                    >
-                      <option value="true">Show</option>
-                      <option value="false">Hide</option>
-                    </Form.Select>
-                  </Form.Group>
+                      <Form.Select
+                        aria-label="Select Date of Birth display format"
+                        value={renderProps.displayDob.toString()}
+                        //onChange={(e) => updateDobFormat(e.target.value)}
+                        onChange={(e) =>
+                          updateRenderProps({
+                            displayDob: e.target.value === 'true' ? true : false,
+                          })
+                        }
+                      >
+                        <option value="true">Show</option>
+                        <option value="false">Hide</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Row>
                 </Col>
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  Company Format
+                  <Row className="mx-0">
+                    <Col xs="auto" className="px-0">
+                      Display Company
+                    </Col>
+                    <Col xs="auto" className="px-1">
+                      <CUTooltip
+                        text={`Choose if you want to associate the participant with the company name, e.g. "Employed at CertUP" or "Attening CertUP University". This text will be displayed on the same line as the participant's name.`}
+                      />
+                    </Col>
+                  </Row>
                 </Col>
                 <Col>
                   <Row>
-                    <Form.Group as={Col} md="6" controlId="validationCustom02">
-                      <Form.Control
-                        required
-                        value={renderProps.employerText}
-                        onChange={(e) => updateRenderProps({ employerText: e.target.value })}
-                        type="text"
-                        placeholder="Employed at: "
-                      />
-                    </Form.Group>
                     <Form.Group as={Col} md="2" controlId="validationCustom02">
                       <Form.Select
                         aria-label="Select Date of Birth display format"
@@ -965,6 +981,17 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         <option value="false">Hide</option>
                       </Form.Select>
                     </Form.Group>
+                    {renderProps.displayEmployer && (
+                      <Form.Group as={Col} md="6" controlId="validationCustom02">
+                        <Form.Control
+                          required
+                          value={renderProps.employerText}
+                          onChange={(e) => updateRenderProps({ employerText: e.target.value })}
+                          type="text"
+                          placeholder="Employed at: "
+                        />
+                      </Form.Group>
+                    )}
                   </Row>
                 </Col>
               </Row>
