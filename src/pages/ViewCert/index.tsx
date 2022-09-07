@@ -46,7 +46,7 @@ import IssuerInfo from '../../components/IssuerInfo';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();
-  const { getCert, getCertAccessCode } = useQuery();
+  const { getCert, getCertAccessCode, getCertPub } = useQuery();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [cert, setCert] = useState<NftDossier>();
@@ -70,10 +70,9 @@ export default function ViewCert() {
 
   useEffect(() => {
     console.log('Passed State', location.state);
-    if (!tokenId) {
-      navigate('/access');
-    } else queryCert();
-  }, []);
+    if (!tokenId) navigate('/access');
+    else queryCert();
+  }, [Querier]);
 
   useEffect(() => {
     if (!QueryPermit || !Querier || !Address) return;
@@ -115,12 +114,26 @@ export default function ViewCert() {
     setLoadingAccessCode(false);
   };
 
-  const queryCert = async () => {
-    if (!Querier || !Address || !QueryPermit || !tokenId) return; //todo: handle this better
-    //if (!Dossiers.length) await refreshDossiers();
-
+  const queryCertPub = async () => {
+    if (!Querier || !tokenId) return; //todo: handle this better
     setLoading(true);
 
+    //query without permit
+    const pubDossier = await getCertPub(tokenId);
+    console.log(pubDossier);
+    if (!pubDossier.display_private_metadata_error) setCert(pubDossier);
+    setLoading(false);
+  };
+
+  const queryCert = async () => {
+    if (!Querier || !tokenId) return; //todo: handle this better
+
+    if (!QueryPermit || !Address) {
+      queryCertPub();
+      return;
+    }
+
+    setLoading(true);
     const dossier = findNft(tokenId);
     console.log('Dossier Found', dossier);
     if (dossier) {
@@ -135,6 +148,41 @@ export default function ViewCert() {
 
     setLoading(false);
   };
+
+  if (loading || !Querier)
+    return (
+      <>
+        <Layout>
+          <Spacer height={100} />
+
+          <Container>
+            <Row>
+              <span className={styles.aboutTitle}>View Certificate</span>
+            </Row>
+            <Row>
+              <span className={styles.aboutSubTitle}>Loading certificate...</span>
+            </Row>
+          </Container>
+          <Spacer height={50} />
+
+          <Container
+            fluid={true}
+            className={`${styles.bannerContainer}`}
+            style={{ minHeight: '20vh' }}
+          >
+            {/* <Container style={{height: '100%'}}> */}
+            <Row style={{ flexGrow: '1' }} className="justify-content-center">
+              <Col xs="auto" className="d-flex align-items-center">
+                {' '}
+                <Spinner animation="border" variant="info" />
+              </Col>
+            </Row>
+          </Container>
+
+          <Spacer height={150} />
+        </Layout>
+      </>
+    );
 
   if (!cert)
     return (

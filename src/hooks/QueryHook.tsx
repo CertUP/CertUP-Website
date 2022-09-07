@@ -280,6 +280,21 @@ export default function useQuery() {
     return response.batch_nft_dossier.nft_dossiers;
   };
 
+  const getCertPub = async (token_id: string) => {
+    if (!Querier) throw new Error('Querier not available.');
+
+    // query NFT metadata
+    const dossierQuery = {
+      nft_dossier: {
+        token_id: token_id,
+      },
+    };
+
+    const response = (await queryNFTContract(dossierQuery)) as DossierResponse;
+
+    return response.nft_dossier;
+  };
+
   const getCert = async (token_id: string) => {
     if (!Querier) throw new Error('Querier not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -428,5 +443,6 @@ export default function useQuery() {
     queryNFTDossier,
     getCertAccessCode,
     queryPubIssuerData,
+    getCertPub,
   };
 }
