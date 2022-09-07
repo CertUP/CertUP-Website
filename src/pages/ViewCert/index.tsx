@@ -221,19 +221,19 @@ export default function ViewCert() {
                       Connect a wallet authorized by the certificate holder.
                     </span>
                   </Row>
-                  {!loading && !cert ? (
+                  {!loading && !cert && Address && (
                     <Row>
                       <span className={styles.bannerSubtitle} style={{ fontSize: '16px' }}>
                         The connected wallet is not authorized to view this certificate.
                       </span>
                     </Row>
-                  ) : null}
+                  )}
                 </Row>
 
                 <Row>
                   <Col xs={'auto'} md={{ span: 'auto', offset: 1 }} className="text-end">
                     <KeplrButton />
-                    {!loading && !cert ? null : (
+                    {!Address && (
                       <div className="mt-1">
                         <a
                           href="https://keplr.app"
