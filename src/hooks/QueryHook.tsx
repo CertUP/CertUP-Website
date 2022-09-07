@@ -72,13 +72,13 @@ const checkError = (queryResponse: any) => {
     if (queryResponse.generic_err?.msg.includes('not a verified issuer')) return;
 
     console.error(queryResponse.parse_err || queryResponse.generic_err);
-    throw new Error(
-      queryResponse.parse_err.msg || queryResponse.generic_err.msg || queryResponse.parse_err
-        ? JSON.stringify(queryResponse.parse_err)
-        : undefined || queryResponse.generic_err
-        ? JSON.stringify(queryResponse.generic_err)
-        : undefined || JSON.stringify(queryResponse),
-    );
+    if (queryResponse.parse_err) {
+      throw new Error(queryResponse.parse_err.msg || queryResponse.parse_err);
+    } else if (queryResponse.generic_err) {
+      throw new Error(queryResponse.generic_err.msg || queryResponse.generic_err);
+    } else {
+      throw new Error(JSON.stringify(queryResponse));
+    }
   }
 };
 
@@ -182,7 +182,7 @@ export default function useQuery() {
       codeHash: process.env.REACT_APP_MANAGER_HASH as string,
       query: query,
     })) as GetIssuerResponse;
-    console.log(query, response)
+    console.log(query, response);
     checkError(response);
 
     return response?.get_issuer;
@@ -427,6 +427,6 @@ export default function useQuery() {
     queryNFTWhitelist,
     queryNFTDossier,
     getCertAccessCode,
-    queryPubIssuerData
+    queryPubIssuerData,
   };
 }
