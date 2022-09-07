@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import bannerImage from '../../assets/BannerImage.svg';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
@@ -29,11 +30,9 @@ export default function Home() {
               </Row>
               <Row className={styles.gsButtonRow}>
                 <Col xs={'auto'}>
-                  {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                    <CUButton disabled={true}>Coming Soon</CUButton>
-                  ) : (
+                  <Link to="/issuers">
                     <CUButton btnStyle="large">Get Started</CUButton>
-                  )}
+                  </Link>
                 </Col>
               </Row>
             </Col>
@@ -148,13 +147,9 @@ export default function Home() {
             </Row>
             <Row className="justify-content-center">
               <Col xs="auto">
-                {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                  <CUButton btnStyle="dark" disabled={true}>
-                    Coming Soon
-                  </CUButton>
-                ) : (
+                <Link to="/issuers">
                   <CUButton btnStyle="dark">Get Started</CUButton>
-                )}
+                </Link>
               </Col>
             </Row>
           </div>

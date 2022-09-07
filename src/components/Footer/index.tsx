@@ -16,11 +16,18 @@ export default function Footer() {
       <Container>
         <Row>
           <Col md={4}>
-            <div style={{ paddingTop: '55px', width: '50%' }}>
-              <Image src={logo} fluid={true} />
-            </div>
-            <br />
-            <CUButton disabled={true}>Coming Soon</CUButton>
+            <Row className="mb-4">
+              <div style={{ paddingTop: '55px', width: '50%' }}>
+                <Image src={logo} fluid={true} />
+              </div>
+            </Row>
+            <Row className="justify-content-center">
+              <Col xs="auto">
+                <Link to="/issuers">
+                  <CUButton>Get Started</CUButton>
+                </Link>
+              </Col>
+            </Row>
           </Col>
           <Col md={8}>
             <Row style={{ paddingTop: '75px' }}>

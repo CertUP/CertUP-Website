@@ -70,7 +70,7 @@ export const CUButton: React.FC<ButtonProps> = (props) => {
         <button
           {...rest}
           className={`${styles.certupBtn} ${styles.certupBtnSq} ${styles.certupButtonColor}`}
-          style={fill ? { width: '100%' } : undefined}
+          style={fill ? { width: '100%' } : { width: 'auto' }}
         >
           {children}
         </button>

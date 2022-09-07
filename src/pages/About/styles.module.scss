@@ -65,3 +65,15 @@ $gradient3: #a659f3;
   line-height: 30px;
   color: #888a8b;
 }
+
+.teamDiv {
+  width: 30vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.teamLogo {
+  width: 15vw;
+  align-self: center;
+  margin-bottom: 1rem;
+}

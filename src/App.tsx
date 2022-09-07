@@ -36,22 +36,18 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
-              {!parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                <>
-                  <Route path="/about" element={<About />} />
-                  <Route path="/clients" element={<Clients />} />
-                  <Route path="/guide" element={<Guide />} />
-                  <Route path="/issuers" element={<Issuers />} />
-                  <Route path="/addCredit" element={<AddCredit />} />
-                  <Route path="/generate" element={<Mint />} />
-                  <Route path="/access" element={<Access />} />
-                  <Route path="/access/:tokenid" element={<ViewCert />} />
-                  <Route path="/payment" element={<Payment />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="*" element={<Error />} />
-                </>
-              ) : null}
+              <Route path="/about" element={<About />} />
+              <Route path="/clients" element={<Clients />} />
+              <Route path="/guide" element={<Guide />} />
+              <Route path="/issuers" element={<Issuers />} />
+              <Route path="/addCredit" element={<AddCredit />} />
+              <Route path="/generate" element={<Mint />} />
+              <Route path="/access" element={<Access />} />
+              <Route path="/access/:tokenid" element={<ViewCert />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<Error />} />
             </Routes>
           </BrowserRouter>
         </NftProvider>

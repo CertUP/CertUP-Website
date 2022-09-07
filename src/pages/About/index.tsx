@@ -8,6 +8,9 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import exampleCert from '../../assets/ExampleCert.svg';
+import triviumLogo from '../../assets/triviumcolor.png';
+import alterLogo from '../../assets/alterlogo.png';
+import { Link } from 'react-router-dom';
 
 export default function About() {
   return (
@@ -53,12 +56,29 @@ export default function About() {
         <Container>
           <span className={styles.aboutSubtitle}>Team</span>
           <Row className="mx-2 mt-2 justify-content-around">
-            <Col xs={6} md={4}>
-              Trivium
-            </Col>
-            <Col xs={6} md={4}>
-              Alter
-            </Col>
+            <div className={styles.teamDiv}>
+              <h3>Trivium</h3>
+
+              <Image src={triviumLogo} fluid className={styles.teamLogo} />
+              <p>
+                Trivium is a validator for Secret Network, and a software development team focused
+                on decentralized privacy solutions for companies and individuals.
+              </p>
+              <a href="https://trivium.network" style={{ alignSelf: 'end' }}>
+                https://trivium.network
+              </a>
+            </div>
+            <div className={styles.teamDiv}>
+              <h3>ALTER</h3>
+              <Image src={alterLogo} fluid className={styles.teamLogo} />
+              <p>
+                ALTER is a dedicated company aiming to build data privacy solutions for the next
+                generation of the web.
+              </p>
+              <a href="https://altermail.live" style={{ alignSelf: 'end' }}>
+                https://altermail.live
+              </a>
+            </div>
           </Row>
         </Container>
 
@@ -88,16 +108,18 @@ export default function About() {
           <span className={styles.aboutSubtitle}>Use-cases</span>
           <Row className="mx-2 mt-2">
             <p className={styles.productText}>
-              Many schools, events, and manufacturing sectors are facing the problems with
-              tracking and verifying certificates using old systems in their rapidly evolving industries.
-              The SecretNFT Certificate resolves the consensus side between all parties with real-time
-              track recording, as the certificate holder can verify the authenticity easily with a digital 
-              signiture attached to every document.
+              Many schools, events, and manufacturing sectors are facing the problems with tracking
+              and verifying certificates using old systems in their rapidly evolving industries. The
+              SecretNFT Certificate resolves the consensus side between all parties with real-time
+              track recording, as the certificate holder can verify the authenticity easily with a
+              digital signiture attached to every document.
             </p>
           </Row>
           <Row className="justify-content-center">
             <Col xs={'auto'}>
-              <CUButton>Get Started</CUButton>
+              <Link to="/issuers">
+                <CUButton>Get Started</CUButton>
+              </Link>
             </Col>
           </Row>
         </Container>

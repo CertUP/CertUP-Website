@@ -13,8 +13,6 @@ declare namespace NodeJS {
     REACT_APP_SNIP20_ADDR: string;
     REACT_APP_SNIP20_HASH: string;
 
-    REACT_APP_HOME_ONLY: string;
-
     REACT_APP_BACKEND: string;
 
     REACT_APP_USCRT_PRICE: string;
