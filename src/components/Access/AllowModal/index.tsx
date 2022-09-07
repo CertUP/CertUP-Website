@@ -12,7 +12,13 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faDownload, faPaste, faTimesCircle, faUnlock } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCircle,
+  faDownload,
+  faPaste,
+  faTimesCircle,
+  faUnlock,
+} from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
 import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
@@ -47,12 +53,15 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
   const [allowButtonStyle, setAllowButtonStyle] = useState<any>({});
 
   const { queryNFTWhitelist, queryNFTDossier } = useQuery();
-  const { generateAccessCode, allowAddressAccess, approveAccessGlobal, revokeAccessGlobal } = useExecute();
+  const { generateAccessCode, allowAddressAccess, approveAccessGlobal, revokeAccessGlobal } =
+    useExecute();
   const { ProcessingTx } = useWallet();
 
   const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
 
   const handleClose = () => setShow(false);
+
+  const accessUrl = `${window.location.protocol}//${window.location.host}/access/${tokenId}`;
 
   const findFormErrors = (): boolean => {
     setWhitelistAddrErr('');
@@ -108,7 +117,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
       setLoading('allowAll');
       e.preventDefault();
       let response;
-      console.log(metadata.private_metadata_is_public)
+      console.log(metadata.private_metadata_is_public);
       if (metadata.private_metadata_is_public) response = await revokeAccessGlobal(tokenId);
       else response = await approveAccessGlobal(tokenId);
       console.log(response);
@@ -170,16 +179,17 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             </Row>
             <Row className="justify-content-center text-center">
               <Col md="auto">
-              { metadata?.private_metadata_is_public ? 
-              <p className={styles.unlockedText}>Public Access Unlocked <FontAwesomeIcon icon={faUnlock} /></p>
-            : null }
+                {metadata?.private_metadata_is_public ? (
+                  <p className={styles.unlockedText}>
+                    Public Access Unlocked <FontAwesomeIcon icon={faUnlock} />
+                  </p>
+                ) : null}
                 <CUButton btnStyle="square" disabled={ProcessingTx} onClick={handleAllowAll}>
                   {loading === 'allowAll' ? (
                     <Spinner animation="border" variant="info" size="sm" />
-                  ) : (
-                    metadata?.private_metadata_is_public ? 
+                  ) : metadata?.private_metadata_is_public ? (
                     'Revoke Public Access'
-                    :
+                  ) : (
                     'Allow All'
                   )}
                 </CUButton>
@@ -293,7 +303,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
 
           <Col className="d-flex flex-column">
             <Row>
-              <h5>Whitelisted Addresses:</h5> 
+              <h5>Whitelisted Addresses:</h5>
             </Row>
             <Row>
               {loadingApprovals ? (
@@ -335,9 +345,19 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
+        <Row className="justify-content-between align-items-center my-0" style={{ width: '100%' }}>
+          <Col xs="auto">
+            <h5 className="mb-1 d-inline">Access URL</h5>
+            <CopyButton text={accessUrl} />
+            <br />
+            <span className={`${styles.accessText} mx-2`}>{accessUrl}</span>
+          </Col>
+          <Col xs="auto" className="px-0">
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+          </Col>
+        </Row>
       </Modal.Footer>
     </Modal>
   );

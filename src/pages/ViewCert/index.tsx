@@ -66,6 +66,8 @@ export default function ViewCert() {
 
   const [isOwner, setIsOwner] = useState(false);
 
+  const accessUrl = `${window.location.protocol}//${window.location.host}/access/${tokenId}`;
+
   useEffect(() => {
     console.log('Passed State', location.state);
     if (!tokenId) {
@@ -373,11 +375,9 @@ export default function ViewCert() {
                         <h5 style={{ display: 'inline', marginRight: '.5rem' }}>
                           Certificate Link
                         </h5>
-                        <CopyButton text={`https://certup.net/access/${tokenId}`} />
+                        <CopyButton text={accessUrl} />
                         <br />
-                        <span className={`${styles.accessText} mx-2`}>
-                          https://certup.net/access/{tokenId}
-                        </span>
+                        <span className={`${styles.accessText} mx-2`}>{accessUrl}</span>
                       </Col>
                     </Row>
 
