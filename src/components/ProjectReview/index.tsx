@@ -10,7 +10,6 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Image from 'react-bootstrap/Image';
 import { Spacer } from '../../components';
-import DatePicker from 'react-datepicker';
 import ImagePicker, { PickImage } from '../ImagePicker';
 //import 'react-image-picker/dist/index.css';
 
@@ -20,7 +19,6 @@ import * as XLSX from 'xlsx';
 import PreloadImage from '../PreloadImage';
 
 import styles from './styles.module.scss';
-import 'react-datepicker/dist/react-datepicker.css';
 import trashImg from '../../assets/trash-2.svg';
 import CUButton from '../CUButton';
 import { useRef } from 'react';

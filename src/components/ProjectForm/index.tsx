@@ -9,12 +9,11 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Image from 'react-bootstrap/Image';
 import { Spacer } from '../../components';
-import DatePicker from 'react-datepicker';
+import DatePicker from 'react-date-picker/dist/entry.nostyle';
 import ImagePicker, { PickImage } from '../ImagePicker';
 //import 'react-image-picker/dist/index.css';
 
 import styles from './styles.module.scss';
-import 'react-datepicker/dist/react-datepicker.css';
 import DeleteButton from '../DeleteButton';
 import Project, {
   CertInfo,
@@ -50,6 +49,7 @@ import {
   faArrowRight,
   faCloudArrowUp,
   faFileArrowUp,
+  faCalendar,
 } from '@fortawesome/free-solid-svg-icons';
 import CUSelectButton from '../CUSelectButton';
 import CsvModal from '../CsvModal';
@@ -58,6 +58,10 @@ import ImportFile from '../../assets/importfile.svg';
 import { SaveExitModal } from '../Issuers';
 import { PreviewProvider, usePreview } from '../../contexts/PreviewContext';
 import CUTooltip from '../Tooltip';
+
+import '../../assets/DatePicker.css';
+import '../../assets/Calendar.css';
+import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -168,6 +172,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const projectId = useRef<string | undefined>(projectInfo?._id || pid);
 
   const navigate = useNavigate();
+
+  const scrollBarWidth = useScrollbarWidth();
 
   const findFormErrors = (): FormErrors => {
     const { cert_name, pub_description, priv_description, issue_date, expire_date } = certInfo;
@@ -568,7 +574,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <hr className={styles.formHr} />
               </Row>
               {/* Labels Row */}
-              <Row>
+              <Row style={{ paddingRight: scrollBarWidth * 2 }} className="justify-content-left">
                 <Col md={3} className={styles.participantLabels}>
                   Name
                 </Col>
@@ -587,7 +593,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   let pErrors;
                   if (errors.participants) pErrors = errors.participants[index];
                   return (
-                    <Row key={`participant-${index}`} className="mb-2">
+                    <Row
+                      key={`participant-${index}`}
+                      className={`mb-2`}
+                      style={{ paddingRight: 0 }}
+                    >
                       <Form.Group as={Col} md="3" controlId="validationCustom02">
                         <Form.Control
                           required
@@ -610,17 +620,20 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         />
                       </Form.Group>
 
-                      <Form.Group as={Col} md="2" controlId="validationCustom02">
+                      <Form.Group
+                        as={Col}
+                        md="2"
+                        controlId="validationCustom02"
+                        className="text-center"
+                      >
                         <DatePicker
-                          selected={participants[index].dob}
+                          value={participants[index].dob}
                           onChange={(date: Date) =>
                             changeParticipant(index, 'dob', undefined, date)
                           }
-                          className={
-                            pErrors?.dob
-                              ? `${styles.inputStyle} ${styles.invalidDate}`
-                              : styles.inputStyle
-                          }
+                          clearIcon={null}
+                          className={pErrors?.dob && `invalidSelection`}
+                          calendarIcon={null}
                           //customInput={<ExampleCustomInput />}
                         />
                       </Form.Group>
@@ -752,13 +765,14 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Col>
                   <Form.Group as={Col} md="3" controlId="validationCustom02">
                     <DatePicker
-                      selected={certInfo.issue_date}
+                      value={certInfo.issue_date}
                       onChange={(date: Date) => updateCertInfo({ issue_date: date })}
-                      className={
-                        errors.issue_date
-                          ? `${styles.inputStyle} ${styles.invalidDate}`
-                          : styles.inputStyle
-                      }
+                      clearIcon={null}
+                      // className={
+                      //   errors.issue_date
+                      //     ? `${styles.inputStyle} ${styles.invalidDate}`
+                      //     : styles.inputStyle
+                      // }
                       //customInput={<TypeableDatePicker />}
                     />
                   </Form.Group>
@@ -772,14 +786,15 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   <Row style={{ margin: 0 }}>
                     <Form.Group
                       as={Col}
-                      md="3"
+                      md="auto"
                       controlId="validationCustom02"
                       style={{ padding: 0 }}
                     >
                       <DatePicker
-                        selected={certInfo.expire_date}
+                        value={certInfo.expire_date}
                         onChange={(date: Date) => updateCertInfo({ expire_date: date })}
-                        className={styles.inputStyle}
+                        clearIcon={null}
+                        // className={styles.inputStyle}
                         //customInput={<ExampleCustomInput />}
                       />
                     </Form.Group>
