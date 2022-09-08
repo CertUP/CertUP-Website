@@ -50,7 +50,7 @@ export interface WalletContextState {
   toggleLoginModal: (state?: string) => void;
   updateClient: (props: UpdateClientProps) => void;
   setProcessingTx: (newState: boolean) => void;
-  queryCredits: () => void;
+  queryCredits: () => Promise<number | undefined>;
 }
 
 interface Props {
@@ -79,7 +79,7 @@ const contextDefaultValues: WalletContextState = {
   updateClient: function (): void {
     throw new Error('Function not implemented.');
   },
-  queryCredits: function (): void {
+  queryCredits: async function (): Promise<number | undefined> {
     throw new Error('Function not implemented.');
   },
   setProcessingTx: function (): void {
@@ -234,7 +234,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
         query: query,
       })) as IssuerDataResponse;
 
-      console.log('Remaining Certs Query Response', response);
+      //console.log('Remaining Certs Query Response', response);
 
       if (response?.parse_err || response?.generic_err) {
         if (response.generic_err?.msg.includes('not a verified issuer')) {

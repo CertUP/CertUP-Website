@@ -124,6 +124,22 @@ export interface GetIssuerResponse extends QueryResponse {
   get_issuer: PubIssuerData;
 }
 
+export interface CertPriceResponse extends QueryResponse {
+  cert_price: {
+    pay_data: Payment;
+  };
+}
+
+interface Payment {
+  contract: {
+    /// contract's code hash string
+    code_hash: string;
+    /// contract's address
+    address: string;
+  };
+  amount: string;
+}
+
 export interface PubIssuerData {
   id: string;
   name?: string;

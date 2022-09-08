@@ -290,7 +290,7 @@ export default function useExecute() {
     }
   };
 
-  const paySSCRT = async (numCerts: number, amount: string): Promise<ComputeTx> => {
+  const paySSCRT = async (numCerts: number, amount: string, toastRef: any): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -303,24 +303,96 @@ export default function useExecute() {
       },
     };
 
-    const response = await Client.tx.snip20.send(
-      {
-        contractAddress: process.env.REACT_APP_SNIP20_ADDR,
-        codeHash: process.env.REACT_APP_SNIP20_HASH,
-        sender: Address,
-        msg: {
-          send: {
-            recipient: process.env.REACT_APP_MANAGER_ADDR,
-            amount: amount,
-            msg: btoa(JSON.stringify(addCertsMsg)),
-          },
+    const sendMsg = {
+      send: {
+        recipient: process.env.REACT_APP_MANAGER_ADDR,
+        amount: amount,
+        msg: btoa(JSON.stringify(addCertsMsg)),
+      },
+    };
+
+    const response = await executeToken(sendMsg, 100000, toastRef);
+
+    // const response = await Client.tx.snip20.send(
+    //   {
+    //     contractAddress: process.env.REACT_APP_SNIP20_ADDR,
+    //     codeHash: process.env.REACT_APP_SNIP20_HASH,
+    //     sender: Address,
+    //     msg: sendMsg,
+    //   {
+    //     gasLimit: 100000,
+    //     gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+    //   },
+    // );
+
+    queryCredits();
+    return response as ComputeTx;
+  };
+
+  const paySCRT = async (numCerts: number, amount: string): Promise<ComputeTx> => {
+    if (!Client) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    // const price = 3; // uSSCRT
+    // const total: string = (numCerts * price).toString();
+
+    const depositMsg = new MsgExecuteContract({
+      sender: Address,
+      contractAddress: process.env.REACT_APP_SNIP20_ADDR,
+      codeHash: process.env.REACT_APP_SNIP20_HASH,
+      msg: {
+        deposit: {},
+      },
+      sentFunds: [
+        {
+          denom: 'uscrt',
+          amount: amount,
+        },
+      ],
+    });
+
+    const addCertsMsg = {
+      add_certs: {
+        purchased_certs: numCerts.toString(),
+      },
+    };
+
+    const sendMsg = new MsgExecuteContract({
+      sender: Address,
+      contractAddress: process.env.REACT_APP_SNIP20_ADDR,
+      codeHash: process.env.REACT_APP_SNIP20_HASH,
+      msg: {
+        send: {
+          recipient: process.env.REACT_APP_MANAGER_ADDR,
+          amount: amount,
+          msg: btoa(JSON.stringify(addCertsMsg)),
         },
       },
-      {
-        gasLimit: 100000,
-        gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
-      },
-    );
+    });
+
+    const response = await Client.tx.broadcast([depositMsg, sendMsg], {
+      gasLimit: 120000,
+      gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+    });
+
+    // const response = await Client.tx.snip20.send(
+    //   {
+    //     contractAddress: process.env.REACT_APP_SNIP20_ADDR,
+    //     codeHash: process.env.REACT_APP_SNIP20_HASH,
+    //     sender: Address,
+    //     msg: {
+    //       send: {
+    //         recipient: process.env.REACT_APP_MANAGER_ADDR,
+    //         amount: amount,
+    //         msg: btoa(JSON.stringify(addCertsMsg)),
+    //       },
+    //     },
+    //   },
+    //   {
+    //     gasLimit: 100000,
+    //     gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+    //   },
+    // );
     parseError(response as ComputeTx);
     queryCredits();
     return response as ComputeTx;
@@ -458,6 +530,39 @@ export default function useExecute() {
     }
   };
 
+  const executeToken = async (msg: any, gas = 50000, toastRef?: any) => {
+    if (!Client) throw new Error('Client not available.');
+
+    if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
+    else toastRef = toast.loading('Processing Transaction...');
+    try {
+      setProcessingTx(true);
+
+      const response = await Client.tx.compute.executeContract(
+        {
+          contractAddress: process.env.REACT_APP_SNIP20_ADDR,
+          codeHash: process.env.REACT_APP_SNIP20_HASH,
+          sender: Address,
+          msg: msg,
+        },
+        {
+          gasLimit: gas,
+          gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+        },
+      );
+      setProcessingTx(false);
+
+      parseError(response as ComputeTx);
+
+      if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+      return response;
+    } catch (err: any) {
+      setProcessingTx(false);
+      toast.update(toastRef, new ToastProps(err.toString(), 'error'));
+      throw err;
+    }
+  };
+
   const approveAccessGlobal = async (tokenId: string, toastRef?: any) => {
     if (!Client) throw new Error('Client not available.');
 
@@ -562,6 +667,7 @@ export default function useExecute() {
 
   return {
     paySSCRT,
+    paySCRT,
     preloadCerts,
     generateAccessCode,
     removeAccessCode,

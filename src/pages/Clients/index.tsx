@@ -46,7 +46,7 @@ export default function Clients() {
                 </Row>
 
                 <Row>
-                  <p className={styles.aboutInfoText}>
+                  <p className={styles.aboutInfoText38}>
                     Upgrade your certificates to keep pace with your rapidly evolving field. The
                     digital age is making else more convenient, but certification and important
                     documents systems have remained shackled to the past, creating serious
@@ -68,10 +68,10 @@ export default function Clients() {
                     blockchain, we give you the ability to upgrade your certification systems with
                     ease! Simply register yourself as an issuer and purchase a package of
                     certificates. When filling in the data, decide which data is allowed to remain
-                    public and which must be private. Then, when the data is submitted, you may
-                    give the recipient the redemption key our system provides to you. When they
-                    redeem this key the certificate will be permanently associated with them and
-                    have a digital signiture attached proving you were the true issuer.
+                    public and which must be private. Then, when the data is submitted, you may give
+                    the recipient the redemption key our system provides to you. When they redeem
+                    this key the certificate will be permanently associated with them and have a
+                    digital signiture attached proving you were the true issuer.
                   </p>
                 </Row>
               </div>

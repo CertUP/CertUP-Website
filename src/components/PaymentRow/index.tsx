@@ -13,8 +13,11 @@ import { ToastProps } from '../../utils/toastHelper';
 import CoinbaseCommerceButton from 'react-coinbase-commerce';
 
 import btnStyles from '../CUButton/styles.module.scss';
+import useQuery from '../../hooks/QueryHook';
+import Spinner from 'react-bootstrap/Spinner';
+import CUSelectButton from '../CUSelectButton';
 
-const certPriceSCRT = parseInt(process.env.REACT_APP_USCRT_PRICE, 10); //uscrt
+import styles from './styles.module.scss';
 
 export interface Confirmation {
   string: string;
@@ -27,70 +30,97 @@ interface PRProps {
   onPaid?: (confirmation: Confirmation) => void;
 }
 
-export default function PaymentRow({ num_certs = 0, editable = true }: PRProps) {
+export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: PRProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, queryCredits } = useWallet();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [certPriceUsd, setCertPriceUsd] = useState(0);
   const [numCerts, setNumCerts] = useState<number>(num_certs);
-  const [totalString, setTotalString] = useState<string>('0 SCRT');
-  const [totalUSDString, setTotalUSDString] = useState<string>('$0.00');
+
+  const [certPriceSCRT, setCertPriceSCRT] = useState(0);
   const [totaluSCRT, setTotaluSCRT] = useState<number>(0);
+  const [sScrtBalance, setSScrtBalance] = useState(0);
+  const [scrtBalance, setScrtBalance] = useState(0);
+  const [payWithSSCRT, setPayWithSSCRT] = useState(false);
+
+  const [certPriceUSD, setCertPriceUSD] = useState(0);
   const [totalUSD, setTotalUSD] = useState<number>(0);
-  const [gotError, setGotError] = useState<boolean>(false);
   const [chargeId, setChargeId] = useState<string>();
+
+  const [gotError, setGotError] = useState<boolean>(false);
 
   const [paid, setPaid] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>();
 
-  const [showCoinbase, setShowCoinbase] = useState(false);
+  const { paySSCRT, paySCRT } = useExecute();
+  const { queryCertPrice, getSSCRTBalance, getSCRTBalance } = useQuery();
 
-  const { paySSCRT } = useExecute();
+  const totalSCRTString = `${totaluSCRT / 10e5} ${payWithSSCRT ? 'sSCRT' : 'SCRT'}`;
+  const totalUSDString = `$${(totalUSD / 10e1).toFixed(2)}`;
 
   useEffect(() => {
     init();
   }, []);
 
   useEffect(() => {
-    if (!numCerts) return;
-    calculateTotalSCRT(numCerts);
-    calculateTotalUSD(numCerts);
-  }, [numCerts]);
+    setNumCerts(num_certs);
+  }, [num_certs]);
 
   useEffect(() => {
     if (!numCerts) return;
     calculateTotalUSD(numCerts);
-  }, [certPriceUsd]);
+  }, [numCerts, certPriceUSD]);
+
+  useEffect(() => {
+    if (!numCerts) return;
+    calculateTotalSCRT(numCerts);
+  }, [numCerts, certPriceSCRT]);
+
+  useEffect(() => {
+    getCharge(numCerts);
+  }, [totalUSD]);
 
   const init = async () => {
-    await getPaymentInfo();
-    getCharge(numCerts);
-    setLoading(false);
+    getPriceUSD();
+    getPriceSCRT();
+    checkSSCRT();
   };
 
-  const getPaymentInfo = async () => {
+  const getPriceUSD = async () => {
     const url = new URL('/payment', process.env.REACT_APP_BACKEND).toString();
     const {
       data: { usd_price_cents },
     } = await axios.get(url);
     console.log('USD Price Cents', usd_price_cents);
-    setCertPriceUsd(usd_price_cents);
+    setCertPriceUSD(usd_price_cents);
     return usd_price_cents;
+  };
+
+  const getPriceSCRT = async () => {
+    const price = await queryCertPrice();
+    console.log('sSCRT Price uSCRT', price);
+    setCertPriceSCRT(price);
   };
 
   const calculateTotalSCRT = (_numCerts: number) => {
     const price = certPriceSCRT; //uscrt
     const total = price * _numCerts;
-    setTotalString(`${total / 10e5} SCRT`);
     setTotaluSCRT(total);
     setNumCerts(_numCerts);
   };
 
+  const checkSSCRT = async () => {
+    // determine if to present sSCRT payment option
+    const sscrtBal = await getSSCRTBalance();
+    setSScrtBalance(sscrtBal);
+    console.log('sSCRT Balance', sscrtBal);
+
+    const scrtBal = await getSCRTBalance();
+    setScrtBalance(scrtBal);
+  };
+
   const calculateTotalUSD = (_numCerts: number, price?: number) => {
     //_numCerts = _numCerts.replace(/\D/g, '');
-    if (!price) price = certPriceUsd;
+    if (!price) price = certPriceUSD;
     const total = price * _numCerts; //cents
-    setTotalUSDString(`$${(total / 10e1).toFixed(2)}`);
     setTotalUSD(total);
     setNumCerts(_numCerts);
   };
@@ -146,12 +176,17 @@ export default function PaymentRow({ num_certs = 0, editable = true }: PRProps) 
       e.preventDefault();
       if (!numCerts) throw new Error('Number of Certs is undefined.');
 
-      const response = await paySSCRT(numCerts, totaluSCRT.toString());
+      let response;
+      if (payWithSSCRT) {
+        response = await paySSCRT(numCerts, totaluSCRT.toString(), toastRef);
+      } else {
+        response = await paySCRT(numCerts, totaluSCRT.toString());
+      }
       console.log(response);
 
       toast.update(toastRef, new ToastProps('Success', 'success'));
       setPaid(true);
-      setConfirmation({
+      const confirm: Confirmation = {
         string: 'Your transaction hash is',
         number: (
           <a
@@ -166,7 +201,9 @@ export default function PaymentRow({ num_certs = 0, editable = true }: PRProps) 
             {response.transactionHash}
           </a>
         ),
-      });
+      };
+      setConfirmation(confirm);
+      if (onPaid) onPaid(confirm);
     } catch (error: any) {
       toast.update(toastRef, new ToastProps(error.toString(), 'error'));
     }
@@ -181,80 +218,141 @@ export default function PaymentRow({ num_certs = 0, editable = true }: PRProps) 
   //     setShowCoinbase(false);
   //   };
 
-  console.log('chargeId', chargeId);
   return (
-    <Row>
-      <Col>
-        <Row className="text-center my-4">
-          <h4>Pay with $SCRT</h4>
-        </Row>
-        <Form>
-          <Form.Group
-            as={Row}
-            className="mb-3 justify-content-center"
-            controlId="formHorizontalEmail"
-          >
-            <Form.Label column sm={4}>
-              Total
-            </Form.Label>
-            <Col sm={4}>
-              <Form.Control
-                required
-                value={totalString}
-                disabled={true}
-                type="text"
-                placeholder="123"
-              />
-            </Col>
-          </Form.Group>
+    <>
+      <Row className="text-center">
+        <h4>Purchasing {numCerts} Certificate Credits</h4>
+      </Row>
+      <Row>
+        <Col className="d-flex flex-column">
+          <Row className="text-center my-4 justify-content-center">
+            <h4>Pay with $SCRT</h4>
+            {!totaluSCRT && (
+              <Col xs="auto">
+                <Spinner animation="border" variant="info" />
+              </Col>
+            )}
 
-          <Row className="justify-content-center">
-            <Col md="7">
-              <CUButton disabled={false} fill={true} onClick={handleSCRTPayment}>
-                Pay with Keplr Wallet
-              </CUButton>
-            </Col>
+            {sScrtBalance > 0.1 && (
+              <Row className="justify-content-center">
+                <Col md="auto">
+                  <CUSelectButton
+                    type="button"
+                    selected={!payWithSSCRT}
+                    onClick={() => setPayWithSSCRT(false)}
+                  >
+                    <span className={!payWithSSCRT ? styles.payWithtext : undefined}>
+                      Pay with SCRT
+                    </span>
+                    <br />
+                    <span className={styles.balanceText}>
+                      Balance: {scrtBalance.toFixed(3)} SCRT
+                    </span>
+                  </CUSelectButton>
+                </Col>
+                <Col md="auto">
+                  <CUSelectButton
+                    type="button"
+                    selected={payWithSSCRT}
+                    onClick={() => setPayWithSSCRT(true)}
+                  >
+                    <span className={payWithSSCRT ? styles.payWithtext : undefined}>
+                      Pay with secretSCRT
+                    </span>
+                    <br />
+                    <span className={styles.balanceText}>
+                      Balance: {sScrtBalance.toFixed(3)} sSCRT
+                    </span>
+                  </CUSelectButton>
+                </Col>
+              </Row>
+            )}
           </Row>
-        </Form>
-      </Col>
-      <Col>
-        <Row className="text-center my-4">
-          <h4>Pay with Coinbase</h4>
-        </Row>
-        <Form>
-          <Form.Group
-            as={Row}
-            className="mb-3 justify-content-center"
-            controlId="formHorizontalEmail"
-          >
-            <Form.Label column sm={4}>
-              Total
-            </Form.Label>
-            <Col sm={4}>
-              <Form.Control
-                required
-                value={totalUSDString}
-                disabled={true}
-                type="text"
-                placeholder="123"
-              />
-            </Col>
-          </Form.Group>
-
-          <Row className="justify-content-center">
-            <Col md="7">
-              <CoinbaseCommerceButton
-                chargeId={chargeId}
-                className={`${btnStyles.certupBtn} ${btnStyles.certupBtnSmall} ${btnStyles.certupButtonColor}`}
-                disabled={!chargeId}
-                style={{ width: '100%' }}
+          <Row>
+            <Form>
+              <Form.Group
+                as={Row}
+                className="mb-3 justify-content-center"
+                controlId="formHorizontalEmail"
               >
-                Pay with Coinbase
-              </CoinbaseCommerceButton>
-            </Col>
+                <Form.Label column sm={4}>
+                  Total
+                </Form.Label>
+                <Col sm={4}>
+                  <Form.Control
+                    required
+                    value={totalSCRTString}
+                    disabled={true}
+                    type="text"
+                    placeholder="123"
+                  />
+                </Col>
+              </Form.Group>
+
+              <Row className="justify-content-center">
+                <Col md="7">
+                  <CUButton disabled={!totaluSCRT} fill={true} onClick={handleSCRTPayment}>
+                    Pay with Keplr Wallet
+                  </CUButton>
+                </Col>
+              </Row>
+            </Form>
           </Row>
-        </Form>
-      </Col>
-    </Row>
+        </Col>
+        <Col className="d-flex flex-column justify-content-between">
+          <Row className="text-center my-4 justify-content-center">
+            <Row className="mb-2">
+              <h4>Pay with Coinbase</h4>
+            </Row>
+            <Row className="px-3">
+              <p className="px-3 mb-0" style={{ color: '#333333' }}>
+                You will be redirected to Coinbase&apos;s cryptocurrency paayment gateway where you
+                can pay with a variety of coins and tokens.
+              </p>
+            </Row>
+            {!chargeId && (
+              <Col xs="auto">
+                <Spinner animation="border" variant="info" />
+              </Col>
+            )}
+          </Row>
+          <Row>
+            <Form>
+              <Form.Group
+                as={Row}
+                className="mb-3 justify-content-center"
+                controlId="formHorizontalEmail"
+              >
+                <Form.Label column sm={4}>
+                  Total
+                </Form.Label>
+                <Col sm={4}>
+                  <Form.Control
+                    required
+                    value={totalUSDString}
+                    disabled={true}
+                    type="text"
+                    placeholder="123"
+                  />
+                </Col>
+              </Form.Group>
+
+              <Row className="justify-content-center">
+                <Col md="7">
+                  <CoinbaseCommerceButton
+                    chargeId={chargeId}
+                    className={`${btnStyles.certupBtn} ${btnStyles.certupBtnSmall} ${btnStyles.certupButtonColor}`}
+                    disabled={!chargeId}
+                    style={{ width: '100%' }}
+                  >
+                    Pay with Coinbase
+                  </CoinbaseCommerceButton>
+                </Col>
+              </Row>
+            </Form>
+          </Row>
+        </Col>
+      </Row>
+    </>
   );
 }

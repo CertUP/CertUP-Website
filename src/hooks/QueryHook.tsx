@@ -4,6 +4,7 @@ import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/G
 import { useWallet } from '../contexts';
 import {
   BatchDossierResponse,
+  CertPriceResponse,
   DossierResponse,
   GetIssuerResponse,
   IssuerData,
@@ -188,6 +189,24 @@ export default function useQuery() {
     return response?.get_issuer;
   };
 
+  const queryCertPrice = async (): Promise<number> => {
+    if (!Querier) throw new Error('Client not available.');
+
+    const query = {
+      cert_price: {},
+    };
+
+    const response = (await Querier.query.compute.queryContract({
+      contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
+      codeHash: process.env.REACT_APP_MANAGER_HASH as string,
+      query: query,
+    })) as CertPriceResponse;
+    console.log(query, response);
+    checkError(response);
+
+    return parseInt(response?.cert_price.pay_data.amount, 10);
+  };
+
   const queryProjects = async () => {
     if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -327,15 +346,26 @@ export default function useQuery() {
     return response.nft_dossier;
   };
 
+  const getViewKey = async (address: string) => {
+    if (!window.keplr) throw new Error('Keplr not available.');
+
+    //get view key
+    const vkey = await window.keplr.getSecret20ViewingKey(
+      process.env.REACT_APP_CHAIN_ID as string,
+      address,
+    );
+    return vkey;
+  };
+
   const getSSCRTBalance = async () => {
     if (!Querier) throw new Error('Querier not available.');
 
+    console.log('Snip20 Address', process.env.REACT_APP_SNIP20_ADDR);
     //get view key
-    const vkey = await window.keplr?.getSecret20ViewingKey(
-      process.env.REACT_APP_CHAIN_ID as string,
-      process.env.REACT_APP_SSCRT_ADDR as string,
-    );
+    const vkey = await getViewKey(process.env.REACT_APP_SNIP20_ADDR as string);
     console.log(vkey);
+
+    if (!vkey) return 0;
 
     const response = await Querier.query.snip20.getBalance({
       contract: {
@@ -444,5 +474,6 @@ export default function useQuery() {
     getCertAccessCode,
     queryPubIssuerData,
     getCertPub,
+    queryCertPrice,
   };
 }

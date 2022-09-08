@@ -51,38 +51,45 @@ export default function About() {
           </div>
         </Container>
 
-        <Spacer height={150} />
+        <Spacer height={120} />
 
         <Container>
           <span className={styles.aboutSubtitle}>Team</span>
-          <Row className="mx-2 mt-2 justify-content-around">
+          <Row className="mx-2 mt-4 justify-content-around">
             <div className={styles.teamDiv}>
-              <h3>Trivium</h3>
-
-              <Image src={triviumLogo} fluid className={styles.teamLogo} />
-              <p>
-                Trivium is a validator for Secret Network, and a software development team focused
-                on decentralized privacy solutions for companies and individuals.
-              </p>
-              <a href="https://trivium.network" style={{ alignSelf: 'end' }}>
-                https://trivium.network
-              </a>
+              <Row>
+                <h3>Trivium</h3>
+                <Row className="justify-content-center">
+                  <Image src={triviumLogo} fluid className={styles.teamLogo} />
+                </Row>
+                <p>
+                  Trivium is a validator for Secret Network, and a software development team focused
+                  on decentralized privacy solutions for companies and individuals.
+                </p>
+              </Row>
+              <Row className="text-end">
+                <a href="https://trivium.network">https://trivium.network</a>
+              </Row>
             </div>
             <div className={styles.teamDiv}>
-              <h3>ALTER</h3>
-              <Image src={alterLogo} fluid className={styles.teamLogo} />
-              <p>
-                ALTER is a dedicated company aiming to build data privacy solutions for the next
-                generation of the web.
-              </p>
-              <a href="https://altermail.live" style={{ alignSelf: 'end' }}>
-                https://altermail.live
-              </a>
+              <Row>
+                <h3>ALTER</h3>
+                <Row className="justify-content-center">
+                  <Image src={alterLogo} fluid className={styles.teamLogo} />
+                </Row>
+                <p>
+                  ALTER is a dedicated company aiming to build data privacy solutions for the next
+                  generation of the web.
+                </p>
+              </Row>
+              <Row className="text-end">
+                <a href="https://altermail.live">https://altermail.live</a>
+              </Row>
             </div>
           </Row>
         </Container>
 
-        <Spacer height={150} />
+        <Spacer height={120} />
 
         <Container>
           <span className={styles.aboutSubtitle}>Product</span>
@@ -96,13 +103,13 @@ export default function About() {
           </Row>
         </Container>
 
-        <Spacer height={130} />
+        <Spacer height={120} />
 
         <Container>
           <Image src={exampleCert} fluid />
         </Container>
 
-        <Spacer height={135} />
+        <Spacer height={120} />
 
         <Container>
           <span className={styles.aboutSubtitle}>Use-cases</span>
@@ -115,7 +122,7 @@ export default function About() {
               digital signiture attached to every document.
             </p>
           </Row>
-          <Row className="justify-content-center">
+          <Row className="justify-content-center mt-2">
             <Col xs={'auto'}>
               <Link to="/issuers">
                 <CUButton>Get Started</CUButton>

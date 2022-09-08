@@ -1,39 +1,35 @@
 // import styles from "./styles.module.scss"
 import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
-import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import exampleCert from '../../assets/ExampleCert.svg';
-import { useWallet } from '../../contexts';
+import { useProject, useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
-import ProjectList from '../../components/ProjectList';
-import { ReactNode, useEffect, useState } from 'react';
-import ProjectForm from '../../components/ProjectForm';
+import { useEffect, useState } from 'react';
 import Project from '../../interfaces/Project';
-import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form, Spinner } from 'react-bootstrap';
-import { Tx } from 'secretjs';
-import { toast } from 'react-toastify';
+import { Spinner } from 'react-bootstrap';
 import { ProgressBar } from '../../components';
-import useExecute from '../../hooks/ExecuteHook';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { ToastProps } from '../../utils/toastHelper';
 import PaymentRow, { Confirmation } from '../../components/PaymentRow';
 
 export default function Payment() {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, queryCredits } = useWallet();
+  const { Wallet, Address, LoginToken, queryCredits, RemainingCerts } = useWallet();
+
   const location = useLocation();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [numCerts, setNumCerts] = useState<number>(location.state?.num_certificates || 0);
+  const [numToPurchase, setNumToPurchase] = useState<number>(0);
   const [paid, setPaid] = useState<boolean>(false);
   const [confirmation, setConfirmation] = useState<Confirmation>();
+  const [project, setProject] = useState<Project>();
+
+  const { findProject, LoadingPendingProjects } = useProject();
 
   useEffect(() => {
     if (!Address) return;
@@ -48,17 +44,49 @@ export default function Payment() {
   const init = async () => {
     const credits = await queryCredits();
     console.log('Credits', credits);
-    if (credits > location.state.num_certificates) {
+    if (credits && credits > location.state.num_certificates) {
       navigate('/generate', { state: { projectId: location.state.projectId } });
       return;
     }
-    setNumCerts(location.state.num_certificates);
+    // calculateNumCerts();
+    loadProject();
     setLoading(false);
+  };
+
+  useEffect(() => {
+    if (LoadingPendingProjects) return;
+    loadProject();
+  }, [LoadingPendingProjects]);
+
+  const loadProject = () => {
+    if (LoadingPendingProjects) return;
+    const foundProject = findProject(location.state?.projectId);
+    setProject(foundProject);
+  };
+
+  useEffect(() => {
+    calculateNumCerts();
+  }, [RemainingCerts]);
+
+  const calculateNumCerts = () => {
+    const toPurchase = location.state.num_certificates - RemainingCerts;
+
+    console.log(
+      'Passed Number',
+      location.state.num_certificates,
+      'Remaining',
+      RemainingCerts,
+      'To Purchase',
+      toPurchase,
+    );
+    setNumToPurchase(toPurchase);
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (window.history.state && window.history.state.idx > 0) {
+    if (location.state.projectId) {
+      navigate('/issuers', { state: { projectId: location.state.projectId, show: true } });
+    } else if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
     } else {
       navigate('/', { replace: true }); // the current entry in the history stack will be replaced with the new one with { replace: true }
@@ -121,8 +149,14 @@ export default function Payment() {
         <Container>
           <Row className="justify-content-center">
             <Col xs="6" className="text-center">
-              <h4>{numCerts} Certificates</h4>
-              TODO show preview
+              <h3 style={{ fontWeight: 'bold' }} className="mb-1">
+                {project?.project_name}
+              </h3>
+              <h5>{project?.participants.length} Certificates</h5>
+              {RemainingCerts && (
+                <h5 className="mt-3">You have {RemainingCerts} certificate credits.</h5>
+              )}
+              <Image fluid src={project?.lastPreview} />
               <hr />
             </Col>
           </Row>
@@ -147,7 +181,7 @@ export default function Payment() {
               </Row>
             </>
           ) : (
-            <PaymentRow num_certs={numCerts} editable={false} onPaid={callback} />
+            <PaymentRow num_certs={numToPurchase} editable={false} onPaid={callback} />
           )}
         </Container>
       </Layout>

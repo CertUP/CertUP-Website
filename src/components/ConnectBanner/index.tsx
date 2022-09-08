@@ -21,8 +21,6 @@ export default function ConnectBanner({ text, issuer }: Props) {
 
   const [cookies, setCookie, removeCookie] = useCookies(['IssuerLogin']);
 
-  console.log('State', { Wallet, Address, QueryPermit });
-
   useEffect(() => {
     if (!Address || !Wallet || !issuer) return;
     if (cookies.IssuerLogin) {

@@ -67,9 +67,10 @@ $gradient3: #a659f3;
 }
 
 .teamDiv {
-  width: 30vw;
+  width: 30vw !important; //why tf did it work at first
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 .teamLogo {

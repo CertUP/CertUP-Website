@@ -42,8 +42,10 @@ export default function Issuers() {
   }, []);
 
   const processReturn = async () => {
+    console.log('Issuers Page passed State', location.state);
     if (location.state?.projectId) {
       if (location.state?.step) setProjectStep(location.state?.step);
+      if (location.state?.show) setShowProject(true);
 
       //const project = await getProject(location.state?.projectId);
       console.log('projectId', location.state?.projectId);
