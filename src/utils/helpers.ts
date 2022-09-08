@@ -52,3 +52,17 @@ export const addHours = (date: Date, hours: number): Date => {
   date.setTime(date.getTime() + hours * 60 * 60 * 1000);
   return date;
 };
+
+export const getPickerFormat = (format: string) => {
+  switch (format) {
+    case 'nl':
+      return 'y/M/d';
+      break;
+    case 'en-GB':
+      return 'd/M/y';
+      break;
+    default:
+      return 'M/d/y';
+      break;
+  }
+};

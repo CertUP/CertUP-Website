@@ -42,15 +42,7 @@ import bg1 from '../../assets/bg1-thumb.jpg';
 import bg2 from '../../assets/bg2-thumb.jpg';
 import bg3 from '../../assets/bg3-thumb.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCoffee,
-  faTimesCircle,
-  faCoins,
-  faArrowRight,
-  faCloudArrowUp,
-  faFileArrowUp,
-  faCalendar,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faArrowRight, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import CUSelectButton from '../CUSelectButton';
 import CsvModal from '../CsvModal';
 
@@ -62,6 +54,7 @@ import CUTooltip from '../Tooltip';
 import '../../assets/DatePicker.css';
 import '../../assets/Calendar.css';
 import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
+import { getPickerFormat } from '../../utils/helpers';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -69,56 +62,6 @@ const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString
 
 type ButtonProps = JSX.IntrinsicElements['button'];
 type InputProps = JSX.IntrinsicElements['input'];
-
-const ExampleCustomInput = forwardRef<HTMLButtonElement, ButtonProps>(
-  // eslint-disable-next-line react/prop-types
-  ({ value, onClick }, ref) => {
-    return (
-      <button
-        type="button"
-        style={{
-          width: '100%',
-          background: '#F2F2F2',
-          borderRadius: '38px',
-          //textAlign: 'left',
-          border: '1px solid #ced4da',
-          padding: '6px 12px',
-          lineHeight: '1.5',
-          height: '36px',
-        }}
-        onClick={onClick}
-        ref={ref}
-      >
-        {value}
-      </button>
-    );
-  },
-);
-
-const TypeableDatePicker = forwardRef<HTMLInputElement, InputProps>(
-  // eslint-disable-next-line react/prop-types
-  ({ value, onClick }, ref) => {
-    return (
-      <input
-        type="text"
-        style={{
-          width: '100%',
-          background: '#F2F2F2',
-          borderRadius: '38px',
-          //textAlign: 'left',
-          border: '1px solid #ced4da',
-          padding: '6px 12px',
-          lineHeight: '1.5',
-          height: '36px',
-        }}
-        onClick={onClick}
-        //onChange={(e) => }
-        ref={ref}
-        value={value}
-      />
-    );
-  },
-);
 
 interface FormProps {
   pid?: string;
@@ -260,20 +203,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     const rprops: RenderProps = {
       ...renderProps,
       template: '2',
-      // templateBg: renderProps.templateBg,
-      // templateLayout: renderProps.templateLayout,
-      // certTitle: renderProps.certTitle,
-      // line1Text: renderProps.line1Text,
-      // line3Text: renderProps.line3Text,
-      // displayDob: renderProps.displayDob,
-      // dateFormat: renderProps.dateFormat,
-      // displayEmployer: false,
-      // employerText: '',
-      // companyName: renderProps.companyName,
-      // signer: renderProps.signer,
-      // signerTitle: renderProps.signerTitle,
-      // signerSignatureUri: renderProps.signerSignatureUri,
-      // companyLogoUri: renderProps.companyLogoUri,
     };
 
     return new Project({
@@ -301,19 +230,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   useEffect(() => {
     const run = async () => {
       const input: GenerateInput = {
-        // logoData: renderProps.company_logo_uri as string,
-        // fullName: `${participant.name} ${participant.surname}`,
-        // dob: participant.dob?.toDateString(),
-        // certNum: participant.cert_num,
-        // companyName: renderProps.company_name || 'CFI',
-        // issueDate: certInfo.issue_date ? certInfo.issue_date.toDateString() : undefined,
-        // expireDate: certInfo.expire_date ? certInfo.expire_date.toDateString() : undefined,
-        // certTitle: renderProps.cert_title,
-        // signer: renderProps.signer || 'John Smith',
-        // signerTitle: renderProps.signerTitle || 'Director',
-        // line1: renderProps.line1Text || 'This certifies that',
-        // line3: renderProps.line3Text || 'has completed Advanced Financial Training',
-        // templateBg: renderProps.templateBg || 1,
         renderProps: renderProps,
         certInfo: certInfo,
         participant: participantToRender(),
@@ -326,23 +242,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       });
     };
     run();
-  }, [
-    // templateBg,
-    // templateLayout,
-    participants[0],
-    renderProps,
-    certInfo.issue_date,
-    certInfo.expire_date,
-    // certTitle,
-    // line1Text,
-    // line3Text,
-    // companyName,
-    // companyLogoFile,
-    //   signer,
-    //   signerTitle,
-    //   issueDate,
-    //   expireDate,
-  ]);
+  }, [participants[0], renderProps, certInfo.issue_date, certInfo.expire_date]);
 
   const handleBack = () => {
     if (!dirty) backHandler();
@@ -634,7 +534,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                           clearIcon={null}
                           className={pErrors?.dob && `invalidSelection`}
                           calendarIcon={null}
-                          //customInput={<ExampleCustomInput />}
+                          format={getPickerFormat(renderProps.dateFormat)}
                         />
                       </Form.Group>
 
@@ -768,12 +668,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       value={certInfo.issue_date}
                       onChange={(date: Date) => updateCertInfo({ issue_date: date })}
                       clearIcon={null}
-                      // className={
-                      //   errors.issue_date
-                      //     ? `${styles.inputStyle} ${styles.invalidDate}`
-                      //     : styles.inputStyle
-                      // }
-                      //customInput={<TypeableDatePicker />}
+                      format={getPickerFormat(renderProps.dateFormat)}
+                      className={errors.issue_date && `invalidSelection`}
                     />
                   </Form.Group>
                 </Col>
@@ -794,8 +690,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         value={certInfo.expire_date}
                         onChange={(date: Date) => updateCertInfo({ expire_date: date })}
                         clearIcon={null}
-                        // className={styles.inputStyle}
-                        //customInput={<ExampleCustomInput />}
+                        format={getPickerFormat(renderProps.dateFormat)}
                       />
                     </Form.Group>
                     {certInfo.expire_date ? (

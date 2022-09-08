@@ -44,7 +44,6 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
   };
 
   useEffect(() => {
-    console.log('Effect', Rendering, NextRender);
     if (Rendering) return;
     if (NextRender) {
       render(NextRender);
