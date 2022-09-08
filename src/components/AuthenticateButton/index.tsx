@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Spinner } from 'react-bootstrap';
+
 import { toast } from 'react-toastify';
 import { useWallet } from '../../contexts';
 import { getLoginToken, getQueryPermit } from '../../utils/loginPermit';
 import CUButton from '../CUButton';
 
 import { useCookies } from 'react-cookie';
+import CUSpinner from '../CUSpinner';
 
 interface AButtonProps {
   callback?: () => void;
@@ -54,7 +55,7 @@ export function AuthenticateButton({ callback, issuer }: AButtonProps) {
         else handleAuthenticate();
       }}
     >
-      Authenticate {loading && <Spinner animation="border" variant="info" size="sm" />}
+      Authenticate {loading && <CUSpinner size="xs" />}
     </CUButton>
   );
 }

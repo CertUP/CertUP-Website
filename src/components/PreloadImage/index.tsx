@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Spinner } from 'react-bootstrap';
+
 import Image, { ImageProps } from 'react-bootstrap/Image';
 import { arrayBufferToDataURI, /*decryptFile,*/ ipfsDownload } from '../../utils/fileHelper';
+import CUSpinner from '../CUSpinner';
 
 import styles from './styles.module.scss';
 
@@ -45,13 +46,13 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
       <Image src={src} {...rest} />
 
       <div className={styles.centered}>
-        {loading ? (
+        {loading && (
           <>
-            <Spinner animation="border" variant="info" />
+            <CUSpinner size="lg" />
             <span>{status}</span>
           </>
-        ) : null}
-        {!loading && !src ? <span>Failed to Load Image</span> : null}
+        )}
+        {!loading && !src && <span>Failed to Load Image</span>}
       </div>
     </div>
   );

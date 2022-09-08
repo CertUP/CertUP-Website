@@ -24,7 +24,7 @@ import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
 import { CUButton } from '../../CUButton';
 import useQuery, { Snip721Approval } from '../../../hooks/QueryHook';
-import { Spinner } from 'react-bootstrap';
+
 import useExecute from '../../../hooks/ExecuteHook';
 import CopyButton from '../../CopyButton';
 import RemoveButton from '../RemoveButton';
@@ -32,6 +32,7 @@ import { toast } from 'react-toastify';
 import { Bech32 } from 'secretjs';
 import { useNft } from '../../../contexts/NftContext';
 import { useWallet } from '../../../contexts';
+import CUSpinner from '../../CUSpinner';
 
 interface props {
   show: boolean;
@@ -186,7 +187,8 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
                 ) : null}
                 <CUButton btnStyle="square" disabled={ProcessingTx} onClick={handleAllowAll}>
                   {loading === 'allowAll' ? (
-                    <Spinner animation="border" variant="info" size="sm" />
+                    // <CUSpinner size="xs" />
+                    <CUSpinner size="xs" />
                   ) : metadata?.private_metadata_is_public ? (
                     'Revoke Public Access'
                   ) : (
@@ -209,11 +211,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             <Row className="justify-content-center">
               <Col md="auto">
                 <CUButton btnStyle="square" onClick={handleGenCode} disabled={ProcessingTx}>
-                  {loading === 'genCode' ? (
-                    <Spinner animation="border" variant="info" size="sm" />
-                  ) : (
-                    'Generate New Code'
-                  )}
+                  {loading === 'genCode' ? <CUSpinner size="xs" /> : 'Generate New Code'}
                 </CUButton>
               </Col>
             </Row>
@@ -267,7 +265,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             </Row>
             <Row>
               {loadingApprovals || !metadata ? (
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="md" className="mx-4 mt-1" />
               ) : metadata.token_code_approvals.length ? (
                 <ul>
                   {metadata.token_code_approvals.map((wl, i) => {
@@ -307,7 +305,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             </Row>
             <Row>
               {loadingApprovals ? (
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="md" className="mx-4 mt-1" />
               ) : metadata?.token_approvals && metadata.token_approvals.length ? (
                 <ul style={{ padding: '0px 3px' }}>
                   {metadata.token_approvals.map((wl, i) => {

@@ -32,7 +32,6 @@ import MiniCircle from '../MiniCircle';
 import ImageDropzone from '../ImageDropzone';
 import { generateImage, GenerateInput, generateWithWait } from '../../utils/backendHelper';
 import { fileToDataURI } from '../../utils/fileHelper';
-import { Spinner } from 'react-bootstrap';
 
 import bg1 from '../../assets/bg1-thumb.jpg';
 import bg2 from '../../assets/bg2-thumb.jpg';
@@ -51,6 +50,7 @@ import { BatchNftDossier, NftDossier, ProjectToken } from '../../interfaces';
 import MetadataRow from '../MetadataRow';
 import ImageRow from '../ImageRow';
 import { Participant } from '../../interfaces/Project';
+import CUSpinner from '../CUSpinner';
 
 interface FormProps {
   pid?: string;
@@ -205,7 +205,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
         <Container>
           <Row className="justify-content-center mb-4">
             <Col xs="auto" className="text-center">
-              <Spinner animation="border" variant="info" />
+              <CUSpinner size="lg" />
               <h3>Loading Project Details</h3>
             </Col>
           </Row>
@@ -219,7 +219,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
           </h2>
           <h4>
             {loading ? (
-              <Spinner animation="border" variant="info" size="sm" />
+              <CUSpinner size="xs" />
             ) : (
               <>
                 {mintOverview?.minted_certs} /{' '}
@@ -272,7 +272,7 @@ export default function ProjectReview({ pid, step, backHandler }: FormProps) {
 
                   {loading ? (
                     <td style={{ width: '7%' }} className="text-center">
-                      <Spinner animation="border" variant="info" size="sm" />
+                      <CUSpinner size="xs" />
                     </td>
                   ) : token.minted ? (
                     <td style={{ color: 'green', width: '7%' }}>True</td>

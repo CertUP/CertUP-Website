@@ -18,7 +18,7 @@ import { BatchDossierResponse, IssuerData, NftDossier, PermitSignature } from '.
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form, Spinner } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
@@ -33,6 +33,7 @@ import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import { RestrictedAccess } from '../../components/RestrictedAccess';
+import CUSpinner from '../../components/CUSpinner';
 
 export default function Profile() {
   const {
@@ -179,7 +180,7 @@ export default function Profile() {
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
               >
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="lg" />
               </div>
             ) : (
               <>
@@ -301,10 +302,13 @@ export default function Profile() {
                           </Row>
                         </Form.Group>
                         <Row className="justify-content-center">
-                          <Col xs={3}>
+                          <Col xs="auto">
                             <CUButton btnStyle="square" type="submit" disabled={ProcessingTx}>
                               {loadingUpdate ? (
-                                <Spinner animation="border" variant="info" />
+                                <>
+                                  <span>Updating Profile</span>&nbsp;
+                                  <CUSpinner size="xs" />
+                                </>
                               ) : (
                                 'Update Profile'
                               )}

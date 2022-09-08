@@ -11,11 +11,12 @@ import ConnectBanner from '../../components/ConnectBanner';
 import { useEffect, useState } from 'react';
 import Project from '../../interfaces/Project';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Spinner } from 'react-bootstrap';
+
 import { ProgressBar } from '../../components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import PaymentRow, { Confirmation } from '../../components/PaymentRow';
+import CUSpinner from '../../components/CUSpinner';
 
 export default function Payment() {
   const { Wallet, Address, LoginToken, queryCredits, RemainingCerts } = useWallet();
@@ -44,9 +45,14 @@ export default function Payment() {
   const init = async () => {
     const credits = await queryCredits();
     console.log('Credits', credits);
-    if (credits && credits > location.state.num_certificates) {
-      navigate('/generate', { state: { projectId: location.state.projectId } });
-      return;
+    if (credits && credits >= location.state.num_certificates) {
+      //navigate('/generate', { state: { projectId: location.state.projectId } });
+      setPaid(true);
+      setConfirmation({
+        string: 'You have enough certificate credits for this project.',
+        number: '',
+      });
+      setLoading(false);
     }
     // calculateNumCerts();
     loadProject();
@@ -153,15 +159,17 @@ export default function Payment() {
                 {project?.project_name}
               </h3>
               <h5>{project?.participants.length} Certificates</h5>
-              {RemainingCerts && (
+              {RemainingCerts ? (
                 <h5 className="mt-3">You have {RemainingCerts} certificate credits.</h5>
-              )}
+              ) : null}
               <Image fluid src={project?.lastPreview} />
               <hr />
             </Col>
           </Row>
           {loading ? (
-            <Spinner animation="border" variant="info" />
+            <Row className="justify-content-center">
+              <CUSpinner size="xl" className="mt-4 pt-4" />
+            </Row>
           ) : paid ? (
             <>
               {confirmation ? (

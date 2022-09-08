@@ -14,10 +14,11 @@ import CoinbaseCommerceButton from 'react-coinbase-commerce';
 
 import btnStyles from '../CUButton/styles.module.scss';
 import useQuery from '../../hooks/QueryHook';
-import Spinner from 'react-bootstrap/Spinner';
+
 import CUSelectButton from '../CUSelectButton';
 
 import styles from './styles.module.scss';
+import CUSpinner from '../CUSpinner';
 
 export interface Confirmation {
   string: string;
@@ -226,10 +227,12 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
       <Row>
         <Col className="d-flex flex-column">
           <Row className="text-center my-4 justify-content-center">
-            <h4>Pay with $SCRT</h4>
+            <Row className="text-center mb-2">
+              <h4>Pay with $SCRT</h4>
+            </Row>
             {!totaluSCRT && (
               <Col xs="auto">
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="md" className="mb-2" />
               </Col>
             )}
 
@@ -306,13 +309,13 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
             </Row>
             <Row className="px-3">
               <p className="px-3 mb-0" style={{ color: '#333333' }}>
-                You will be redirected to Coinbase&apos;s cryptocurrency paayment gateway where you
+                You will be redirected to Coinbase&apos;s cryptocurrency payment gateway where you
                 can pay with a variety of coins and tokens.
               </p>
             </Row>
             {!chargeId && (
               <Col xs="auto">
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="md" className="mb-2" />
               </Col>
             )}
           </Row>

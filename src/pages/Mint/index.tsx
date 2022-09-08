@@ -17,7 +17,7 @@ import ProjectForm from '../../components/ProjectForm';
 import Project, { Participant, ProjectToCertList } from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form, Spinner } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
@@ -29,6 +29,7 @@ import dlExcel from '../../assets/dlExcel.svg';
 import * as XLSX from 'xlsx';
 import useExecute from '../../hooks/ExecuteHook';
 import { CertupExtension } from '../../interfaces/token';
+import CUSpinner from '../../components/CUSpinner';
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
@@ -300,11 +301,7 @@ export default function Mint() {
                 onClick={handleGenerate}
                 disabled={ProcessingTx || loading}
               >
-                {ProcessingTx || loading ? (
-                  <Spinner animation="border" variant="info" size="sm" />
-                ) : (
-                  'Generate'
-                )}
+                {ProcessingTx || loading ? <CUSpinner size="xs" /> : 'Generate'}
               </button>
             </Col>
           </Row>

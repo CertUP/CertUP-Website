@@ -7,7 +7,7 @@ import Project from '../../interfaces/Project';
 import styles from './styles.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { useProject } from '../../contexts';
-import { Spinner } from 'react-bootstrap';
+
 import useQuery from '../../hooks/QueryHook';
 import { PubIssuerData } from '../../interfaces';
 

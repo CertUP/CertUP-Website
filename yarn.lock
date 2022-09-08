@@ -10102,6 +10102,14 @@ react-cookie@^4.1.1:
     hoist-non-react-statics "^3.0.0"
     universal-cookie "^4.0.0"
 
+react-custom-image-loader.@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-custom-image-loader./-/react-custom-image-loader.-1.0.3.tgz#797350f52bc9db3a6a77c6f4b4eca06b45908269"
+  integrity sha512-VmiXzAYx3NT3h0sRc+FZqXBsOP3/qkmkwnhBpZK0tIhxs/N4RsZIhC5xRf8flErNk8ZYgqt0VLi2sKj9GedjJA==
+  dependencies:
+    prop-types "^15.7.2"
+    react "^16.12.0"
+
 react-date-picker@^8.4.0:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/react-date-picker/-/react-date-picker-8.4.0.tgz#2d166bbaa59b08ec8686f671fde553458d19f8c8"
@@ -10348,6 +10356,15 @@ react-transition-group@^4.4.2:
     "@babel/runtime" "^7.5.5"
     dom-helpers "^5.0.1"
     loose-envify "^1.4.0"
+    prop-types "^15.6.2"
+
+react@^16.12.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.14.0.tgz#94d776ddd0aaa37da3eda8fc5b6b18a4c9a3114d"
+  integrity sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
     prop-types "^15.6.2"
 
 react@^17.0.2:

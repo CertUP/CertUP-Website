@@ -36,7 +36,6 @@ import MiniCircle from '../MiniCircle';
 import ImageDropzone from '../ImageDropzone';
 import { generateImage, GenerateInput, generateWithWait } from '../../utils/backendHelper';
 import { fileToDataURI } from '../../utils/fileHelper';
-import { Spinner } from 'react-bootstrap';
 
 import bg1 from '../../assets/bg1-thumb.jpg';
 import bg2 from '../../assets/bg2-thumb.jpg';
@@ -55,6 +54,7 @@ import '../../assets/DatePicker.css';
 import '../../assets/Calendar.css';
 import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
 import { getPickerFormat } from '../../utils/helpers';
+import CUSpinner from '../CUSpinner';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -297,12 +297,12 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       await handleSave();
       console.log('remain', RemainingCerts);
 
-      if (RemainingCerts >= participants.length) {
-        navigate('/generate', { state: { projectId: projectId.current } });
-      } else
-        navigate('/payment', {
-          state: { num_certificates: participants.length, projectId: projectId.current },
-        });
+      // if (RemainingCerts >= participants.length) {
+      //   navigate('/generate', { state: { projectId: projectId.current } });
+      // } else
+      navigate('/payment', {
+        state: { num_certificates: participants.length, projectId: projectId.current },
+      });
     } catch (error) {
       console.error(error);
     }
@@ -1018,7 +1018,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Image src={LastRender} fluid={true} />
                 {Rendering ? (
                   <div className={styles.previewLoading}>
-                    <Spinner animation="border" variant="info" />
+                    <CUSpinner size="xxl" />
                   </div>
                 ) : null}
               </div>

@@ -17,7 +17,7 @@ import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfa
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Form, Spinner } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
@@ -43,6 +43,7 @@ import MetadataRow from '../../components/MetadataRow';
 import ImageRow from '../../components/ImageRow';
 import KeplrButton from '../../components/KeplrButton';
 import IssuerInfo from '../../components/IssuerInfo';
+import CUSpinner from '../../components/CUSpinner';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();
@@ -174,7 +175,7 @@ export default function ViewCert() {
             <Row style={{ flexGrow: '1' }} className="justify-content-center">
               <Col xs="auto" className="d-flex align-items-center">
                 {' '}
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="lg" />
               </Col>
             </Row>
           </Container>
@@ -292,10 +293,7 @@ export default function ViewCert() {
                             // onClick={handleWhitelist}
                             disabled={loadingAccessCode}
                           >
-                            Access{' '}
-                            {loadingAccessCode ? (
-                              <Spinner animation="border" variant="info" size="sm" />
-                            ) : null}
+                            Access {loadingAccessCode ? <CUSpinner size="xs" /> : null}
                           </CUButton>
                         </Col>
                       </Row>
@@ -350,7 +348,7 @@ export default function ViewCert() {
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
               >
-                <Spinner animation="border" />
+                <CUSpinner size="lg" />
               </div>
             </Row>
           ) : (
@@ -437,7 +435,7 @@ export default function ViewCert() {
             </>
           )}
 
-          {location.state?.tokenId ? (
+          {!!location.state?.tokenId && cert && (
             <Row className="mt-4">
               <Col md={'auto'}>
                 <CUButton btnStyle="square" onClick={handleBack}>
@@ -445,7 +443,7 @@ export default function ViewCert() {
                 </CUButton>
               </Col>
             </Row>
-          ) : null}
+          )}
         </Container>
       </Layout>
     </>

@@ -24,7 +24,7 @@ import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
 import { CUButton } from '../../CUButton';
 import useQuery, { Snip721Approval } from '../../../hooks/QueryHook';
-import { Spinner } from 'react-bootstrap';
+
 import useExecute from '../../../hooks/ExecuteHook';
 import CopyButton from '../../CopyButton';
 import RemoveButton from '../RemoveButton';

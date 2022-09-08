@@ -7,7 +7,8 @@ import Project from '../../interfaces/Project';
 import styles from './styles.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { useProject } from '../../contexts';
-import { Spinner } from 'react-bootstrap';
+
+import CUSpinner from '../CUSpinner';
 
 interface Props {
   projectIn: Project;
@@ -59,7 +60,7 @@ export default function ProjectTile({ projectIn, setProjectIdForm, setProjectIdR
             </Col>
             {LoadingMintedProjects ? (
               <Col xs={'auto'}>
-                <Spinner animation="border" variant="info" size="sm" />
+                <CUSpinner size="xs" />
               </Col>
             ) : minted ? (
               <>

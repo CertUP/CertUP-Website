@@ -7,7 +7,6 @@ import ConnectBanner from '../ConnectBanner';
 import { Spacer } from '../../components';
 import axios from 'axios';
 import { useWallet } from '../../contexts/WalletContext';
-import Spinner from 'react-bootstrap/Spinner';
 
 import styles from './styles.module.scss';
 import ProjectTile from '../ProjectTile';
@@ -16,6 +15,7 @@ import CUButton from '../CUButton';
 import { useProject } from '../../contexts/ProjectContext';
 import { Link } from 'react-router-dom';
 import { RestrictedAccess } from '../RestrictedAccess';
+import CUSpinner from '../CUSpinner';
 
 interface Props {
   setProjectIdForm: (projectId?: string) => void;
@@ -91,9 +91,9 @@ export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Pr
       <Container>
         <h3 className={styles.certsLabel}>Your Certificates</h3>
         {LoadingPendingProjects || LoadingRemainingCerts ? (
-          <Spinner animation="border" variant="info" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
+          <Row className="mx-4 px-4 my-4">
+            <CUSpinner size="lg" />
+          </Row>
         ) : PendingProjects.length ? (
           <Row className="">
             {PendingProjects.map((p, i) => (

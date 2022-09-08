@@ -18,7 +18,7 @@ import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfa
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form, Spinner } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
@@ -33,6 +33,7 @@ import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import useExecute from '../../hooks/ExecuteHook';
+import CUSpinner from '../../components/CUSpinner';
 
 export default function Access() {
   const [loadingMint, setLoadingMint] = useState(false);
@@ -164,7 +165,7 @@ export default function Access() {
                 onClick={handleMint}
                 disabled={ProcessingTx || loadingMint}
               >
-                Mint {loadingMint ? <Spinner animation="border" variant="info" size="sm" /> : null}
+                Mint {loadingMint ? <CUSpinner size="xs" /> : null}
               </button>
             </Col>
           </Row>
@@ -176,7 +177,7 @@ export default function Access() {
                 style={{ height: '10vh' }}
                 className="d-flex align-items-center justify-content-center"
               >
-                <Spinner animation="border" variant="info" />
+                <CUSpinner size="xl" className="mt-4 pt-4" />
               </div>
             ) : Dossiers.length ? (
               Dossiers.map((cert, index) => {
