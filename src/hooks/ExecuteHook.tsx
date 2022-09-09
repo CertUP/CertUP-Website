@@ -371,7 +371,7 @@ export default function useExecute() {
     });
 
     const response = await Client.tx.broadcast([depositMsg, sendMsg], {
-      gasLimit: 120000,
+      gasLimit: 480000,
       gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
     });
 

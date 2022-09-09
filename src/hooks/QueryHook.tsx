@@ -130,7 +130,7 @@ export default function useQuery() {
 
     checkError(response);
 
-    return parseInt(response.remaining_certs?.certs || '0', 10);
+    return parseInt(response?.remaining_certs?.certs || '0', 10);
   };
 
   const queryIssuerData = async (): Promise<IssuerData> => {
@@ -236,7 +236,7 @@ export default function useQuery() {
     checkError(response);
     console.log(response);
 
-    return response.list_projects?.data_list;
+    return response?.list_projects?.data_list;
   };
 
   const queryProjectData = async (projectId: string): Promise<ProjectToken[]> => {
