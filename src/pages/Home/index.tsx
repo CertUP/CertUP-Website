@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import bannerImage from '../../assets/BannerImage.svg';
+import bannerImage from '../../assets/BannerImage2.svg';
 import { Link } from 'react-router-dom';
 
 export default function Home() {

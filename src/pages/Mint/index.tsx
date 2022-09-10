@@ -51,7 +51,12 @@ function BackButton({ backHandler }: ButtonProps) {
 
 const generate = async (projectInput: Project): Promise<UploadResponse[]> => {
   const inputs = ProjectToCertList(projectInput);
-  const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
+  const hashes = await generateMultiple({
+    id: '2',
+    layoutId: projectInput.renderProps.templateLayout,
+    input: inputs,
+    upload: true,
+  });
   return hashes;
 };
 
@@ -62,8 +67,15 @@ export interface UploadResponse {
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
-  const { findProject, LoadingPendingProjects, PendingProjects, refreshPendingProjects } =
-    useProject();
+  const {
+    findProject,
+    LoadingPendingProjects,
+    PendingProjects,
+    refreshMintedProjects,
+    LoadingMintedProjects,
+    MintedProjects,
+    findMintedProject,
+  } = useProject();
   const { preloadCerts } = useExecute();
 
   const [project, setProject] = useState<Project>();
@@ -87,17 +99,30 @@ export default function Mint() {
   }, []);
 
   useEffect(() => {
-    if (LoadingPendingProjects || !PendingProjects.length) return;
+    if (
+      LoadingPendingProjects ||
+      !PendingProjects.length ||
+      LoadingMintedProjects ||
+      !MintedProjects.length
+    )
+      return;
     refreshProjectInfo();
-  }, [LoadingPendingProjects]);
+  }, [LoadingPendingProjects, LoadingMintedProjects]);
 
   const refreshProjectInfo = () => {
     // TODO check for empty project fields
     const foundProject = findProject(location.state?.projectId);
     if (!foundProject) {
       toast.error("Didn't find a project to mint, please try again.");
+      return;
     }
     setProject(foundProject);
+    const alreadyMintedProject = findMintedProject(location.state?.projectId);
+    if (alreadyMintedProject) {
+      toast.error('This project has already been loaded to the blockchain.');
+      setLoaded(true);
+      return;
+    }
   };
 
   const handleCancel = () => {
@@ -185,6 +210,7 @@ export default function Mint() {
         return;
       }
 
+      // refreshMintedProjects();
       setTxHash(result.transactionHash);
 
       const resultData = new TextDecoder('utf8').decode(result.data[0]);
@@ -269,7 +295,7 @@ export default function Mint() {
               <Row className="align-items-center mb-2">
                 <Col xs="auto" className="px-0">
                   <h4
-                    className={!imageHashes.length ? styles.activeStep : undefined}
+                    className={!imageHashes.length && !loaded ? styles.activeStep : undefined}
                     style={{ display: 'inline-block', marginBottom: 0 }}
                   >
                     Step 1
@@ -296,11 +322,11 @@ export default function Mint() {
                         : styles.cancelBtn
                     }
                     onClick={handleGenerate}
-                    disabled={loadingGenerate || !!imageHashes.length || !project}
+                    disabled={loadingGenerate || !!imageHashes.length || !project || loaded}
                   >
                     {loadingGenerate ? (
                       <>Processing</>
-                    ) : imageHashes.length ? (
+                    ) : imageHashes.length || loaded ? (
                       'Complete'
                     ) : (
                       'Generate'
@@ -358,13 +384,15 @@ export default function Mint() {
                         Complete
                       </button>
                       <br />
-                      <a
-                        href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View Transaction →
-                      </a>
+                      {!!txHash && (
+                        <a
+                          href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View Transaction →
+                        </a>
+                      )}
                     </>
                   ) : (
                     <button

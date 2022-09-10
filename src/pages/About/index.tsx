@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import exampleCert from '../../assets/ExampleCert.svg';
-import triviumLogo from '../../assets/triviumcolor.png';
+import triviumLogo from '../../assets/triviumcolor.svg';
 import alterLogo from '../../assets/alterlogo.png';
 import { Link } from 'react-router-dom';
 
