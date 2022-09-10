@@ -18,7 +18,7 @@ export default function Footer() {
     <div className={styles.footerContainer}>
       <Container>
         <Row>
-          <Col md={3}>
+          <Col md={{ span: 3, offset: 0 }} xs={{ span: 8, offset: 3 }}>
             <Row className="mb-4" style={{ paddingTop: '55px', width: '70%' }}>
               <Image src={logo} fluid={true} />
             </Row>
@@ -58,9 +58,9 @@ export default function Footer() {
               </Col>
             </Row>
           </Col>
-          <Col md={6} className={styles.mainLinkContainer}>
+          <Col md={6} xs={12} className={styles.mainLinkContainer}>
             <Row style={{ paddingTop: '75px' }} className="justify-content-around">
-              <Col md={5}>
+              <Col sm={5} xs={6}>
                 <Link to="/">
                   <span className={styles.navItem}>Home</span>
                 </Link>
@@ -75,7 +75,7 @@ export default function Footer() {
                   <span className={styles.navItem}>Contact</span>
                 </Link>
               </Col>
-              <Col md={5}>
+              <Col sm={5} xs={6}>
                 <Link to="/issuers">
                   <span className={styles.navItem}>Issue Certificate</span>
                 </Link>
@@ -87,10 +87,12 @@ export default function Footer() {
               </Col>
             </Row>
           </Col>
-          <Col md={3} className="d-flex flex-column justify-content-end align-items-center">
+          <Col md={3} xs={12} className="d-flex flex-column justify-content-end align-items-center">
+            <div className="d-md-none mt-4 mb-4" />
             <a href="https://scrt.network">
               <Image src="/securedby.png" style={{ height: '75px' }} />
             </a>
+            <div className="d-md-none mt-4" />
           </Col>
         </Row>
       </Container>
