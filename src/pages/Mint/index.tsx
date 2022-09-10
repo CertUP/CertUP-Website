@@ -68,7 +68,7 @@ function BackButton({ backHandler }: ButtonProps) {
   );
 }
 
-const generate = async (projectInput: Project): Promise<string[]> => {
+const generate = async (projectInput: Project): Promise<UploadResponse[]> => {
   const inputs = ProjectToCertList(projectInput);
 
   const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
@@ -77,6 +77,11 @@ const generate = async (projectInput: Project): Promise<string[]> => {
   return hashes;
 };
 
+export interface UploadResponse {
+  hash: string;
+  key: string;
+}
+
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
   const { findProject, LoadingPendingProjects, PendingProjects, refreshPendingProjects } =
@@ -84,7 +89,7 @@ export default function Mint() {
   const { preloadCerts } = useExecute();
 
   const [project, setProject] = useState<Project>();
-  const [imageHashes, setImageHashes] = useState<string[]>([]);
+  const [imageHashes, setImageHashes] = useState<UploadResponse[]>([]);
   const [loadingGenerate, setLoadingGenerate] = useState<boolean>(false);
   const [loadingPreload, setLoadingPreload] = useState<boolean>(false);
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -130,18 +135,24 @@ export default function Mint() {
     if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
     if (!project.certInfo.issue_date) throw new Error('Project must have an issue date.');
 
-    setLoadingGenerate(true);
+    try {
+      setLoadingGenerate(true);
 
-    const toastRef = toast.loading('Generating Certificate Images...');
-    let hashes: string[];
-    if (imageHashes.length) hashes = imageHashes;
-    else {
-      hashes = await generate(project);
-      setImageHashes(hashes);
-      console.log('dklvbnmjkldfbndfjkn', hashes);
+      const toastRef = toast.loading('Generating Certificate Images...');
+      let hashes: UploadResponse[];
+      if (imageHashes.length) hashes = imageHashes;
+      else {
+        hashes = await generate(project);
+        setImageHashes(hashes);
+        console.log('dklvbnmjkldfbndfjkn', hashes);
+      }
+      toast.update(toastRef, SuccessToast);
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.toString());
     }
+
     setLoadingGenerate(false);
-    toast.update(toastRef, SuccessToast);
   };
 
   const handlePreload = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -229,9 +240,9 @@ export default function Mint() {
           // };
           const { pubMeta, privMeta } = participantToExtensions(
             participant,
-            imageHashes[i],
             project.certInfo,
             project.renderProps,
+            imageHashes[i],
           );
 
           return {

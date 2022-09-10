@@ -3,6 +3,7 @@ import { ProjectToken } from '../interfaces';
 import Project, { Participant, CertInfo, RenderProps } from '../interfaces/Project';
 import { CertupExtension } from '../interfaces/token';
 import * as XLSX from 'xlsx';
+import { UploadResponse } from '../pages/Mint';
 
 export const changeThisFunction = () => {
   return 'change me'; // TODO: CHANGE HERE
@@ -73,9 +74,9 @@ export const getPickerFormat = (format: string) => {
 
 export const participantToExtensions = (
   participant: Participant,
-  hash: string,
   certInfo: CertInfo,
   renderProps: RenderProps,
+  hashPair?: UploadResponse,
 ) => {
   const pubMeta: CertupExtension = {
     certificate: { cert_number: participant.cert_num },
@@ -134,23 +135,25 @@ export const participantToExtensions = (
         value: certInfo.issue_date.toDateString(),
       },
     ],
-    media: [
-      {
-        file_type: 'image/png',
-        extension: 'png',
-        // authentication: {
-        //   key: 'TO DO',
-        // },
-        url: `https://ipfs.io/ipfs/${hash}`,
-      },
-    ],
+    media: hashPair
+      ? [
+          {
+            file_type: 'image/png',
+            extension: 'png',
+            authentication: {
+              key: hashPair.key,
+            },
+            url: `https://ipfs.io/ipfs/${hashPair.hash}`,
+          },
+        ]
+      : undefined,
     protected_attributes: [],
   };
 
   return { pubMeta, privMeta };
 };
 
-export const projectToPreload = (project: Project, hashes?: string[]): ProjectToken[] => {
+export const projectToPreload = (project: Project, hashes?: UploadResponse[]): ProjectToken[] => {
   const response: ProjectToken[] = [];
 
   for (let i = 0; i < project.participants.length; i++) {
@@ -158,9 +161,9 @@ export const projectToPreload = (project: Project, hashes?: string[]): ProjectTo
 
     const { pubMeta, privMeta } = participantToExtensions(
       participant,
-      hashes && hashes.length ? hashes[i] : 'undefined',
       project.certInfo,
       project.renderProps,
+      hashes && hashes.length ? hashes[i] : undefined,
     );
 
     const token: ProjectToken = {

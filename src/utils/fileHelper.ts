@@ -110,6 +110,7 @@ export const decryptFile = (input: Uint8Array, key: string) => {
     decipher.setAuthTag(authTag);
     return Buffer.concat([decipher.update(dataBuffer.slice(ivSize + 17)), decipher.final()]);
   } catch (error: any) {
+    console.error(error);
     if (error.toString().includes('invalid key length')) return input;
     else throw error;
   }

@@ -23,11 +23,12 @@ import Project, {
 import { participantsToWorksheet, projectToPreload } from '../../utils/helpers';
 
 import styles from './styles.module.scss';
+import { UploadResponse } from '../../pages/Mint';
 
 interface ViewerProps {
   pid: string;
   step?: string;
-  hashes?: string[];
+  hashes?: UploadResponse[];
   pData?: Project;
 }
 
