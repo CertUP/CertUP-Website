@@ -56,7 +56,8 @@ export default function About() {
         <Container>
           <span className={styles.aboutSubtitle}>Team</span>
           <Row className="mx-2 mt-4 justify-content-around">
-            <div className={styles.teamDiv}>
+            <Col md={4} sm={5} xs={6}>
+              {/* <div className={styles.teamDiv}> */}
               <Row>
                 <h3>Trivium</h3>
                 <Row className="justify-content-center">
@@ -70,8 +71,10 @@ export default function About() {
               <Row className="text-end">
                 <a href="https://trivium.network">https://trivium.network</a>
               </Row>
-            </div>
-            <div className={styles.teamDiv}>
+            </Col>
+            {/* </div> */}
+            {/* <div className={styles.teamDiv}> */}
+            <Col md={4} sm={5} xs={6}>
               <Row>
                 <h3>ALTER</h3>
                 <Row className="justify-content-center">
@@ -85,7 +88,8 @@ export default function About() {
               <Row className="text-end">
                 <a href="https://altermail.live">https://altermail.live</a>
               </Row>
-            </div>
+            </Col>
+            {/* </div> */}
           </Row>
         </Container>
 
