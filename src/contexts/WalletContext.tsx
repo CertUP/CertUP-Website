@@ -141,14 +141,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     permit,
     force = false,
   }: UpdateClientProps) => {
-    console.log('Update Client', {
-      client,
-      wallet,
-      address,
-      token,
-      permit,
-      force,
-    });
     if (client || force) setClient(client);
     if (wallet || force) setWallet(wallet);
     if (address || force) setAddress(address || '');
@@ -173,7 +165,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   };
 
   const getQuerier = async () => {
-    console.log('Getting Querier');
     const querier = await SecretNetworkClient.create({
       grpcWebUrl: process.env.REACT_APP_GRPC_URL,
       chainId: process.env.REACT_APP_CHAIN_ID,
@@ -182,10 +173,8 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   };
 
   const getDummy = async () => {
-    console.log('Getting Simulator');
     const dWallet = new SJSWallet('dont use this wallet');
     const dAddress = dWallet.address;
-    console.log('Simulation Wallet:', dAddress);
     const dClient = await SecretNetworkClient.create({
       grpcWebUrl: process.env.REACT_APP_GRPC_URL,
       chainId: process.env.REACT_APP_CHAIN_ID,
@@ -203,8 +192,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   const queryCredits = async (queryPermit = QueryPermit): Promise<number | undefined> => {
     if (!queryPermit) return;
     setLoadingRemainingCerts(true);
-
-    console.log('Updating Remaining Certs...');
 
     const query = {
       with_permit: {

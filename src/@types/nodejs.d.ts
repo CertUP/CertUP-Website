@@ -14,5 +14,7 @@ declare namespace NodeJS {
     REACT_APP_SNIP20_HASH: string;
 
     REACT_APP_BACKEND: string;
+
+    REACT_APP_EXPLORER_URL: string;
   }
 }

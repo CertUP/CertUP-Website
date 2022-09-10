@@ -278,3 +278,8 @@ export type ComputeTx = {
   readonly gasUsed: number;
   readonly gasWanted: number;
 };
+
+export interface MintOverview {
+  minted_certs: string;
+  pending_certs: string;
+}

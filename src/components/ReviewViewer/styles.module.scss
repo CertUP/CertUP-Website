@@ -1,0 +1,64 @@
+@use '../../global/_variables.scss' as vars;
+
+.selectedRow {
+  //background-color: #55f4c5;
+  background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
+    vars.$certupGradient;
+}
+.selectedRow:hover {
+  //background-color: #55f4c5;
+  background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
+    vars.$certupGradient !important;
+}
+
+.unselectedRow:hover {
+  background-image: vars.$lightCertupGradient;
+  cursor: pointer;
+}
+
+.fixed_header {
+  // width: 400px;
+  // table-layout: fixed;
+  width: 100%;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.fixed_header tbody {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 50vh;
+  width: 100%;
+}
+
+.fixed_header thead tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.fixed_header tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-width: 0;
+}
+
+// .fixed_header thead {
+//   background: black;
+//   color:#fff;
+// }
+
+// .fixed_header th, .fixed_header td {
+//   padding: 5px;
+//   text-align: left;
+//   width: 200px;
+// }
+
+// .reviewTable {
+//   display: block;
+//   overflow-y: auto;    /* Trigger vertical scroll    */
+//   overflow-x: hidden;  /* Hide the horizontal scroll */
+//   height: 100%;
+// }

@@ -6,11 +6,12 @@ import CU_COnly from '../../assets/cOnlySq.svg';
 import styles from './styles.module.scss';
 
 export interface SpinnerProps {
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'custom';
+  customSize?: number;
   style?: any;
   className?: string;
 }
-export const CUSpinner = ({ size, style, className }: SpinnerProps) => {
+export const CUSpinner = ({ size, style, className, customSize = 50 }: SpinnerProps) => {
   let width = '50px';
   switch (size) {
     case 'xs':
@@ -30,6 +31,9 @@ export const CUSpinner = ({ size, style, className }: SpinnerProps) => {
       break;
     case 'xxl':
       width = '200px';
+      break;
+    case 'custom':
+      width = `${customSize}px`;
       break;
     default:
       width = '50px';

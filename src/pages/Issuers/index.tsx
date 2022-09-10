@@ -14,14 +14,14 @@ import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
 import Project from '../../interfaces/Project';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { PreviewProvider } from '../../contexts/PreviewContext';
-import ProjectReview from '../../components/ProjectReview';
+import ProjectReview from '../ProjectReview';
+import ReviewViewer from '../../components/ReviewViewer';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
-  const [showReview, setShowReview] = useState(false);
   //const [projectInfo, setProjectInfo] = useState<Project | undefined>();
   const [projectId, setProjectId] = useState<string>();
   const [projectStep, setProjectStep] = useState();
@@ -36,6 +36,7 @@ export default function Issuers() {
   } = useWallet();
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     processReturn();
@@ -72,14 +73,12 @@ export default function Issuers() {
   };
 
   const setReview = (projectId?: string) => {
-    setProjectId(projectId);
-    setShowReview(true);
+    navigate(`/issuers/review/${projectId}`, { state: { projectId: projectId } });
   };
 
   const showList = () => {
     setProjectId(undefined);
     setShowProject(false);
-    setShowReview(false);
   };
 
   if (!Wallet || !Address || !LoginToken)
@@ -109,14 +108,6 @@ export default function Issuers() {
         <PreviewProvider>
           <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
         </PreviewProvider>
-      </Layout>
-    );
-
-  if (showReview)
-    return (
-      <Layout>
-        <Spacer height={100} />
-        <ProjectReview pid={projectId} backHandler={showList} step={projectStep} />
       </Layout>
     );
 

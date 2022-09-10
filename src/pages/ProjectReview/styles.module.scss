@@ -227,18 +227,29 @@ $gradient3: #a659f3;
   // width: 400px;
   // table-layout: fixed;
   width: 100%;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
 .fixed_header tbody {
   display: block;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   max-height: 50vh;
   width: 100%;
 }
 
 .fixed_header thead tr {
-  display: block;
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.fixed_header tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  border-width: 0;
 }
 
 // .fixed_header thead {

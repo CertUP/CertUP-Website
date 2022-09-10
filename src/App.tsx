@@ -15,6 +15,7 @@ import Mint from './pages/Mint';
 import { NftProvider } from './contexts/NftContext';
 import Profile from './pages/Profile';
 import Contact from './pages/Contact';
+import ProjectReview from './pages/ProjectReview';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
               <Route path="/clients" element={<Clients />} />
               <Route path="/guide" element={<Guide />} />
               <Route path="/issuers" element={<Issuers />} />
+              <Route path="/issuers/review/:projectid" element={<ProjectReview />} />
               <Route path="/addCredit" element={<AddCredit />} />
               <Route path="/generate" element={<Mint />} />
               <Route path="/access" element={<Access />} />

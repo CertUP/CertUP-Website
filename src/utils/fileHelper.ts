@@ -24,19 +24,20 @@ const IV_LENGTH = 16;
 
 const ipfsMirrors = [
   'ipfs.trivium.network',
-  'infura-ipfs.io',
-  'dweb.link',
-  'ipfs.fleek.co',
-  'cloudflare-ipfs.com',
-  'gateway.pinata.cloud',
-  'cf-ipfs.com',
-  'ipfs.io',
-  'gateway.ipfs.io',
-  'nftstorage.link',
-  'storry.tv',
+  // 'infura-ipfs.io',
+  // 'dweb.link',
+  // 'ipfs.fleek.co',
+  // 'cloudflare-ipfs.com',
+  // 'gateway.pinata.cloud',
+  // 'cf-ipfs.com',
+  // 'ipfs.io',
+  // 'gateway.ipfs.io',
+  // 'nftstorage.link',
+  // 'storry.tv',
 ];
 
 export const ipfsDownload = async (url: string) => {
+  if (url.includes('/ipfs/undefined')) return;
   if (!url.includes('ipfs.io')) return await download(url);
   let final;
 

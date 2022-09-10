@@ -34,10 +34,10 @@ interface Props {
 // set default values for initializing
 const contextDefaultValues: ProjectContextState = {
   PendingProjects: [],
-  LoadingPendingProjects: true,
+  LoadingPendingProjects: false,
 
   MintedProjects: [],
-  LoadingMintedProjects: true,
+  LoadingMintedProjects: false,
 
   refreshProjects: function (): void {
     throw new Error('Function not implemented.');
@@ -92,8 +92,13 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   useEffect(() => {
     if (!Address || !LoginToken || !QueryPermit || !VerifiedIssuer) return;
-    refreshProjects();
-  }, [LoginToken, Address, QueryPermit, VerifiedIssuer]);
+    refreshPendingProjects();
+  }, [Address, LoginToken, VerifiedIssuer]);
+
+  useEffect(() => {
+    if (!Address || !QueryPermit || !VerifiedIssuer) return;
+    refreshMintedProjects(true);
+  }, [Address, QueryPermit, VerifiedIssuer]);
 
   const refreshProjects = () => {
     refreshPendingProjects();
@@ -137,6 +142,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
     setPendingProjects(projects);
     setLoadingPending(false);
+    return projects;
   };
 
   const refreshMintedProjects = async (force = false) => {
@@ -179,12 +185,13 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   const findProject = (id: string): Project | undefined => {
     const data = PendingProjects;
 
+    console.log('All Projects', data);
+
     // find the item's index to remove it
     const project = data.find((Project) => Project._id === id);
 
     // to check if the item exist in the list
     if (!project) {
-      alert('No project found in the list');
       return;
     }
 

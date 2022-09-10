@@ -47,3 +47,70 @@ $gradient3: #a659f3;
 .cancelBtn:disabled {
   box-shadow: 0 0 6px 0 $gradient1;
 }
+
+.processingButton {
+  animation: 2s linear 0s infinite normal none running colorAnimation;
+
+  color: #999999be;
+}
+
+@keyframes shadowAnimation {
+  0% {
+    box-shadow: 2px 1000px 1px #fff inset;
+  }
+  25% {
+    box-shadow: none;
+  }
+  50% {
+    box-shadow: 2px 1000px 1px #fff inset;
+  }
+  75% {
+    box-shadow: none;
+  }
+  100% {
+    box-shadow: 2px 1000px 1px #fff inset;
+  }
+}
+
+@keyframes colorAnimation {
+  0% {
+    color: #666666;
+  }
+  25% {
+    color: #66666699;
+  }
+  50% {
+    color: #66666640;
+  }
+  75% {
+    color: #66666699;
+  }
+  100% {
+    color: #666666;
+  }
+}
+
+.stepColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.stepColumnLeft {
+  border-right: 0.5px solid #bbbbbb;
+}
+
+.stepColumnRight {
+  border-left: 0.5px solid #bbbbbb;
+}
+
+.activeStep {
+  // background-color: #31b5c7;
+  color: #31b5c770 !important;
+  background-image: vars.$certupGradient;
+  background-size: 10%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+}

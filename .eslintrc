@@ -31,7 +31,8 @@
     "radix": "warn",
     "space-before-blocks": "warn",
     "import/prefer-default-export": "off",
-    "prettier/prettier": "warn"
+    "prettier/prettier": "warn",
+    "no-control-regex": 0
   },
   "overrides": [
     {
