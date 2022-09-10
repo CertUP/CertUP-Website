@@ -1,46 +1,27 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, Spacer } from '../../components';
+import { Spacer } from '../../components';
 import Layout from '../../components/Layout';
-import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import exampleCert from '../../assets/ExampleCert.svg';
 import { useProject, useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
-import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
-import ProjectForm from '../../components/ProjectForm';
-import Project, {
-  CertInfo,
-  Participant,
-  ProjectToCertList,
-  RenderProps,
-} from '../../interfaces/Project';
-import axios from 'axios';
+import Project, { ProjectToCertList } from '../../interfaces/Project';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
-import { Tx } from 'secretjs';
 import { toast } from 'react-toastify';
-import StepNumber from '../../components/StepNumber';
 import { ProgressBar } from '../../components';
-import Table from 'react-bootstrap/Table';
-import { GenerateInput, generateMultiple } from '../../utils/backendHelper';
+import { generateMultiple } from '../../utils/backendHelper';
 import { SuccessToast, ToastProps } from '../../utils/toastHelper';
-import * as XLSX from 'xlsx';
 import useExecute from '../../hooks/ExecuteHook';
-import { CertupExtension } from '../../interfaces/token';
 import CUSpinner from '../../components/CUSpinner';
-import { participantsToWorksheet, participantToExtensions } from '../../utils/helpers';
-import ProjectReview from '../ProjectReview';
+import { participantToExtensions } from '../../utils/helpers';
 import ReviewViewer from '../../components/ReviewViewer';
 
 //@ts-ignore
 import textEncoding from 'text-encoding';
-// const textEncoding = require('text-encoding');
 const TextDecoder = textEncoding.TextDecoder;
 
 interface ButtonProps {
@@ -70,10 +51,7 @@ function BackButton({ backHandler }: ButtonProps) {
 
 const generate = async (projectInput: Project): Promise<UploadResponse[]> => {
   const inputs = ProjectToCertList(projectInput);
-
   const hashes = await generateMultiple({ id: '2', input: inputs, upload: true });
-  // hashes.map((e: string) => console.log(`https://ipfs.trivium.network/ipfs/${e}`));
-  //setHashes(hashes);
   return hashes;
 };
 
@@ -135,21 +113,25 @@ export default function Mint() {
     if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
     if (!project.certInfo.issue_date) throw new Error('Project must have an issue date.');
 
-    try {
-      setLoadingGenerate(true);
+    setLoadingGenerate(true);
+    const toastRef = toast.loading('Generating Certificate Images...');
 
-      const toastRef = toast.loading('Generating Certificate Images...');
+    try {
       let hashes: UploadResponse[];
       if (imageHashes.length) hashes = imageHashes;
       else {
         hashes = await generate(project);
         setImageHashes(hashes);
-        console.log('dklvbnmjkldfbndfjkn', hashes);
       }
       toast.update(toastRef, SuccessToast);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.toString());
+      toast.update(toastRef, {
+        render: error.toString(),
+        type: 'error',
+        isLoading: false,
+        autoClose: 70000,
+      });
     }
 
     setLoadingGenerate(false);
@@ -165,79 +147,9 @@ export default function Mint() {
 
       setLoadingPreload(true);
       const toastRef = toast.loading('Processing Transaction...');
-      //toast.update(toastRef, { render: 'Processing Transaction...' });
       let result;
       try {
         const newData = project?.participants.map((participant, i) => {
-          // const pubMeta: CertupExtension = {
-          //   certificate: { cert_number: participant.cert_num },
-          //   description: project.certInfo.pub_description,
-          //   protected_attributes: [],
-          // };
-
-          // const privMeta: CertupExtension = {
-          //   description: project.certInfo.priv_description,
-          //   certificate: {
-          //     name: project.certInfo.cert_name,
-          //     cert_type: project.renderProps.certTitle,
-          //     issue_date: project.certInfo?.issue_date.toISOString() as string,
-          //     cert_number: participant.cert_num,
-          //   },
-          //   certified_individual: {
-          //     first_name: participant.name,
-          //     last_name: participant.surname,
-          //     date_of_birth: participant.dob?.toISOString(),
-          //   },
-          //   issuing_organizations: [
-          //     {
-          //       name: project.renderProps.companyName,
-          //       //url: 'https://cfi.org',
-          //     },
-          //   ],
-          //   issuing_individuals: [
-          //     {
-          //       name: project.renderProps.signer,
-          //       company: project.renderProps.companyName,
-          //       title: project.renderProps.signerTitle,
-          //     },
-          //   ],
-          //   // inclusions: [
-          //   //   {
-          //   //     type: 'Course',
-          //   //     name: 'Introduction to Finance',
-          //   //     value: '89.4',
-          //   //   },
-          //   //   {
-          //   //     type: 'Instructor',
-          //   //     name: 'Jane Smith',
-          //   //   },
-          //   // ],
-          //   attributes: [
-          //     {
-          //       trait_type: 'Certificate Number',
-          //       value: participant.cert_num,
-          //     },
-          //     {
-          //       trait_type: 'Certificate Name',
-          //       value: project.certInfo.cert_name,
-          //     },
-          //     {
-          //       trait_type: 'Issue Date',
-          //       value: project.certInfo.issue_date.toDateString(),
-          //     },
-          //   ],
-          //   media: [
-          //     {
-          //       file_type: 'image/png',
-          //       extension: 'png',
-          //       // authentication: {
-          //       //   key: 'TO DO',
-          //       // },
-          //       url: `https://ipfs.io/ipfs/${hashes[i]}`,
-          //     },
-          //   ],
-          //   protected_attributes: [],
-          // };
           const { pubMeta, privMeta } = participantToExtensions(
             participant,
             project.certInfo,
@@ -264,7 +176,7 @@ export default function Mint() {
       } catch (error: any) {
         console.error(error);
         setLoadingPreload(false);
-        //toast.update(toastRef, new ToastProps(error.toString(), 'error'));
+        toast.update(toastRef, new ToastProps(error.toString(), 'error'));
       }
 
       console.log('TX Result', result);
@@ -304,8 +216,6 @@ export default function Mint() {
 
         participant.claim_code = claimCode;
       }
-
-      console.log(newParticipants);
 
       const newProject = new Project({
         ...project,
