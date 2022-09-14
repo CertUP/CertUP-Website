@@ -184,20 +184,25 @@ export default function Profile() {
               </div>
             ) : (
               <>
-                <Row className="justify-content-around">
+                <Row className="justify-content-center">
                   <Col md="auto">
                     <div className={`${styles.largeLabel} mb-2`} style={{ fontWeight: '600' }}>
                       Logo:
                     </div>
-                    <div className="mx-4">
-                      <Image src={newIssuerData?.logo_img_url} fluid />
-                    </div>
+                    <Row className="mx-4 text-center">
+                      <Image
+                        src={newIssuerData?.logo_img_url}
+                        fluid
+                        style={{ maxHeight: '35vh' }}
+                      />
+                    </Row>
                   </Col>
                   <Col md="auto">
-                    <h6 className={`d-inline ${styles.smallLabel}`}>Address:</h6> {Address}
+                    <h6 className={`d-inline ${styles.smallLabel}`}>Address:</h6>{' '}
+                    <span className={styles.lineBreak}>{Address}</span>
                     <br />
                     <h6 className={`d-inline ${styles.smallLabel}`}>Issuer ID:</h6>{' '}
-                    {IssuerProfile?.id}
+                    <span className={styles.lineBreak}>{IssuerProfile?.id}</span>
                     <br />
                     <h6 className={`d-inline ${styles.smallLabel}`}>Certs Issued:</h6>{' '}
                     {IssuerProfile?.certs_issued}
@@ -214,14 +219,18 @@ export default function Profile() {
                     className={`justify-content-center ${styles.certupInputForm}`}
                     onSubmit={handleUpdate}
                   >
-                    <Col md={{ span: 8, offset: 2 }} xs={12}>
+                    <Col xs={{ span: 12, offset: 0 }} lg={{ span: 8, offset: 2 }}>
                       <Row className="justify-content-center mt-4 pt-4">
                         <Form.Group as={Col} md="12" controlId="validationCustom01">
                           <Row className="mb-4" style={{ width: '100%' }}>
-                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                            <Col
+                              style={{ paddingTop: '0vh' }}
+                              xs={{ span: 4, offset: 4 }}
+                              md={{ span: 2, offset: 1 }}
+                            >
                               <Form.Label className={`${styles.largeLabel} mb-0`}>Name</Form.Label>
                             </Col>
-                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                            <Col style={{ paddingTop: '0vh' }} xs={12} md={8}>
                               <Form.Control
                                 required
                                 value={newIssuerData?.name}
@@ -246,12 +255,16 @@ export default function Profile() {
                       <Row className="justify-content-center">
                         <Form.Group as={Col} md="12" controlId="validationCustom01">
                           <Row className="mb-4" style={{ width: '100%' }}>
-                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                            <Col
+                              style={{ paddingTop: '0vh' }}
+                              xs={{ span: 4, offset: 4 }}
+                              md={{ span: 2, offset: 1 }}
+                            >
                               <Form.Label className={`${styles.largeLabel} mb-0`}>
                                 Website
                               </Form.Label>
                             </Col>
-                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                            <Col style={{ paddingTop: '0vh' }} xs={12} md={8}>
                               <Form.Control
                                 required
                                 value={newIssuerData?.website}
@@ -276,12 +289,16 @@ export default function Profile() {
                       <Row className="justify-content-center">
                         <Form.Group as={Col} md="12" controlId="validationCustom01">
                           <Row className="mb-4" style={{ width: '100%' }}>
-                            <Col style={{ paddingTop: '0vh' }} xs={{ span: 2, offset: 1 }}>
+                            <Col
+                              style={{ paddingTop: '0vh' }}
+                              xs={{ span: 4, offset: 4 }}
+                              md={{ span: 2, offset: 1 }}
+                            >
                               <Form.Label className={`${styles.largeLabel} mb-0`}>
                                 Logo URL
                               </Form.Label>
                             </Col>
-                            <Col style={{ paddingTop: '0vh' }} xs={8}>
+                            <Col style={{ paddingTop: '0vh' }} xs={12} md={8}>
                               <Form.Control
                                 required
                                 value={newIssuerData?.logo_img_url}
