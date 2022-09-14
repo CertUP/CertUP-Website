@@ -24,6 +24,8 @@ import { participantsToWorksheet, projectToPreload } from '../../utils/helpers';
 
 import styles from './styles.module.scss';
 import { UploadResponse } from '../../pages/Mint';
+import IssuerInfo from '../IssuerInfo';
+import { Link } from 'react-router-dom';
 
 interface ViewerProps {
   pid: string;
@@ -33,7 +35,8 @@ interface ViewerProps {
 }
 
 export default function ReviewViewer({ pid, step, hashes, pData }: ViewerProps) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts, IssuerProfile } =
+    useWallet();
   const scrollBarWidth = useScrollbarWidth();
   const {
     findProject,
@@ -146,30 +149,46 @@ export default function ReviewViewer({ pid, step, hashes, pData }: ViewerProps) 
         </Container>
       )}
       <Container>
-        <Row className="text-center mb-4">
-          <h2>
-            <span style={{ fontWeight: '700' }}>Project: </span>
-            {projectInfo?.project_name}
-          </h2>
-          {mintOverview ? (
-            <h4>
-              {loading ? (
-                <CUSpinner size="xs" />
-              ) : (
-                <>
-                  {mintOverview?.minted_certs} /{' '}
-                  {parseInt(mintOverview?.pending_certs || '0', 10) +
-                    parseInt(mintOverview?.minted_certs || '0', 10)}{' '}
-                </>
-              )}{' '}
-              certs have been claimed.
-            </h4>
-          ) : (
-            <h4>
-              {projectInfo?.participants.length}{' '}
-              {projectInfo?.participants.length === 1 ? 'Certificate' : 'Certificates'}
-            </h4>
-          )}
+        <Row className="mb-4">
+          <Col xs="8" className="d-flex flex-column justify-content-center text-center">
+            <h2>
+              <span style={{ fontWeight: '700' }}>Project: </span>
+              {projectInfo?.project_name}
+            </h2>
+            {mintOverview ? (
+              <h4>
+                {loading ? (
+                  <CUSpinner size="xs" />
+                ) : (
+                  <>
+                    {mintOverview?.minted_certs} /{' '}
+                    {parseInt(mintOverview?.pending_certs || '0', 10) +
+                      parseInt(mintOverview?.minted_certs || '0', 10)}{' '}
+                  </>
+                )}{' '}
+                certs have been claimed.
+              </h4>
+            ) : (
+              <h4>
+                {projectInfo?.participants.length}{' '}
+                {projectInfo?.participants.length === 1 ? 'Certificate' : 'Certificates'}
+              </h4>
+            )}
+          </Col>
+          <Col xs="4">
+            <Row>
+              <IssuerInfo
+                issuerId={IssuerProfile?.id as string}
+                title="Your Issuer Profile"
+                horizontal={true}
+              />
+            </Row>
+            <Row className="text-center">
+              <Link to="/profile" className={styles.navLink}>
+                Edit Profile
+              </Link>
+            </Row>
+          </Col>
         </Row>
         {/* <Row style={{maxHeight: '50vh'}}> */}
         <Table

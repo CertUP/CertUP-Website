@@ -350,7 +350,7 @@ export default function Mint() {
               <Row>
                 <p>
                   Review the final certificates and images below for accuracy. Go back and make any
-                  changes if needed.{' '}
+                  changes if needed.
                 </p>
               </Row>
             </Col>

@@ -148,7 +148,6 @@ export default function ViewCert() {
 
     setLoading(true);
     const dossier = findNft(tokenId);
-    console.log('Dossier Found', dossier);
     if (dossier) {
       setCert(dossier);
       setIsOwner(true);

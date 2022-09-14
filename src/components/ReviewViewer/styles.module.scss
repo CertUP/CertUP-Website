@@ -45,6 +45,25 @@
   border-width: 0;
 }
 
+.navLink {
+  //margin-right: 90px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 30px;
+  color: #999999 !important;
+  // color: #000000 !important;
+}
+.navLink:hover {
+  background-color: #31b5c7;
+  color: #31b5c759 !important;
+  background-image: vars.$certupGradient;
+  background-size: 100%;
+  background-repeat: repeat;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+}
+
 // .fixed_header thead {
 //   background: black;
 //   color:#fff;
