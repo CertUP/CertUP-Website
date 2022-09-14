@@ -15,6 +15,7 @@ import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
 import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
+import CUButton from '../../CUButton';
 
 interface props {
   show: boolean;
@@ -112,9 +113,12 @@ export default function SaveModal({ show, setShow, metadata }: props) {
         </Row>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        {/* <Button variant="secondary" onClick={handleClose}>
           Close
-        </Button>
+        </Button> */}
+        <CUButton btnStyle="default" onClick={handleClose} fill={false} style={{ margin: 0 }}>
+          Close
+        </CUButton>
       </Modal.Footer>
     </Modal>
   );

@@ -17,7 +17,7 @@ import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfa
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import StepNumber from '../../components/StepNumber';
@@ -33,6 +33,7 @@ import {
   LinkedinShareButton,
   TwitterShareButton,
   TwitterIcon,
+  EmailShareButton,
 } from 'react-share';
 import AllowModal from '../../components/Access/AllowModal';
 import { useNft } from '../../contexts/NftContext';
@@ -44,6 +45,17 @@ import ImageRow from '../../components/ImageRow';
 import KeplrButton from '../../components/KeplrButton';
 import IssuerInfo from '../../components/IssuerInfo';
 import CUSpinner from '../../components/CUSpinner';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faDiscord,
+  faTwitter,
+  faGithub,
+  faLinkedin,
+  faFacebook,
+} from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();
@@ -357,9 +369,9 @@ export default function ViewCert() {
               <Row>
                 {/* <Col md={{ span: 6, offset: 1 }}> */}
                 <Row>
-                  <Col md={{ span: 6, offset: 1 }}>
+                  <Col lg={{ span: 6, offset: 1 }} xs={{ span: 10, offset: 1 }}>
                     <Row>
-                      <Col>
+                      <Col className="mb-4">
                         <CUButton onClick={handleShowSave}>Save Certificate</CUButton>
                       </Col>
                       <Col>
@@ -391,31 +403,104 @@ export default function ViewCert() {
                 </Row>
                 <Row className="mt-4">
                   <Col md={{ span: 10, offset: 1 }}>
-                    {isOwner ? (
+                    {isOwner && (
                       <>
                         <hr />
                         <Row className="mb-2">
                           <h2>Share on Social Media</h2>
                         </Row>
-                        <Row style={{ marginBottom: '3rem' }}>
-                          <Col>
-                            <span>LinkedIn</span>
-                          </Col>
-                          <Col>
-                            <span>Twitter</span>
-                            <TwitterShareButton url="test">
-                              <TwitterIcon size={32} round={false} />
-                            </TwitterShareButton>
-                          </Col>
-                          <Col>
-                            <span>Facebook</span>
-                          </Col>
-                          <Col>
-                            <span>Email</span>
-                          </Col>
+                        <Row>
+                          {cert.private_metadata_is_public ? (
+                            <Col xs="auto">
+                              <div className={styles.socialRow}>
+                                <OverlayTrigger
+                                  placement={'top'}
+                                  overlay={
+                                    <Tooltip id={`tooltip-${'top'}`}>Share on Twitter</Tooltip>
+                                  }
+                                >
+                                  <TwitterShareButton
+                                    url={accessUrl}
+                                    title="Check out my CertUP Certificate"
+                                    related={['cert_up']}
+                                  >
+                                    <FontAwesomeIcon icon={faTwitter as IconProp} />
+                                  </TwitterShareButton>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                  placement={'top'}
+                                  overlay={
+                                    <Tooltip id={`tooltip-${'top'}`}>Share on Facebook</Tooltip>
+                                  }
+                                >
+                                  <FacebookShareButton
+                                    url={accessUrl}
+                                    quote="Check out my CertUP Certificate"
+                                  >
+                                    <FontAwesomeIcon icon={faFacebook as IconProp} />
+                                  </FacebookShareButton>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                  placement={'top'}
+                                  overlay={
+                                    <Tooltip id={`tooltip-${'top'}`}>Share on LinkedIn</Tooltip>
+                                  }
+                                >
+                                  <LinkedinShareButton
+                                    url={accessUrl}
+                                    source="CertUP"
+                                    title={
+                                      cert.private_metadata.extension.certificate.name
+                                        ? `${cert.private_metadata.extension.certificate.name} on CertUP`
+                                        : 'CertUP Certificate'
+                                    }
+                                  >
+                                    <FontAwesomeIcon icon={faLinkedin as IconProp} />
+                                  </LinkedinShareButton>
+                                </OverlayTrigger>
+                                <OverlayTrigger
+                                  placement={'top'}
+                                  overlay={
+                                    <Tooltip id={`tooltip-${'top'}`}>Share with Email</Tooltip>
+                                  }
+                                >
+                                  <EmailShareButton
+                                    url={accessUrl}
+                                    subject={
+                                      cert.private_metadata.extension.certificate.name
+                                        ? `${cert.private_metadata.extension.certificate.name} on CertUP`
+                                        : 'CertUP Certificate'
+                                    }
+                                  >
+                                    <FontAwesomeIcon icon={faEnvelope as IconProp} />
+                                  </EmailShareButton>
+                                </OverlayTrigger>
+                              </div>
+                            </Col>
+                          ) : (
+                            <OverlayTrigger
+                              placement={'top'}
+                              overlay={
+                                <Tooltip id={`tooltip-${'top'}`}>
+                                  Your certificate is private, allow public access in{' '}
+                                  <strong>Allow Access</strong> to share.
+                                </Tooltip>
+                              }
+                            >
+                              <Col xs="auto">
+                                <div className={`${styles.socialRowDisabled} ${styles.socialRow}`}>
+                                  <FontAwesomeIcon icon={faTwitter as IconProp} />
+                                  <FontAwesomeIcon icon={faFacebook as IconProp} />
+                                  <FontAwesomeIcon icon={faLinkedin as IconProp} />
+                                  <FontAwesomeIcon icon={faEnvelope as IconProp} />
+                                </div>
+                              </Col>
+                            </OverlayTrigger>
+                          )}
                         </Row>
                       </>
-                    ) : null}
+                    )}
+
                     <Row className="mb-4">
                       <Col>
                         <h5 style={{ display: 'inline', marginRight: '.5rem' }}>
@@ -423,7 +508,9 @@ export default function ViewCert() {
                         </h5>
                         <CopyButton text={accessUrl} />
                         <br />
-                        <span className={`${styles.accessText} mx-2`}>{accessUrl}</span>
+                        <p className={`${styles.accessText} ${styles.certLink} mx-2`}>
+                          {accessUrl}
+                        </p>
                       </Col>
                     </Row>
 

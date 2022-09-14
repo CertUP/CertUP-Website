@@ -213,9 +213,9 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
         },
       },
     };
-
+    let response: IssuerDataResponse | undefined;
     try {
-      const response = (await Client?.query.compute.queryContract({
+      response = (await Client?.query.compute.queryContract({
         contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
         codeHash: process.env.REACT_APP_MANAGER_HASH as string,
         query: query,
@@ -249,7 +249,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
         setLoadingRemainingCerts(false);
       } else {
-        const result = parseInt(response.issuer_data.certs_remaining || '0', 10);
+        const result = parseInt(response?.issuer_data?.certs_remaining || '0', 10);
         setIssuerProfile(response.issuer_data);
         setRemainingCerts(result);
         setVerifiedIssuer(true);

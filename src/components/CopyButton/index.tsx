@@ -1,6 +1,8 @@
 import { faPaste } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ReactElement, ReactNode, useState } from 'react';
+import Tooltip from 'react-bootstrap/Tooltip';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { toast } from 'react-toastify';
 import { useItem } from '../../contexts';
 import { sleep } from '../../utils/helpers';
@@ -31,14 +33,19 @@ export const CopyButton: React.FC<ButtonProps> = (props) => {
     setClicked(false);
   };
   return (
-    <button
-      onClick={() => {
-        handleClick();
-      }}
-      className={`${styles.blankButton} ${clicked ? styles.clicked : null} ${className}`}
+    <OverlayTrigger
+      placement={'top'}
+      overlay={<Tooltip id={`tooltip-copyBtn`}>Click to Copy</Tooltip>}
     >
-      <FontAwesomeIcon icon={faPaste} />
-    </button>
+      <button
+        onClick={() => {
+          handleClick();
+        }}
+        className={`${styles.blankButton} ${clicked ? styles.clicked : null} ${className}`}
+      >
+        <FontAwesomeIcon icon={faPaste} />
+      </button>
+    </OverlayTrigger>
   );
 };
 

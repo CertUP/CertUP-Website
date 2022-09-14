@@ -47,7 +47,13 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
 
   return (
     <div className={styles.container}>
-      <Image src={src} {...rest} />
+      {!loading && src ? (
+        <a href={src} target="_blank" rel="noreferrer">
+          <Image src={src} {...rest} />
+        </a>
+      ) : (
+        <Image src={src} {...rest} />
+      )}
 
       <div className={styles.centered}>
         {loading && (

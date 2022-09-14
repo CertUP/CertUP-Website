@@ -499,7 +499,7 @@ export default function useExecute() {
     }
   };
 
-  const executeNft = async (msg: any, gas = 50000, toastRef?: any) => {
+  const executeNft = async (msg: any, gas = 75000, toastRef?: any) => {
     if (!Client) throw new Error('Client not available.');
 
     if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
@@ -519,6 +519,8 @@ export default function useExecute() {
           gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
         },
       );
+      console.log('Gas Limit:', response.gasWanted);
+      console.log('Gas Used:', response.gasUsed);
       parseError(response as ComputeTx);
       setProcessingTx(false);
       if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
@@ -573,7 +575,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 50000, toastRef);
+    const response = await executeNft(approveMsg, 135000, toastRef);
     return response;
   };
 

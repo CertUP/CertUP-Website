@@ -14,7 +14,7 @@ $gradient3: #a659f3;
   background-clip: content-box, border-box;
   box-shadow: 2px 1000px 1px #fff inset;
   transition: box-shadow 0.2s ease-in-out;
-  width: 100%;
+  // width: 100%;
   transition: width 1s, height 1s;
 }
 .certupButtonColor:hover {
@@ -26,6 +26,12 @@ $gradient3: #a659f3;
     vars.$lightCertupGradient;
   //width: fit-content;
   transition: box-shadow 0.2s ease-in-out;
+}
+
+.defaultBtn {
+  border: solid 2px transparent;
+  border-radius: 5px;
+  padding: 0.2rem 0.4rem;
 }
 
 .certupBtn {
