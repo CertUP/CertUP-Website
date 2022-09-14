@@ -107,42 +107,49 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   const refreshPendingProjects = async () => {
     if (!LoginToken || !Address) return;
-    setLoadingPending(true);
 
-    const token = `Permit ${JSON.stringify(LoginToken)}`;
-    const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
-    const response = await axios.get(url.toString(), {
-      headers: {
-        Authorization: token,
-      },
-    });
+    try {
+      setLoadingPending(true);
 
-    const returnedProjects: Project[] = response.data.data;
+      const token = `Permit ${JSON.stringify(LoginToken)}`;
+      const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
+      const response = await axios.get(url.toString(), {
+        headers: {
+          Authorization: token,
+        },
+      });
 
-    const projects: Project[] = [];
+      const returnedProjects: Project[] = response.data.data;
 
-    //= response.data.data.map((project: any) => {
-    for (let i = 0; i < returnedProjects.length; i++) {
-      const project: Project = returnedProjects[i];
+      const projects: Project[] = [];
 
-      //convert issue date string from DB into Date
-      if (project.certInfo.issue_date)
-        project.certInfo.issue_date = new Date(project.certInfo.issue_date);
-      if (project.certInfo.expire_date)
-        project.certInfo.expire_date = new Date(project.certInfo.expire_date);
+      //= response.data.data.map((project: any) => {
+      for (let i = 0; i < returnedProjects.length; i++) {
+        const project: Project = returnedProjects[i];
 
-      // convert participant dob strings from DB to Date
-      for (let i = 0; i < project.participants.length; i++) {
-        if (project.participants[i].dob)
-          project.participants[i].dob = new Date(project.participants[i].dob || '');
+        //convert issue date string from DB into Date
+        if (project.certInfo.issue_date)
+          project.certInfo.issue_date = new Date(project.certInfo.issue_date);
+        if (project.certInfo.expire_date)
+          project.certInfo.expire_date = new Date(project.certInfo.expire_date);
+
+        // convert participant dob strings from DB to Date
+        for (let i = 0; i < project.participants.length; i++) {
+          if (project.participants[i].dob)
+            project.participants[i].dob = new Date(project.participants[i].dob || '');
+        }
+
+        projects.push(project);
       }
 
-      projects.push(project);
+      setPendingProjects(projects);
+      setLoadingPending(false);
+      return projects;
+    } catch (error: any) {
+      toast.error('Failed to load pending projects.');
+      console.error('Failed to load pending projects:', error);
+      setLoadingPending(false);
     }
-
-    setPendingProjects(projects);
-    setLoadingPending(false);
-    return projects;
   };
 
   const refreshMintedProjects = async (force = false) => {

@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -16,6 +18,8 @@ import { useProject } from '../../contexts/ProjectContext';
 import { Link } from 'react-router-dom';
 import { RestrictedAccess } from '../RestrictedAccess';
 import CUSpinner from '../CUSpinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   setProjectIdForm: (projectId?: string) => void;
@@ -24,7 +28,7 @@ interface Props {
 
 export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Props) {
   //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
-  const { PendingProjects, LoadingPendingProjects } = useProject();
+  const { PendingProjects, LoadingPendingProjects, refreshPendingProjects } = useProject();
   const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
 
   // const [loading, setLoading] = useState<boolean>(true);
@@ -106,7 +110,15 @@ export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Pr
             ))}
           </Row>
         ) : (
-          <span className={styles.certStatus}>You dont have any certificate projets yet.</span>
+          <>
+            <span className={styles.certStatus}>You dont have any certificate projets yet.</span>
+            <h5
+              style={{ cursor: 'pointer', marginLeft: '1rem', color: '#888888' }}
+              onClick={refreshPendingProjects}
+            >
+              <FontAwesomeIcon icon={faRefresh} /> Refresh Projects{' '}
+            </h5>
+          </>
         )}
       </Container>
     </>
