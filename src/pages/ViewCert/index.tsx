@@ -82,6 +82,10 @@ export default function ViewCert() {
   const accessUrl = `${window.location.protocol}//${window.location.host}/access/${tokenId}`;
 
   useEffect(() => {
+    document.title = `CertUP - View Certificate`;
+  }, []);
+
+  useEffect(() => {
     console.log('Passed State', location.state);
     if (!tokenId) navigate('/access');
     else queryCert();

@@ -33,6 +33,10 @@ export default function Payment() {
   const { findProject, LoadingPendingProjects } = useProject();
 
   useEffect(() => {
+    document.title = `CertUP - Payment`;
+  }, []);
+
+  useEffect(() => {
     if (!Address) return;
     console.log('Passed State', location.state);
     if (!location.state?.projectId) {

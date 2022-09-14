@@ -32,9 +32,10 @@ interface ViewerProps {
   step?: string;
   hashes?: UploadResponse[];
   pData?: Project;
+  meta?: boolean;
 }
 
-export default function ReviewViewer({ pid, step, hashes, pData }: ViewerProps) {
+export default function ReviewViewer({ pid, step, hashes, pData, meta = false }: ViewerProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts, IssuerProfile } =
     useWallet();
   const scrollBarWidth = useScrollbarWidth();
@@ -65,6 +66,10 @@ export default function ReviewViewer({ pid, step, hashes, pData }: ViewerProps) 
     if (LoadingPendingProjects || !MintedProjects.length) return;
     refreshProjectInfo();
   }, [pid, PendingProjects, MintedProjects, hashes, pData]);
+
+  useEffect(() => {
+    if (meta) document.title = `CertUP Project Review - ${projectInfo?.project_name}`;
+  }, [projectInfo]);
 
   //   useEffect(() => {
   //     if (!LoginToken) return;

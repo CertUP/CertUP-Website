@@ -51,8 +51,7 @@ export default function Access() {
   //const numCerts = location.state?.num_certificates || undefined;
 
   useEffect(() => {
-    console.log(location.state);
-    //if (QueryPermit) queryOwnedCerts();
+    document.title = `CertUP`;
   }, []);
 
   // useEffect(() => {

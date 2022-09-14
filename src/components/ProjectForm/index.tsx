@@ -226,6 +226,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     updateRenderProps({ signerSignatureUri: uri });
   };
 
+  useEffect(() => {
+    document.title = `CertUP Project - ${projectName}`;
+  }, [projectName]);
+
   // Re-Render Peview when data changes
   useEffect(() => {
     const run = async () => {

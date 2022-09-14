@@ -109,7 +109,7 @@ export default function ProjectReview() {
           {!!backHandler && <BackButton />}
           <div style={{ height: '3vh' }} />
         </Container>
-        <ReviewViewer pid={pid} />
+        <ReviewViewer pid={pid} meta={true} />
       </Layout>
     </>
   );

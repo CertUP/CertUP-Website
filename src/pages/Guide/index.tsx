@@ -16,8 +16,13 @@ import stepsImg from '../../assets/steps.svg';
 import connectImg from '../../assets/connectKeplr.svg';
 import step3Img from '../../assets/step3.svg';
 import step4Img from '../../assets/step4.svg';
+import { useEffect } from 'react';
 
 export default function Guide() {
+  useEffect(() => {
+    document.title = `CertUP Guide`;
+  }, []);
+
   return (
     <>
       <Layout>

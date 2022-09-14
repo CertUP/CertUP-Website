@@ -11,8 +11,13 @@ import exampleCert from '../../assets/ExampleCert.svg';
 import triviumLogo from '../../assets/triviumcolor.svg';
 import alterLogo from '../../assets/alterlogo.png';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function About() {
+  useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
   return (
     <>
       <Layout>

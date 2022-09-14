@@ -54,6 +54,10 @@ export default function Profile() {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   useEffect(() => {
+    document.title = `CertUP - Profile`;
+  }, []);
+
+  useEffect(() => {
     if (!newIssuerData) setNewIssuerData(IssuerProfile);
   }, [IssuerProfile]);
 

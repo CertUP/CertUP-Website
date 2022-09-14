@@ -39,6 +39,10 @@ export default function Issuers() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
+  useEffect(() => {
     processReturn();
   }, []);
 

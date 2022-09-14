@@ -8,8 +8,13 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import etsLogo from '../../assets/ETSLogo.png';
+import { useEffect } from 'react';
 
 export default function Clients() {
+  useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
   return (
     <>
       <Layout>

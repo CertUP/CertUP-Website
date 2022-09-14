@@ -34,6 +34,10 @@ export default function AddCredit() {
   //const numCerts = location.state?.num_certificates || undefined;
 
   useEffect(() => {
+    document.title = `CertUP - Buy Credits`;
+  }, []);
+
+  useEffect(() => {
     console.log('running effect');
     console.log(location.state);
 

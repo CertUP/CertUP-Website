@@ -89,6 +89,10 @@ export default function Mint() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    document.title = `CertUP - Finalize Project ${project?.project_name}`;
+  }, [project]);
+
   // Ensure Project ID is available
   useEffect(() => {
     console.log('Passed State', location.state);

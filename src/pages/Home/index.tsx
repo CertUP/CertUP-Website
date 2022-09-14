@@ -9,8 +9,13 @@ import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
 import bannerImage from '../../assets/BannerImage2.svg';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function Home() {
+  useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
   return (
     <>
       <Layout>
