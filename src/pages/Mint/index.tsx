@@ -103,13 +103,7 @@ export default function Mint() {
   }, []);
 
   useEffect(() => {
-    if (
-      LoadingPendingProjects ||
-      !PendingProjects.length ||
-      LoadingMintedProjects ||
-      !MintedProjects.length
-    )
-      return;
+    if (LoadingPendingProjects || !PendingProjects.length || LoadingMintedProjects) return;
     refreshProjectInfo();
   }, [LoadingPendingProjects, LoadingMintedProjects]);
 
@@ -121,6 +115,7 @@ export default function Mint() {
       return;
     }
     setProject(foundProject);
+
     const alreadyMintedProject = findMintedProject(location.state?.projectId);
     if (alreadyMintedProject) {
       toast.error('This project has already been loaded to the blockchain.');

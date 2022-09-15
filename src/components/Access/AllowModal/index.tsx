@@ -20,7 +20,7 @@ import {
   faUnlock,
 } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
-import { NftDossier } from '../../../interfaces';
+import { NftDossier } from '../../../interfaces/721';
 import { ModalButton } from '../../ModalButton';
 import { CUButton } from '../../CUButton';
 import useQuery, { Snip721Approval } from '../../../hooks/QueryHook';

@@ -2,7 +2,7 @@ import { faPaste, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ReactElement, ReactNode, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useItem, useWallet } from '../../../contexts';
+import { useWallet } from '../../../contexts';
 import { sleep } from '../../../utils/helpers';
 import useExecute from '../../../hooks/ExecuteHook';
 

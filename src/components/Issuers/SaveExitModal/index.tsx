@@ -13,7 +13,6 @@ import Row from 'react-bootstrap/Row';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudArrowUp, faDownload, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
-import { NftDossier } from '../../../interfaces';
 import { ModalButton } from '../../ModalButton';
 
 interface props {

@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useProject } from '../../contexts';
 
 import useQuery from '../../hooks/QueryHook';
-import { PubIssuerData } from '../../interfaces';
+import { PubIssuerData } from '../../interfaces/manager';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
@@ -26,13 +26,13 @@ export default function IssuerInfo({ issuerId, title = 'Issued By', horizontal =
   const { queryPubIssuerData } = useQuery();
 
   useEffect(() => {
+    if (!issuerId) return;
     queryData();
   }, [issuerId]);
 
   const queryData = async () => {
     //todo handle if this errors
     const response = await queryPubIssuerData(issuerId);
-    console.log(response);
     setIssuerData(response);
   };
   if (issuerData?.logo_img_url || issuerData?.name || issuerData?.website || issuerData?.verified)

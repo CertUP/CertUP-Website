@@ -11,14 +11,8 @@ import {
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
 import { useWallet } from '../contexts';
 import { useNft } from '../contexts/NftContext';
-import {
-  BatchDossierResponse,
-  ComputeResultCode,
-  ComputeTx,
-  DossierResponse,
-  PreLoad,
-  RemainingCertsResponse,
-} from '../interfaces';
+import { ComputeTx, ComputeResultCode } from '../interfaces';
+import { PreLoad } from '../interfaces/manager';
 import { logSizeInBytes } from '../utils/helpers';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 import { ToastProps } from '../utils/toastHelper';

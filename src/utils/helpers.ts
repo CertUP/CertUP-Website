@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { ProjectToken } from '../interfaces';
+import { ProjectToken } from '../interfaces/manager';
 import Project, { Participant, CertInfo, RenderProps } from '../interfaces/Project';
 import { CertupExtension } from '../interfaces/token';
 import * as XLSX from 'xlsx';

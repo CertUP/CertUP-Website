@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 import { useWallet, useProject } from '../../contexts';
 import useQuery from '../../hooks/QueryHook';
 import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
-import { NftDossier, ProjectToken, BatchNftDossier, MintOverview } from '../../interfaces';
 import CUSpinner from '../CUSpinner';
 import ImageRow from '../ImageRow';
 import MetadataRow from '../MetadataRow';
@@ -26,6 +25,8 @@ import styles from './styles.module.scss';
 import { UploadResponse } from '../../pages/Mint';
 import IssuerInfo from '../IssuerInfo';
 import { Link } from 'react-router-dom';
+import { NftDossier, BatchNftDossier } from '../../interfaces/721';
+import { MintOverview, ProjectToken } from '../../interfaces/manager';
 
 interface ViewerProps {
   pid: string;
@@ -63,7 +64,7 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (LoadingPendingProjects || !MintedProjects.length) return;
+    if (LoadingPendingProjects || LoadingMintedProjects) return;
     refreshProjectInfo();
   }, [pid, PendingProjects, MintedProjects, hashes, pData]);
 
@@ -116,6 +117,7 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
   };
 
   const refreshProjectInfo = async () => {
+    console.log('Internal AAA');
     if (!pid) {
       console.error('returning');
       return;

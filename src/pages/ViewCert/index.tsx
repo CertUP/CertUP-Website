@@ -13,7 +13,6 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfaces';
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -56,6 +55,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { NftDossier } from '../../interfaces/721';
 
 export default function ViewCert() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, QueryPermit, Querier } = useWallet();

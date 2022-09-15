@@ -1,8 +1,7 @@
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { NftDossier } from '../../interfaces';
+import { NftDossier } from '../../interfaces/721';
 import ReactJson from 'react-json-view';
-
 
 import styles from './styles.module.scss';
 

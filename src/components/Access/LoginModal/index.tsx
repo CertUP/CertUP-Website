@@ -1,39 +1,13 @@
-import React, { FormEvent, FormEventHandler, useEffect, useState } from 'react';
-import { useDropzone, FileWithPath } from 'react-dropzone';
+import { useState } from 'react';
 
 import Image from 'react-bootstrap/Image';
-import Form from 'react-bootstrap/Form';
 
-import styles from './styles.module.scss';
-
-import ChooseFile from '../../assets/ChooseFile.svg';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCircle,
-  faDownload,
-  faPaste,
-  faTimesCircle,
-  faUnlock,
-} from '@fortawesome/free-solid-svg-icons';
-import Container from 'react-bootstrap/Container';
-import { NftDossier } from '../../../interfaces';
-import { ModalButton } from '../../ModalButton';
-import { CUButton } from '../../CUButton';
-import useQuery, { Snip721Approval } from '../../../hooks/QueryHook';
 
-import useExecute from '../../../hooks/ExecuteHook';
-import CopyButton from '../../CopyButton';
-import RemoveButton from '../RemoveButton';
-import { toast } from 'react-toastify';
-import { Bech32 } from 'secretjs';
-import { useNft } from '../../../contexts/NftContext';
 import { useWallet } from '../../../contexts';
 import cOnly from '../../../assets/cOnly.svg';
-import { getQueryPermit } from '../../../utils/loginPermit';
 import { AuthenticateButton } from '../../AuthenticateButton';
 
 interface ModalProps {

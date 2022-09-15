@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode, useEffect } from 'react';
-import { useItem, useWallet } from '../../contexts';
+import { useWallet } from '../../contexts';
 import KeplrButton from '../KeplrButton';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';

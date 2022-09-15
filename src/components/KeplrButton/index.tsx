@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { ReactElement, ReactNode, useEffect, useState, forwardRef } from 'react';
-import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';

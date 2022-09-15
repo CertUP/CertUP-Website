@@ -1,6 +1,6 @@
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { NftDossier } from '../../interfaces';
+import { NftDossier } from '../../interfaces/721';
 import PreloadImage from '../PreloadImage';
 
 interface IRProps {

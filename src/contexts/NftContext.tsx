@@ -6,7 +6,7 @@ import { useWallet } from '.';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { dataURLtoFile } from '../utils/fileHelper';
-import { BatchNftDossier, NftDossier } from '../interfaces';
+import { BatchNftDossier, NftDossier } from '../interfaces/721';
 import useQuery from '../hooks/QueryHook';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();

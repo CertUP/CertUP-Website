@@ -1,10 +1,4 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import {
-  IssuerData,
-  IssuerDataResponse,
-  PermitSignature,
-  RemainingCertsResponse,
-} from '../interfaces';
 import { SecretNetworkClient, Wallet as SJSWallet } from 'secretjs';
 import {
   LoginToken,
@@ -13,9 +7,10 @@ import {
   permitName,
   getQueryPermit,
 } from '../utils/loginPermit';
-import useQuery from '../hooks/QueryHook';
 
 import { toast } from 'react-toastify';
+import { PermitSignature } from '../interfaces';
+import { Issuer, IssuerData, IssuerDataResponse } from '../interfaces/manager';
 
 interface DummyWallet {
   wallet: SJSWallet;
@@ -41,7 +36,7 @@ export interface WalletContextState {
   LoginToken: LoginToken | undefined;
   QueryPermit: PermitSignature | undefined;
   RemainingCerts: number;
-  IssuerProfile?: IssuerData;
+  IssuerProfile?: Issuer;
   LoadingRemainingCerts: boolean;
   ProcessingTx: boolean;
   VerifiedIssuer: boolean;
@@ -114,7 +109,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.LoadingRemainingCerts,
   );
 
-  const [IssuerProfile, setIssuerProfile] = useState<IssuerData | undefined>(
+  const [IssuerProfile, setIssuerProfile] = useState<Issuer | undefined>(
     contextDefaultValues.IssuerProfile,
   );
 
@@ -221,7 +216,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
         query: query,
       })) as IssuerDataResponse;
 
-      //console.log('Remaining Certs Query Response', response);
+      console.log('Remaining Certs Query Response', response);
 
       if (response?.parse_err || response?.generic_err) {
         if (response.generic_err?.msg.includes('not a verified issuer')) {
@@ -249,8 +244,8 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
 
         setLoadingRemainingCerts(false);
       } else {
-        const result = parseInt(response?.issuer_data?.certs_remaining || '0', 10);
-        setIssuerProfile(response.issuer_data);
+        const result = parseInt(response.issuer_data.issuer.remaining_certs || '0', 10);
+        setIssuerProfile(response.issuer_data.issuer);
         setRemainingCerts(result);
         setVerifiedIssuer(true);
         setLoadingRemainingCerts(false);

@@ -7,7 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { dataURLtoFile } from '../utils/fileHelper';
 import useQuery from '../hooks/QueryHook';
-import { ExportProject } from '../interfaces';
+import { ExportProject } from '../interfaces/manager';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 

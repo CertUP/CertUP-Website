@@ -1,33 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { CUButton, Spacer } from '../../components';
+import { Spacer } from '../../components';
 import Layout from '../../components/Layout';
-import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import exampleCert from '../../assets/ExampleCert.svg';
 import { useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
-import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
-import ProjectForm from '../../components/ProjectForm';
-import { BatchDossierResponse, NftDossier, PermitSignature } from '../../interfaces';
-import Project from '../../interfaces/Project';
-import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
-import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
-import StepNumber from '../../components/StepNumber';
-import { ProgressBar } from '../../components';
-import Table from 'react-bootstrap/Table';
-import { permissions, allowedTokens, permitName } from '../../utils/loginPermit';
-import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
-import ReactJson from 'react-json-view';
-import { Extension } from 'secretjs/dist/extensions/snip721/types';
 import useQuery from '../../hooks/QueryHook';
 import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';

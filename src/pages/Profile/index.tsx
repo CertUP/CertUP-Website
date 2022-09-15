@@ -14,7 +14,6 @@ import ConnectBanner from '../../components/ConnectBanner';
 import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
 import ProjectForm from '../../components/ProjectForm';
-import { BatchDossierResponse, IssuerData, NftDossier, PermitSignature } from '../../interfaces';
 import Project from '../../interfaces/Project';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -34,6 +33,7 @@ import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import { RestrictedAccess } from '../../components/RestrictedAccess';
 import CUSpinner from '../../components/CUSpinner';
+import { Issuer, IssuerData } from '../../interfaces/manager';
 
 export default function Profile() {
   const {
@@ -50,7 +50,7 @@ export default function Profile() {
     ProcessingTx,
   } = useWallet();
 
-  const [newIssuerData, setNewIssuerData] = useState<IssuerData | undefined>(IssuerProfile);
+  const [newIssuerData, setNewIssuerData] = useState<Issuer | undefined>(IssuerProfile);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
   useEffect(() => {
@@ -209,10 +209,10 @@ export default function Profile() {
                     <span className={styles.lineBreak}>{IssuerProfile?.id}</span>
                     <br />
                     <h6 className={`d-inline ${styles.smallLabel}`}>Certs Issued:</h6>{' '}
-                    {IssuerProfile?.certs_issued}
+                    {IssuerProfile?.cert_num}
                     <br />
                     <h6 className={`d-inline ${styles.smallLabel}`}>Cert Credits:</h6>{' '}
-                    {IssuerProfile?.certs_remaining}
+                    {IssuerProfile?.remaining_certs}
                     <br />
                   </Col>
                 </Row>

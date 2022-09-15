@@ -1,52 +1,4 @@
-import { ArrayLog, JsonLog, SecretNetworkClient, TxContent, TxResultCode, Wallet } from 'secretjs';
-import { Extension, Metadata } from 'secretjs/dist/extensions/snip721/types';
-import { Tx } from 'secretjs';
-import { classicNameResolver } from 'typescript';
-import { LoginToken } from '../utils/loginPermit';
-import { CertupExtension, CertupMetadata } from './token';
-
-export * as Project from './Project';
-
-export interface Item {
-  id: string;
-  value: string;
-}
-
-export type Items = Item[];
-
-export interface ItemContextState {
-  Items: Items;
-  addItem: (newItem: Item) => void;
-  removeItem: (id: string) => void;
-  removeAll: () => void;
-  updateItem: (id: string, data: Item) => void;
-}
-
-export interface IssuerData {
-  id: string;
-  name?: string;
-  website?: string;
-  logo_img_url?: string;
-  verified: boolean;
-  verified_name?: string;
-  certs_issued: string;
-  certs_remaining: string;
-}
-
-// export interface Project {
-//   _id?: string;
-//   owner: string;
-//   project_name: string;
-//   pub_description: string;
-//   priv_description: string;
-//   template: number;
-//   // issue_d: number;
-//   // issue_m: number;
-//   // issue_y: number;
-//   issue_date?: Date;
-//   issuer: string;
-//   participants: Participant[];
-// }
+import { ArrayLog, TxContent, TxResultCode } from 'secretjs';
 
 interface PermitParams {
   permit_name: string;
@@ -70,119 +22,9 @@ export interface PermitSignature {
   signature: string;
 }
 
-export interface DossierResponse {
-  nft_dossier: NftDossier;
-}
-
-export interface BatchDossierResponse {
-  batch_nft_dossier: _BatchDossiers;
-}
-
-export interface _BatchDossiers {
-  nft_dossiers: BatchNftDossier[];
-}
-
-export interface NftDossier {
-  display_private_metadata_error: string | null;
-  owner: string | null;
-  private_metadata: CertupMetadata;
-  private_metadata_is_public: boolean;
-  public_metadata: CertupMetadata;
-  token_approvals: any[];
-  token_code_approvals: any[];
-}
-
-export interface BatchNftDossier extends NftDossier {
-  token_id: string;
-}
-
-export interface PreLoad {
-  name: string;
-  date: string;
-  cert_type: string;
-  pub_metadata: CertupMetadata;
-  priv_metadata: CertupMetadata;
-}
-
-export interface PendingToken extends PreLoad {
-  cert_num: string;
-  issuer_id: string;
-  issuer_name?: string;
-}
-
-export interface RemainingCertsResponse extends QueryResponse {
-  remaining_certs?: {
-    certs: string;
-  };
-}
-
-export interface IssuerDataResponse extends QueryResponse {
-  issuer_data: IssuerData;
-}
-
-export interface GetIssuerResponse extends QueryResponse {
-  get_issuer: PubIssuerData;
-}
-
-export interface CertPriceResponse extends QueryResponse {
-  cert_price: {
-    pay_data: Payment;
-  };
-}
-
-interface Payment {
-  contract: {
-    /// contract's code hash string
-    code_hash: string;
-    /// contract's address
-    address: string;
-  };
-  amount: string;
-}
-
-export interface PubIssuerData {
-  id: string;
-  name?: string;
-  website?: string;
-  logo_img_url?: string;
-  verified: boolean;
-  verified_name?: string;
-}
-
-export interface ProjectDataResponse extends QueryResponse {
-  project_contents: {
-    data_list: ProjectToken[];
-  };
-}
-
-export interface ProjectToken {
-  preload_data: PendingToken;
-  claim_code: string;
-  minted: boolean;
-}
-
 export interface QueryResponse {
   parse_err?: ErrorResponse;
   generic_err?: ErrorResponse;
-}
-
-export interface ListProjectsResponse extends QueryResponse {
-  list_projects?: LPSub;
-}
-
-interface LPSub {
-  data_list: ExportProject[];
-}
-
-export interface ExportProject {
-  /// Unique ID of the project
-  project_id: string;
-  project: ProjectOverview;
-}
-
-interface ProjectOverview {
-  pending_certs: string;
-  minted_certs: string;
 }
 
 interface ErrorResponse {
@@ -278,8 +120,3 @@ export type ComputeTx = {
   readonly gasUsed: number;
   readonly gasWanted: number;
 };
-
-export interface MintOverview {
-  minted_certs: string;
-  pending_certs: string;
-}

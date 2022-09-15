@@ -4,7 +4,6 @@ import React, { ReactElement, ReactNode, useState } from 'react';
 import Tooltip from 'react-bootstrap/Tooltip';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { toast } from 'react-toastify';
-import { useItem } from '../../contexts';
 import { sleep } from '../../utils/helpers';
 
 import styles from './styles.module.scss';

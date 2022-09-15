@@ -2,21 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { Permit, SecretNetworkClient, Snip20Querier } from 'secretjs';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
 import { useWallet } from '../contexts';
+import { PermitSignature } from '../interfaces';
+import { BatchDossierResponse, DossierResponse, NftDossier } from '../interfaces/721';
 import {
-  BatchDossierResponse,
-  CertPriceResponse,
-  DossierResponse,
-  GetIssuerResponse,
+  RemainingCertsResponse,
   IssuerData,
   IssuerDataResponse,
-  ListProjectsResponse,
-  NftDossier,
-  PermitSignature,
-  ProjectDataResponse,
-  ProjectToken,
   PubIssuerData,
-  RemainingCertsResponse,
-} from '../interfaces';
+  GetIssuerResponse,
+  CertPriceResponse,
+  ListProjectsResponse,
+  ProjectToken,
+  ProjectDataResponse,
+  Issuer,
+} from '../interfaces/manager';
 import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 
 interface TokenApprovalsResponse {
@@ -133,7 +132,7 @@ export default function useQuery() {
     return parseInt(response?.remaining_certs?.certs || '0', 10);
   };
 
-  const queryIssuerData = async (): Promise<IssuerData> => {
+  const queryIssuerData = async (): Promise<Issuer> => {
     if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -166,7 +165,7 @@ export default function useQuery() {
 
     checkError(response);
 
-    return response?.issuer_data;
+    return response?.issuer_data.issuer;
   };
 
   const queryPubIssuerData = async (issuerId: string): Promise<PubIssuerData> => {

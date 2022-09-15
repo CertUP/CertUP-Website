@@ -20,7 +20,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ProgressBar } from '../../components';
 
 import useQuery from '../../hooks/QueryHook';
-import { BatchNftDossier, NftDossier, ProjectToken } from '../../interfaces';
 import MetadataRow from '../../components/MetadataRow';
 import ImageRow from '../../components/ImageRow';
 import Project, { Participant } from '../../interfaces/Project';

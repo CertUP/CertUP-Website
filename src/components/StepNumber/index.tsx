@@ -1,5 +1,4 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 

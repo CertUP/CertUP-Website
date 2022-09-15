@@ -3,7 +3,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { StepNumber } from '..';
-import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ItemProvider, ProjectProvider, WalletProvider } from './contexts';
+import { ProjectProvider, WalletProvider } from './contexts';
 import { Home, Error, About, Clients, Access, ViewCert, Payment } from './pages/';
 import { ToastContainer } from 'react-toastify';
 
