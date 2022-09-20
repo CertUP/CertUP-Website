@@ -208,17 +208,21 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
         },
       },
     };
-    let response: IssuerDataResponse | undefined;
+
+    // wtf secret.js
+    let response: IssuerDataResponse | string | undefined;
     try {
       response = (await Client?.query.compute.queryContract({
         contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
         codeHash: process.env.REACT_APP_MANAGER_HASH as string,
         query: query,
-      })) as IssuerDataResponse;
+      })) as IssuerDataResponse | string;
 
-      console.log('Remaining Certs Query Response', response);
+      if (typeof response === 'string' || response instanceof String)
+        response = JSON.parse(response as string) as IssuerDataResponse;
 
       if (response?.parse_err || response?.generic_err) {
+        console.log('abababa2', response.generic_err?.msg);
         if (response.generic_err?.msg.includes('not a verified issuer')) {
           setLoadingRemainingCerts(false);
           setVerifiedIssuer(false);
