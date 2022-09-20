@@ -158,7 +158,7 @@ export default function ViewCert() {
     } else {
       //manually query
       const manual = await getCert(tokenId);
-      console.log(manual);
+      console.log('Dossier Query Response', manual);
       if (!manual.display_private_metadata_error) setCert(manual);
     }
 

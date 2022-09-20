@@ -18,6 +18,7 @@ import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import useExecute from '../../hooks/ExecuteHook';
 import CUSpinner from '../../components/CUSpinner';
+import { claimCert } from '../../utils/backendHelper';
 
 export default function Access() {
   const [loadingMint, setLoadingMint] = useState(false);
@@ -28,7 +29,7 @@ export default function Access() {
 
   const { getOwnedCerts } = useQuery();
   const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
-  const { claimCert } = useExecute();
+  //const { claimCert } = useExecute();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,39 +53,22 @@ export default function Access() {
     setLoadingMint(true);
     const toastRef = toast.loading('Transaction Processing...');
     try {
-      // const mintMsg = {
-      //   mint_cert: {
-      //     cert_key: accessCode,
-      //     recipient: Address,
-      //   },
-      // };
-
-      // const result = await Client?.tx.compute.executeContract(
-      //   {
-      //     sender: Address,
-      //     contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
-      //     codeHash: process.env.REACT_APP_MANAGER_HASH as string,
-      //     msg: mintMsg,
-      //   },
-      //   {
-      //     gasLimit: 100_000,
-      //   },
-      // );
-
-      const result = await claimCert(accessCode, toastRef);
+      //const result = await claimCert(accessCode, toastRef);
+      const result = await claimCert({ claim_code: accessCode, address: Address });
       console.log('Mint Result:', result);
       if (!result) throw new Error('Something went wrong');
       console.log('OK');
 
-      // toast.update(toastRef, {
-      //   render: 'Success!',
-      //   type: 'success',
-      //   isLoading: false,
-      //   autoClose: 5000,
-      // });
-      // refreshDossiers();
+      // only needed if using backend to mint
+      toast.update(toastRef, {
+        render: 'Success!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 5000,
+      });
+      refreshDossiers();
 
-      //navigate to cert page
+      // navigate to cert page
       handleView(accessCode);
     } catch (error: any) {
       toast.update(toastRef, {

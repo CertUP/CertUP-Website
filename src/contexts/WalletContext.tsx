@@ -222,7 +222,6 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
         response = JSON.parse(response as string) as IssuerDataResponse;
 
       if (response?.parse_err || response?.generic_err) {
-        console.log('abababa2', response.generic_err?.msg);
         if (response.generic_err?.msg.includes('not a verified issuer')) {
           setLoadingRemainingCerts(false);
           setVerifiedIssuer(false);

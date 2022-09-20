@@ -68,6 +68,9 @@ export class WithPermit {
 }
 
 const checkError = (queryResponse: any) => {
+  if (typeof queryResponse === 'string' || queryResponse instanceof String)
+    queryResponse = JSON.parse(queryResponse as string) as IssuerDataResponse;
+
   if (queryResponse.parse_err || queryResponse.generic_err) {
     if (queryResponse.generic_err?.msg.includes('not a verified issuer')) return;
 

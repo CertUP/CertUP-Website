@@ -45,6 +45,11 @@ interface GIProps {
   input: GenerateInput;
 }
 
+interface ClaimCertProps {
+  claim_code: string;
+  address: string;
+}
+
 export const generateWithWait = async ({ id, layoutId, input }: GIProps) => {
   //update pending render queue with latest request
   const time = new Date();
@@ -52,7 +57,7 @@ export const generateWithWait = async ({ id, layoutId, input }: GIProps) => {
 
   // skip if already waiting on a render
   if (waiting) return false;
-  console.log('Rendering', pendingRender)
+  console.log('Rendering', pendingRender);
 
   //otherwise continue and make sure no others will render simulataniously
   waiting = true;
@@ -102,5 +107,12 @@ export const generateMultiple = async ({ id, layoutId = 1, input, upload = false
   ).toString();
 
   const { data } = await axios.post(url, temp);
+  return data.data;
+};
+
+export const claimCert = async (props: ClaimCertProps) => {
+  const url = new URL(`/claim`, process.env.REACT_APP_BACKEND).toString();
+
+  const { data } = await axios.post(url, props);
   return data.data;
 };
