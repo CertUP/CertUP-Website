@@ -439,28 +439,35 @@ export default function useExecute() {
   };
 
   const executeManager = async (msg: any, gas = 50000, toastRef?: any) => {
-    if (!Client) throw new Error('Client not available.');
-    if (!QueryPermit) throw new Error('QueryPermit not available.');
-    if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
-    else toastRef = toast.loading('Processing Transaction...');
+    // if (!Client) throw new Error('Client not available.');
+    // if (!QueryPermit) throw new Error('QueryPermit not available.');
+    // if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
+    // else toastRef = toast.loading('Processing Transaction...');
     try {
-      setProcessingTx(true);
+      // setProcessingTx(true);
 
-      const response = await Client.tx.compute.executeContract(
-        {
-          contractAddress: process.env.REACT_APP_MANAGER_ADDR,
-          codeHash: process.env.REACT_APP_MANAGER_HASH,
-          sender: Address,
-          msg: msg,
-        },
-        {
-          gasLimit: gas,
-          gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
-        },
-      );
-      parseError(response as ComputeTx);
-      setProcessingTx(false);
-      if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+      // const response = await Client.tx.compute.executeContract(
+      //   {
+      //     contractAddress: process.env.REACT_APP_MANAGER_ADDR,
+      //     codeHash: process.env.REACT_APP_MANAGER_HASH,
+      //     sender: Address,
+      //     msg: msg,
+      //   },
+      //   {
+      //     gasLimit: gas,
+      //     gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+      //   },
+      // );
+      // parseError(response as ComputeTx);
+      // setProcessingTx(false);
+      // if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+      const response = await execute({
+        msg,
+        gas,
+        toastRef,
+        contract: process.env.REACT_APP_MANAGER_ADDR,
+        hash: process.env.REACT_APP_MANAGER_HASH,
+      });
       return response;
     } catch (err: any) {
       setProcessingTx(false);
@@ -493,7 +500,23 @@ export default function useExecute() {
     }
   };
 
-  const executeNft = async (msg: any, gas = 75000, toastRef?: any) => {
+  interface ExecuteProps {
+    msg: any;
+    gas: number;
+    toastRef?: any;
+    contract: string;
+    hash: string;
+    isRetry?: boolean;
+  }
+
+  const execute = async ({
+    msg,
+    gas = 75000,
+    toastRef,
+    contract,
+    hash,
+    isRetry = false,
+  }: ExecuteProps) => {
     if (!Client) throw new Error('Client not available.');
 
     if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
@@ -501,10 +524,10 @@ export default function useExecute() {
     try {
       setProcessingTx(true);
 
-      const response = await Client.tx.compute.executeContract(
+      let response = await Client.tx.compute.executeContract(
         {
-          contractAddress: process.env.REACT_APP_NFT_ADDR,
-          codeHash: process.env.REACT_APP_NFT_HASH,
+          contractAddress: contract,
+          codeHash: hash,
           sender: Address,
           msg: msg,
         },
@@ -515,9 +538,72 @@ export default function useExecute() {
       );
       console.log('Gas Limit:', response.gasWanted);
       console.log('Gas Used:', response.gasUsed);
+      if (response.rawLog.includes('Out of gas') && !isRetry) {
+        if (toastRef) {
+          toast.update(
+            toastRef,
+            new ToastProps(
+              'Transaction Failed: Out of Gas. Trying again with more gas.',
+              'error',
+              10000,
+            ),
+          );
+          toastRef = undefined;
+        }
+
+        response = await execute({
+          msg,
+          gas: gas * 1.8, //todo set to 1.25 once gas problem is fixed
+          //toastRef,
+          contract,
+          hash,
+          isRetry: true,
+        });
+      }
       parseError(response as ComputeTx);
       setProcessingTx(false);
       if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+      return response;
+    } catch (err: any) {
+      setProcessingTx(false);
+      toast.update(toastRef, new ToastProps(err.toString(), 'error'));
+      throw err;
+    }
+  };
+
+  const executeNft = async (msg: any, gas = 75000, toastRef?: any) => {
+    // if (!Client) throw new Error('Client not available.');
+
+    // if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
+    // else toastRef = toast.loading('Processing Transaction...');
+    try {
+      // setProcessingTx(true);
+
+      // const response = await Client.tx.compute.executeContract(
+      //   {
+      //     contractAddress: process.env.REACT_APP_NFT_ADDR,
+      //     codeHash: process.env.REACT_APP_NFT_HASH,
+      //     sender: Address,
+      //     msg: msg,
+      //   },
+      //   {
+      //     gasLimit: gas,
+      //     gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
+      //   },
+      // );
+      // console.log('Gas Limit:', response.gasWanted);
+      // console.log('Gas Used:', response.gasUsed);
+      // parseError(response as ComputeTx);
+      // setProcessingTx(false);
+      // if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
+
+      const response = await execute({
+        msg,
+        gas,
+        toastRef,
+        contract: process.env.REACT_APP_NFT_ADDR,
+        hash: process.env.REACT_APP_NFT_HASH,
+      });
       return response;
     } catch (err: any) {
       setProcessingTx(false);

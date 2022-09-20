@@ -47,9 +47,16 @@ export default function Payment() {
   }, [Address]);
 
   const init = async () => {
-    const credits = await queryCredits();
-    console.log('Credits', credits);
-    if (credits && credits >= location.state.num_certificates) {
+    await queryCredits();
+    console.log('Credits', RemainingCerts);
+
+    // calculateNumCerts();
+    loadProject();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (RemainingCerts && RemainingCerts >= location.state.num_certificates) {
       //navigate('/generate', { state: { projectId: location.state.projectId } });
       setPaid(true);
       setConfirmation({
@@ -58,10 +65,7 @@ export default function Payment() {
       });
       setLoading(false);
     }
-    // calculateNumCerts();
-    loadProject();
-    setLoading(false);
-  };
+  }, [RemainingCerts]);
 
   useEffect(() => {
     if (LoadingPendingProjects) return;
