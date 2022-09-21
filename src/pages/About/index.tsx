@@ -105,9 +105,21 @@ export default function About() {
 
           <Row className="mx-2 mt-2">
             <p className={styles.productText}>
-              The product works on a SNIP-721 smart contract technology provided by Secret Network.
-              Having the ability to store private and public meta-data enables any industry to
-              easily setup the certificate as a non-fungible token and issue to the relevant party.
+              Using the power of{' '}
+              <a
+                href="https://github.com/SecretFoundation/SNIPs/blob/master/SNIP-721.md"
+                target="_blank"
+                rel="noreferrer"
+              >
+                SNIP-721 secretNFTs
+              </a>{' '}
+              on the world&apos;s only production ready encrypted blockchain, we give you the
+              ability to upgrade your certification systems with ease! Simply register yourself as
+              an issuer, and purchase a package of certificates. When filling in the data, decide
+              which data is allowed to remain public, and which must be private. Then, when the data
+              is submitted, you may give the recipient the redemption key our system provides to
+              you. When they redeem this key, the certificate will be permanently associated with
+              them, and have a digital signature attached proving you were the true issuer.
             </p>
           </Row>
         </Container>

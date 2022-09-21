@@ -10,7 +10,13 @@ import logo from '../../assets/certup-logo-small.png';
 import secretlogo from '../../assets/secret-logo.svg';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiscord, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
+import {
+  faDiscord,
+  faTwitter,
+  faGithub,
+  faLinkedinIn,
+  faLinkedin,
+} from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export default function Footer() {
@@ -48,6 +54,16 @@ export default function Footer() {
               </Col>
               <Col xs="auto">
                 <a
+                  href="https://www.linkedin.com/company/certupnft"
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.socialLink}
+                >
+                  <FontAwesomeIcon icon={faLinkedin as IconProp} />
+                </a>
+              </Col>
+              <Col xs="auto">
+                <a
                   href="https://github.com/CertUP"
                   target="_blank"
                   rel="noreferrer"
@@ -71,8 +87,8 @@ export default function Footer() {
                 </Link>
                 <div style={{ paddingTop: '30px' }} />
 
-                <Link to="/contact">
-                  <span className={styles.navItem}>Contact</span>
+                <Link to="/clients">
+                  <span className={styles.navItem}>Clients</span>
                 </Link>
               </Col>
               <Col sm={5} xs={6}>
@@ -83,6 +99,11 @@ export default function Footer() {
 
                 <Link to="/access" style={{ paddingTop: '30px' }}>
                   <span className={styles.navItem}>Access Certificate</span>
+                </Link>
+                <div style={{ paddingTop: '30px' }} />
+
+                <Link to="/contact">
+                  <span className={styles.navItem}>Contact</span>
                 </Link>
               </Col>
             </Row>
