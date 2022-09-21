@@ -19,6 +19,7 @@ $gradient3: #a659f3;
 }
 .certupButtonColor:hover {
   box-shadow: none;
+  transition: box-shadow 0.2s ease-in-out;
 }
 .certupButtonColor:disabled {
   box-shadow: 0 0 6px 0 transparent;
@@ -26,6 +27,8 @@ $gradient3: #a659f3;
     vars.$lightCertupGradient;
   //width: fit-content;
   transition: box-shadow 0.2s ease-in-out;
+
+  color: #666666 !important;
 }
 
 .defaultBtn {
@@ -48,6 +51,19 @@ $gradient3: #a659f3;
   padding: 0.25rem 1.5rem;
 }
 
+.xsmall {
+  border-radius: 11.8356px;
+  padding: 0.15rem 1rem;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 33px;
+  letter-spacing: 0.02em;
+  color: #1f1f1f;
+}
+.xsmall :disabled {
+  color: #666666 !important;
+}
+
 .certupBtnSq {
   border-radius: 11.8356px;
   border: solid 2px transparent;
@@ -56,7 +72,7 @@ $gradient3: #a659f3;
   font-size: 16px;
   line-height: 33px;
   letter-spacing: 0.02em;
-  color: #666666;
+  color: #535353;
 }
 
 .certupBtnDark {

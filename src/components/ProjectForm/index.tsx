@@ -289,6 +289,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     try {
       if (e) e.preventDefault();
 
+      if (participants.length > 150) {
+        toast.error('Projects are currently limited to 150 participants.');
+        return;
+      }
+
       const newErrors = findFormErrors();
       // Conditional logic:
       if (Object.keys(newErrors).length > 0) {
@@ -317,6 +322,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
     if (!projectName) {
       toast.error("Please enter a 'Project Name'");
+      return;
+    }
+    if (participants.length > 150) {
+      toast.error('Projects are currently limited to 150 participants.');
       return;
     }
     const tid = toast.loading('Saving...');
@@ -360,6 +369,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   const addParticipant = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
+    if (participants.length >= 150) {
+      toast.error('Projects are currently limited to 150 participants.');
+      return;
+    }
     setParticipants([...participants, new Participant()]);
     setDirty(true);
   };
@@ -576,9 +589,13 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
               <Row className="mt-2">
                 <Col xs={'auto'}>
-                  <button className={styles.addBtn} onClick={addParticipant}>
+                  <CUButton
+                    btnStyle="small"
+                    onClick={addParticipant}
+                    disabled={participants.length >= 150}
+                  >
                     + Add
-                  </button>
+                  </CUButton>
                 </Col>
                 <Col xs={'auto'} className="d-flex align-items-center mx-2">
                   <Image
@@ -832,9 +849,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  <Row>
-                    <Col xs="auto">Display DOB</Col>
-                    <Col xs="auto">
+                  <Row className="mx-0 justify-content-center">
+                    <Col xs="auto" className="px-0">
+                      Display DOB
+                    </Col>
+                    <Col xs="auto" className="px-2">
                       <CUTooltip text="Choose if you want to display the participant's date of birth on the certificate image." />
                     </Col>
                   </Row>
@@ -868,13 +887,13 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  <Row className="mx-0">
+                  <Row className="mx-0 justify-content-center">
                     <Col xs="auto" className="px-0">
-                      Display Company
+                      Extra Text
                     </Col>
-                    <Col xs="auto" className="px-1">
+                    <Col xs="auto" className="px-2">
                       <CUTooltip
-                        text={`Choose if you want to associate the participant with the company name, e.g. "Employed at CertUP" or "Attening CertUP University". This text will be displayed on the same line as the participant's name.`}
+                        text={`Choose if you want to add extra text to the second line, e.g. "Employed at CertUP" or "Attending CertUP University". This text will be displayed after the participant's name and DOB (if shown).`}
                       />
                     </Col>
                   </Row>
@@ -883,7 +902,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   <Row>
                     <Form.Group as={Col} md="2" controlId="validationCustom02">
                       <Form.Select
-                        aria-label="Select Date of Birth display format"
+                        aria-label="Select if Date of Birth should be displayed"
                         value={renderProps.displayEmployer?.toString()}
                         onChange={(e) =>
                           updateRenderProps({
@@ -891,8 +910,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                           })
                         }
                       >
-                        <option value="true">Show</option>
-                        <option value="false">Hide</option>
+                        <option value="true">Custom</option>
+                        <option value="false">None</option>
                       </Form.Select>
                     </Form.Group>
                     {renderProps.displayEmployer && (

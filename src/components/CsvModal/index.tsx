@@ -15,6 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
 import { Participant } from '../../interfaces/Project';
+import { toast } from 'react-toastify';
 
 interface props {
   show: boolean;
@@ -28,6 +29,12 @@ export default function CsvModal({ show, setShow, setParticipants }: props) {
 
   const handleParticipants = (data: Participant[]) => {
     setParticipants(data);
+    if (data.length > 150) {
+      toast.error(
+        `Projects are currently limited to 150 participants. Your uploaded ${data.length} participants.`,
+      );
+      return;
+    }
     handleClose();
   };
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // import styles from "./styles.module.scss"
-import { Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -137,6 +137,13 @@ export default function Mint() {
     if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
     if (!project.certInfo.issue_date) throw new Error('Project must have an issue date.');
 
+    if (project.participants.length > 150) {
+      toast.error(
+        `Projects are currently limited to 150 participants. Your project contains ${project.participants.length} participants.`,
+      );
+      return;
+    }
+
     setLoadingGenerate(true);
     const toastRef = toast.loading('Generating Certificate Images...');
 
@@ -168,6 +175,13 @@ export default function Mint() {
       if (!project) throw new Error('Project Data Not Found');
       if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
       if (!imageHashes.length) throw new Error('Images Not Generated');
+
+      if (project.participants.length > 150) {
+        toast.error(
+          `Projects are currently limited to 150 participants. Your project contains ${project.participants.length} participants.`,
+        );
+        return;
+      }
 
       setLoadingPreload(true);
       const toastRef = toast.loading('Processing Transaction...');
@@ -314,7 +328,21 @@ export default function Mint() {
               </Row>
               <Row className="justify-content-end">
                 <Col xs={'auto'} className="mx-4">
-                  <button
+                  <CUButton
+                    btnStyle="square"
+                    onClick={handleGenerate}
+                    disabled={loadingGenerate || !!imageHashes.length || !project || loaded}
+                    className={loadingGenerate ? `${styles.processingButton}` : undefined}
+                  >
+                    {loadingGenerate ? (
+                      <>Processing</>
+                    ) : imageHashes.length || loaded ? (
+                      'Complete'
+                    ) : (
+                      'Generate'
+                    )}
+                  </CUButton>
+                  {/* <button
                     className={
                       loadingGenerate
                         ? `${styles.processingButton} ${styles.cancelBtn}`
@@ -330,7 +358,7 @@ export default function Mint() {
                     ) : (
                       'Generate'
                     )}
-                  </button>
+                  </button> */}
                   {loaded && (
                     <>
                       <br />
@@ -379,9 +407,12 @@ export default function Mint() {
                 <Col xs={'auto'} className="mx-4">
                   {loaded ? (
                     <>
-                      <button className={styles.cancelBtn} disabled={true}>
+                      <CUButton btnStyle="square" disabled={true}>
                         Complete
-                      </button>
+                      </CUButton>
+                      {/* <button className={styles.cancelBtn} disabled={true}>
+                        Complete
+                      </button> */}
                       <br />
                       {!!txHash && (
                         <a
@@ -394,17 +425,25 @@ export default function Mint() {
                       )}
                     </>
                   ) : (
-                    <button
-                      className={
-                        loadingPreload
-                          ? `${styles.processingButton} ${styles.cancelBtn}`
-                          : styles.cancelBtn
-                      }
+                    <CUButton
+                      btnStyle="square"
+                      className={loadingPreload ? `${styles.processingButton}` : undefined}
                       onClick={handlePreload}
                       disabled={ProcessingTx || loadingPreload || !imageHashes.length}
                     >
                       {loadingPreload ? 'Processing' : 'Finish'}
-                    </button>
+                    </CUButton>
+                    // <button
+                    //   className={
+                    //     loadingPreload
+                    //       ? `${styles.processingButton} ${styles.cancelBtn}`
+                    //       : styles.cancelBtn
+                    //   }
+                    //   onClick={handlePreload}
+                    //   disabled={ProcessingTx || loadingPreload || !imageHashes.length}
+                    // >
+                    //   {loadingPreload ? 'Processing' : 'Finish'}
+                    // </button>
                   )}
                 </Col>
               </Row>

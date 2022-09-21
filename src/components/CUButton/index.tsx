@@ -15,7 +15,7 @@ export interface ButtonProps
     React.AriaAttributes {
   large?: boolean;
   fill?: boolean;
-  btnStyle?: 'large' | 'square' | 'dark' | 'default';
+  btnStyle?: 'large' | 'square' | 'dark' | 'default' | 'small';
 }
 
 // enum ButtonStyle { wtf
@@ -50,8 +50,8 @@ export interface ButtonProps
 //     );
 // }
 
-export const CUButton: React.FC<ButtonProps> = (props) => {
-  const { children, fill, btnStyle, style, ...rest } = props;
+export const CUButton: React.FC<ButtonProps> = (props: ButtonProps) => {
+  const { children, fill, btnStyle, style, className, ...rest } = props;
   switch (btnStyle) {
     case 'large':
       return (
@@ -68,7 +68,7 @@ export const CUButton: React.FC<ButtonProps> = (props) => {
       return (
         <button
           {...rest}
-          className={`${styles.certupBtn} ${styles.certupBtnSq} ${styles.certupButtonColor}`}
+          className={`${styles.certupBtn} ${styles.certupBtnSq} ${styles.certupButtonColor} ${className}`}
           style={fill ? { width: '100%' } : { width: 'auto' }}
         >
           {children}
@@ -101,7 +101,9 @@ export const CUButton: React.FC<ButtonProps> = (props) => {
       return (
         <button
           {...rest}
-          className={`${styles.certupBtn} ${styles.certupBtnSmall} ${styles.certupButtonColor}`}
+          className={`${styles.certupBtn} ${
+            btnStyle === 'small' ? styles.xsmall : styles.certupBtnSmall
+          } ${styles.certupButtonColor}`}
           style={fill ? { width: '100%' } : undefined}
         >
           {children}
