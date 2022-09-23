@@ -17,12 +17,20 @@ interface Props {
 }
 
 export default function ConnectBanner({ text, issuer }: Props) {
-  const { updateClient, Wallet, Address, LoginToken, QueryPermit, toggleLoginModal } = useWallet();
+  const {
+    updateClient,
+    Wallet,
+    Address,
+    LoginToken,
+    QueryPermit,
+    toggleLoginModal,
+    VerifiedIssuer,
+  } = useWallet();
 
   const [cookies, setCookie, removeCookie] = useCookies(['IssuerLogin']);
 
   useEffect(() => {
-    if (!Address || !Wallet || !issuer) return;
+    if (!Address || !Wallet || !issuer || !QueryPermit) return;
     if (cookies.IssuerLogin) {
       if (
         numDaysBetween(new Date(cookies.IssuerLogin), new Date()) <

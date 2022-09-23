@@ -16,13 +16,14 @@ interface AButtonProps {
 export function AuthenticateButton({ callback, issuer }: AButtonProps) {
   const [loading, setLoading] = useState(false);
   const { updateClient, ShowLoginModal, toggleLoginModal, Address } = useWallet();
-  const [cookies, setCookie, removeCookie] = useCookies(['IssuerLogin']);
+  const [cookies, setCookie, removeCookie] = useCookies(['IssuerLogin', 'ConnectedKeplr']);
 
   const handleAuthenticate = async () => {
     setLoading(true);
     try {
       const queryPermit = await getQueryPermit(Address, true);
       updateClient({ permit: queryPermit });
+      setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
       setLoading(false);
       if (callback) callback();
     } catch (error: any) {

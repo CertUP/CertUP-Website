@@ -1,15 +1,18 @@
 import { QueryResponse } from '.';
 import { CertupMetadata } from './token';
 
-export interface Issuer {
-  /// ID of Issuer
-  id: string;
+export interface NewIssuer {
   /// Name of the organization
   name?: string;
   /// Website URL of the organization
   website?: string;
   /// URL of the issuer's logo
   logo_img_url?: string;
+}
+
+export interface Issuer extends NewIssuer {
+  /// ID of Issuer
+  id: string;
   /// If the issuer has been verified by CertUP
   verified: boolean;
   /// Name of the organization verified by CertUP

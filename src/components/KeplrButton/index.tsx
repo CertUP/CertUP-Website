@@ -11,7 +11,11 @@ import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, numDaysBetween, reportError, sleep } from '../../utils/helpers';
-import getPermits, { getCachedQueryPermit, LoginToken } from '../../utils/loginPermit';
+import getPermits, {
+  getCachedLoginToken,
+  getCachedQueryPermit,
+  LoginToken,
+} from '../../utils/loginPermit';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import React from 'react';
@@ -69,13 +73,9 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
   const { Address, updateClient, IssuerProfile, toggleLoginModal } = useWallet();
   const [loading, setLoading] = useState(false);
 
-  const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr']);
+  const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr', 'IssuerLogin']);
 
   const navigate = useNavigate();
-
-  //const [secretJs, setSecretJs] = useGlobalState('secretJs');
-  //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
-  //const [isSigner, setIsSigner] = useGlobalState('isSigner');
 
   // eslint-disable-next-line react/display-name
   const CustomToggle = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -86,17 +86,6 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
         <span>{truncateAddress(Address)}</span>
         <FontAwesomeIcon icon={faAngleDown} style={{ paddingLeft: '.5rem' }} />
       </button>
-      // <a
-      //   href=""
-      //   ref={ref}
-      //   onClick={(e) => {
-      //     e.preventDefault();
-      //     onClick(e);
-      //   }}
-      // >
-      //   {children}
-      //   &#x25bc;
-      // </a>
     ),
   );
 
@@ -159,19 +148,25 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
         return; //modal will handle the rest
       }
 
-      // const issueDate = new Date();
-      // const expDate = addHours(new Date(), 12);
-      // const { loginPermit: token, queryPermit: permit } = await getPermits(
-      //   myAddress,
-      //   issueDate,
-      //   expDate,
-      // );
-      updateClient({
-        client: secretjs,
-        wallet: keplrOfflineSigner as Wallet,
-        address: myAddress,
-        permit: cachedPermit,
-      });
+      //check for LOGIN permit from storage, but dont get a new one
+      const cachedToken = getCachedLoginToken(myAddress); //todo check if expired
+      if (cachedToken) {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+          permit: cachedPermit,
+          token: cachedToken,
+        });
+      } else {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+          permit: cachedPermit,
+        });
+      }
+
       setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
       setLoading(false);
     } catch (error) {
@@ -192,6 +187,7 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
 
       updateClient({ force: true });
       removeCookie('ConnectedKeplr', { path: '/' });
+      removeCookie('IssuerLogin', { path: '/' });
       setLoading(false);
     } catch (error) {
       setLoading(false);

@@ -19,6 +19,7 @@ import axios from 'axios';
 import { PreviewProvider } from '../../contexts/PreviewContext';
 import ProjectReview from '../ProjectReview';
 import ReviewViewer from '../../components/ReviewViewer';
+import { RestrictedAccess } from '../../components/RestrictedAccess';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
@@ -33,6 +34,7 @@ export default function Issuers() {
     LoginToken,
     VerifiedIssuer,
     LoadingRemainingCerts,
+    QueryPermit,
   } = useWallet();
 
   const location = useLocation();
@@ -85,7 +87,7 @@ export default function Issuers() {
     setShowProject(false);
   };
 
-  if (!Wallet || !Address || !LoginToken)
+  if (!Wallet || !Address || !QueryPermit || (VerifiedIssuer && !LoginToken))
     return (
       <>
         <Layout>
@@ -99,6 +101,26 @@ export default function Issuers() {
           <Spacer height={50} />
 
           <ConnectBanner text="Connect a wallet to start issuing certifificates." issuer={true} />
+
+          <Spacer height={150} />
+        </Layout>
+      </>
+    );
+
+  if (!VerifiedIssuer && !LoadingRemainingCerts)
+    return (
+      <>
+        <Layout>
+          <Spacer height={100} />
+
+          <Container>
+            <Row>
+              <span className={styles.aboutTitle}>Issue Certificate</span>
+            </Row>
+          </Container>
+          <Spacer height={50} />
+
+          <RestrictedAccess />
 
           <Spacer height={150} />
         </Layout>

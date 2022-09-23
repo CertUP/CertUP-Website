@@ -284,6 +284,50 @@ export default function useExecute() {
     }
   };
 
+  interface RegisterProps {
+    name?: string;
+    website?: string;
+    logo_img_url?: string;
+    toastRef?: any;
+  }
+  const registerIssuer = async ({
+    name,
+    website,
+    logo_img_url,
+    toastRef,
+  }: RegisterProps): Promise<ComputeTx> => {
+    if (!Client) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    // const price = 3; // uSSCRT
+    // const total: string = (numCerts * price).toString();
+
+    const msg = {
+      add_issuer: {
+        new_issuer: {
+          addr: Address,
+          name,
+          website,
+          logo_img_url,
+        },
+        purchased_certs: '0',
+      },
+    };
+
+    const sendMsg = {
+      send: {
+        recipient: process.env.REACT_APP_MANAGER_ADDR,
+        amount: '0',
+        msg: btoa(JSON.stringify(msg)),
+      },
+    };
+
+    const response = await executeToken(sendMsg, 400000, toastRef);
+
+    queryCredits();
+    return response as ComputeTx;
+  };
+
   const paySSCRT = async (numCerts: number, amount: string, toastRef: any): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -758,5 +802,6 @@ export default function useExecute() {
     approveAccessGlobal,
     revokeAccessGlobal,
     claimCert,
+    registerIssuer,
   };
 }
