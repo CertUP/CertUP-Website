@@ -53,8 +53,8 @@ export default function Access() {
     setLoadingMint(true);
     const toastRef = toast.loading('Transaction Processing...');
     try {
-      //const result = await claimCert(accessCode, toastRef);
-      const result = await claimCert({ claim_code: accessCode, address: Address });
+      const result = await claimCert(accessCode, toastRef);
+      //const result = await claimCert({ claim_code: accessCode, address: Address });
       console.log('Mint Result:', result);
       if (!result) throw new Error('Something went wrong');
       console.log('OK');
