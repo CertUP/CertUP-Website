@@ -349,7 +349,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeToken(sendMsg, 100000, toastRef);
+    const response = await executeToken(sendMsg, 500000, toastRef);
 
     // const response = await Client.tx.snip20.send(
     //   {
@@ -409,7 +409,7 @@ export default function useExecute() {
     });
 
     const response = await Client.tx.broadcast([depositMsg, sendMsg], {
-      gasLimit: 480000,
+      gasLimit: 1_500_000,
       gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
     });
 

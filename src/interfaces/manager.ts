@@ -65,8 +65,8 @@ export interface GetIssuerResponse extends QueryResponse {
 }
 
 export interface CertPriceResponse extends QueryResponse {
-  cert_price: {
-    pay_data: Payment;
+  display_cost: {
+    cost_data: Payment;
   };
 }
 

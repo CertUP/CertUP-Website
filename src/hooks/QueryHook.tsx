@@ -195,7 +195,7 @@ export default function useQuery() {
     if (!Querier) throw new Error('Client not available.');
 
     const query = {
-      cert_price: {},
+      display_cost: {},
     };
 
     const response = (await Querier.query.compute.queryContract({
@@ -205,8 +205,8 @@ export default function useQuery() {
     })) as CertPriceResponse;
     console.log(query, response);
     checkError(response);
-
-    return parseInt(response?.cert_price.pay_data.amount, 10);
+    return parseInt(response?.display_cost.cost_data.amount, 10);
+    //return parseInt(response?.cert_price.pay_data.amount, 10);
   };
 
   const queryProjects = async () => {
