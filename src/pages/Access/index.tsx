@@ -18,7 +18,7 @@ import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import useExecute from '../../hooks/ExecuteHook';
 import CUSpinner from '../../components/CUSpinner';
-import { claimCert } from '../../utils/backendHelper';
+//import { claimCert } from '../../utils/backendHelper';
 
 export default function Access() {
   const [loadingMint, setLoadingMint] = useState(false);
@@ -29,7 +29,7 @@ export default function Access() {
 
   const { getOwnedCerts } = useQuery();
   const { Dossiers, LoadingNfts, refreshDossiers, findNft } = useNft();
-  //const { claimCert } = useExecute();
+  const { claimCert } = useExecute();
 
   const navigate = useNavigate();
   const location = useLocation();
