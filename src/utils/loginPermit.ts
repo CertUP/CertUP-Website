@@ -99,7 +99,7 @@ export async function getLoginToken(
 
   let cachedToken = getCachedLoginToken(address);
   if (cachedToken) {
-    //console.log('found cached token', cachedToken);
+    console.log('found cached token', cachedToken);
     if (!cachedToken.expires || new Date(cachedToken.expires) < new Date()) cachedToken = undefined;
   }
   if (!refresh && cachedToken) return cachedToken;
