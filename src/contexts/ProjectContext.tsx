@@ -131,13 +131,13 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
       //= response.data.data.map((project: any) => {
       for (let i = 0; i < returnedProjects.length; i++) {
         const project: Project = returnedProjects[i];
-
-        //convert issue date string from DB into Date
-        if (project.certInfo.issue_date)
-          project.certInfo.issue_date = new Date(project.certInfo.issue_date);
-        if (project.certInfo.expire_date)
-          project.certInfo.expire_date = new Date(project.certInfo.expire_date);
-
+        if (project.certInfo) {
+          //convert issue date string from DB into Date
+          if (project.certInfo.issue_date)
+            project.certInfo.issue_date = new Date(project.certInfo.issue_date);
+          if (project.certInfo.expire_date)
+            project.certInfo.expire_date = new Date(project.certInfo.expire_date);
+        }
         // convert participant dob strings from DB to Date
         for (let i = 0; i < project.participants.length; i++) {
           if (project.participants[i].dob)
