@@ -303,26 +303,17 @@ export default function useExecute() {
     // const total: string = (numCerts * price).toString();
 
     const msg = {
-      add_issuer: {
+      quick_register_issuer: {
         new_issuer: {
           addr: Address,
           name,
           website,
           logo_img_url,
         },
-        purchased_certs: '0',
       },
     };
 
-    const sendMsg = {
-      send: {
-        recipient: process.env.REACT_APP_MANAGER_ADDR,
-        amount: '0',
-        msg: btoa(JSON.stringify(msg)),
-      },
-    };
-
-    const response = await executeToken(sendMsg, 400000, toastRef);
+    const response = await executeManager(msg, 175000, toastRef);
 
     queryCredits();
     return response as ComputeTx;

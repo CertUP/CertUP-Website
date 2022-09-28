@@ -54,6 +54,8 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
         logo_img_url: newIssuerData?.logo_img_url,
         toastRef,
       });
+      setLoadingUpdate(false);
+      toggleLoginModal(undefined);
     } catch (error: any) {
       toast.update(toastRef, {
         render: error.toString(),
@@ -91,7 +93,7 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
             onSubmit={handleRegister}
           >
             <Row className={`justify-content-center`}>
-              <Col md="auto" className="pt-4">
+              <Col md="3" className="pt-4">
                 <div className={`${styles.largeLabel} mb-2`} style={{ fontWeight: '600' }}>
                   Logo Preview:
                 </div>
