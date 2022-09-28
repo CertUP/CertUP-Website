@@ -46,6 +46,7 @@ export interface WalletContextState {
   updateClient: (props: UpdateClientProps) => void;
   setProcessingTx: (newState: boolean) => void;
   queryCredits: () => Promise<number | undefined>;
+  clearToken: () => void;
 }
 
 interface Props {
@@ -78,6 +79,9 @@ const contextDefaultValues: WalletContextState = {
     throw new Error('Function not implemented.');
   },
   setProcessingTx: function (): void {
+    throw new Error('Function not implemented.');
+  },
+  clearToken: function (): void {
     throw new Error('Function not implemented.');
   },
 };
@@ -142,6 +146,10 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     if (token || force) setLoginToken(token);
     if (permit || force) setQueryPermit(permit);
     if (wallet) setClientIsSigner(wallet ? true : false);
+  };
+
+  const clearToken = () => {
+    setLoginToken(undefined);
   };
 
   useEffect(() => {
@@ -280,6 +288,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     updateClient,
     queryCredits,
     setProcessingTx,
+    clearToken,
     VerifiedIssuer,
   };
 

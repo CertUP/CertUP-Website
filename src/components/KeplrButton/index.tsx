@@ -14,6 +14,7 @@ import { getErrorMessage, numDaysBetween, reportError, sleep } from '../../utils
 import getPermits, {
   getCachedLoginToken,
   getCachedQueryPermit,
+  isExpired,
   LoginToken,
 } from '../../utils/loginPermit';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -148,9 +149,10 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
         return; //modal will handle the rest
       }
 
-      //check for LOGIN permit from storage, but dont get a new one
-      const cachedToken = getCachedLoginToken(myAddress); //todo check if expired
-      if (cachedToken) {
+      //check for LOGIN permit from storage
+      const cachedToken = getCachedLoginToken(myAddress);
+      console.log('Cached Token', cachedToken);
+      if (cachedToken && !isExpired(cachedToken)) {
         updateClient({
           client: secretjs,
           wallet: keplrOfflineSigner as Wallet,

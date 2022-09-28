@@ -84,7 +84,19 @@ export function getCachedQueryPermit(address: string): PermitSignature | undefin
 
 export function getCachedLoginToken(address: string): LoginToken | undefined {
   const cachedToken = localStorage.getItem(getLoginString(address));
-  return cachedToken ? JSON.parse(cachedToken) : undefined;
+  if (cachedToken) {
+    const json: LoginToken = JSON.parse(cachedToken);
+    json.expires = new Date(json.expires);
+    json.issued = new Date(json.issued);
+    if (isExpired(json)) return undefined;
+    return json;
+  }
+  return undefined;
+}
+
+export function isExpired(token: LoginToken): boolean {
+  if (token.expires < new Date()) return true;
+  return false;
 }
 
 export async function getLoginToken(
@@ -100,7 +112,7 @@ export async function getLoginToken(
   let cachedToken = getCachedLoginToken(address);
   if (cachedToken) {
     console.log('found cached token', cachedToken);
-    if (!cachedToken.expires || new Date(cachedToken.expires) < new Date()) cachedToken = undefined;
+    if (!cachedToken.expires || isExpired(cachedToken)) cachedToken = undefined;
   }
   if (!refresh && cachedToken) return cachedToken;
 

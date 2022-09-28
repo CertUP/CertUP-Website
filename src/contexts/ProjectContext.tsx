@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { dataURLtoFile } from '../utils/fileHelper';
 import useQuery from '../hooks/QueryHook';
 import { ExportProject } from '../interfaces/manager';
+import { isExpired } from '../utils/loginPermit';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
@@ -88,7 +89,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   const { queryProjects } = useQuery();
 
-  const { Address, LoginToken, QueryPermit, VerifiedIssuer } = useWallet();
+  const { Address, LoginToken, QueryPermit, VerifiedIssuer, clearToken } = useWallet();
 
   useEffect(() => {
     if (!Address || !LoginToken || !QueryPermit || !VerifiedIssuer) return;
@@ -107,6 +108,10 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
   const refreshPendingProjects = async () => {
     if (!LoginToken || !Address) return;
+    if (isExpired(LoginToken)) {
+      clearToken();
+      return;
+    }
 
     try {
       setLoadingPending(true);
