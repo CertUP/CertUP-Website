@@ -19,7 +19,8 @@ import PaymentRow, { Confirmation } from '../../components/PaymentRow';
 import CUSpinner from '../../components/CUSpinner';
 
 export default function Payment() {
-  const { Wallet, Address, LoginToken, queryCredits, RemainingCerts } = useWallet();
+  const { Wallet, Address, LoginToken, queryCredits, RemainingCerts, LoadingRemainingCerts } =
+    useWallet();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,6 +57,8 @@ export default function Payment() {
   };
 
   useEffect(() => {
+    if (!!confirmation || LoadingRemainingCerts) return;
+
     if (RemainingCerts && RemainingCerts >= location.state.num_certificates) {
       //navigate('/generate', { state: { projectId: location.state.projectId } });
       setPaid(true);
@@ -65,7 +68,7 @@ export default function Payment() {
       });
       setLoading(false);
     }
-  }, [RemainingCerts]);
+  }, [RemainingCerts, LoadingRemainingCerts]);
 
   useEffect(() => {
     if (LoadingPendingProjects) return;
