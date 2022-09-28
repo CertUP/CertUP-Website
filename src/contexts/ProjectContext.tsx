@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import Project, { MintedProject } from '../interfaces/Project';
+import Project, { defaultCertInfo, MintedProject } from '../interfaces/Project';
 // import { getRandom } from '../utils/helpers';
 import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { useWallet } from '.';
@@ -135,8 +135,11 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
           //convert issue date string from DB into Date
           if (project.certInfo.issue_date)
             project.certInfo.issue_date = new Date(project.certInfo.issue_date);
+          else project.certInfo.issue_date = new Date();
           if (project.certInfo.expire_date)
             project.certInfo.expire_date = new Date(project.certInfo.expire_date);
+        } else {
+          project.certInfo = defaultCertInfo;
         }
         // convert participant dob strings from DB to Date
         for (let i = 0; i < project.participants.length; i++) {

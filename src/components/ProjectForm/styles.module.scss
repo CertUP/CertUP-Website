@@ -192,6 +192,8 @@ $gradient3: #a659f3;
 
 .participantList {
   padding-top: 0.5rem;
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: 50vh;
+  min-height: 30vh;
+  align-content: flex-start;
 }

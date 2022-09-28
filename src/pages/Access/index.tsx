@@ -18,7 +18,7 @@ import PreloadImage from '../../components/PreloadImage';
 import { CertupExtension } from '../../interfaces/token';
 import useExecute from '../../hooks/ExecuteHook';
 import CUSpinner from '../../components/CUSpinner';
-//import { claimCert } from '../../utils/backendHelper';
+import { claimCert as claimCertFree } from '../../utils/backendHelper';
 
 export default function Access() {
   const [loadingMint, setLoadingMint] = useState(false);
@@ -53,8 +53,8 @@ export default function Access() {
     setLoadingMint(true);
     const toastRef = toast.loading('Transaction Processing...');
     try {
-      const result = await claimCert(accessCode, toastRef);
-      //const result = await claimCert({ claim_code: accessCode, address: Address });
+      //const result = await claimCert(accessCode, toastRef);
+      const result = await claimCertFree({ claim_code: accessCode, address: Address });
       console.log('Mint Result:', result);
       if (!result) throw new Error('Something went wrong');
       console.log('OK');
