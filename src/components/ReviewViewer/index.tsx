@@ -120,9 +120,7 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
   };
 
   const refreshProjectInfo = async () => {
-    console.log('Internal AAA');
     if (!pid) {
-      console.error('returning');
       return;
     }
     setLoading(true);

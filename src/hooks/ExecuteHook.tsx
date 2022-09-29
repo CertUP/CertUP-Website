@@ -527,7 +527,12 @@ export default function useExecute() {
       console.log('Simulation Used:', response.gasInfo?.gasUsed);
 
       //return gas used with some overhead
-      return parseInt(response.gasInfo?.gasUsed || '500000', 10) * 1.08;
+      const gasLimit = Math.floor(
+        parseInt(response.gasInfo?.gasUsed || '500000', 10) *
+          parseFloat(process.env.REACT_APP_SIM_MULTIPLIER || '1.08'),
+      );
+      console.log('Recommended Limit:', gasLimit);
+      return gasLimit;
     } catch (err: any) {
       console.error('TX Simulation Error', err);
       throw err;
