@@ -148,13 +148,16 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
     e: React.MouseEvent<HTMLButtonElement, MouseEvent> | FormEvent<HTMLFormElement>,
   ) => {
     try {
-      setLoading('addWhitelist');
       e.preventDefault();
       if (findFormErrors()) {
         return;
       }
+      if (!whitelistAddr) return; //error will be displayed by by form errors
+
+      setLoading('addWhitelist');
       const response = await allowAddressAccess({ tokenId, address: whitelistAddr });
       console.log(response);
+      setWhitelistAddr('');
       await refreshDossier();
       setLoading('');
     } catch (error) {
@@ -249,7 +252,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
               <Row className="justify-content-center">
                 <Col md="auto">
                   <CUButton btnStyle="square" onClick={handleWhitelist} disabled={ProcessingTx}>
-                    Allow Address
+                    {loading === 'addWhitelist' ? <CUSpinner size="xs" /> : 'Allow Address'}
                   </CUButton>
                 </Col>
               </Row>

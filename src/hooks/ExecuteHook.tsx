@@ -695,7 +695,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 135000, toastRef);
+    const response = await executeNft(approveMsg, 150000, toastRef);
     return response;
   };
 
@@ -709,7 +709,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 50000, toastRef);
+    const response = await executeNft(approveMsg, 150000, toastRef);
     return response;
   };
 
@@ -728,7 +728,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 50000, toastRef);
+    const response = await executeNft(approveMsg, 200000, toastRef);
     return response;
   };
 
@@ -743,7 +743,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(removeMsg, 50000, toastRef);
+    const response = await executeNft(removeMsg, 200000, toastRef);
     return response;
   };
 
@@ -768,7 +768,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 50000, toastRef);
+    const response = await executeNft(approveMsg, 135000, toastRef);
     return response;
   };
 
@@ -783,7 +783,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(removeMsg, 50000, toastRef);
+    const response = await executeNft(removeMsg, 135000, toastRef);
     return response;
   };
 
