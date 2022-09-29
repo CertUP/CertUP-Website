@@ -45,6 +45,7 @@ function App() {
               <Route path="/addCredit" element={<AddCredit />} />
               <Route path="/generate" element={<Mint />} />
               <Route path="/access" element={<Access />} />
+              <Route path="/claim" element={<Access />} />
               <Route path="/access/:tokenid" element={<ViewCert />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/profile" element={<Profile />} />

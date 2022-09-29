@@ -37,7 +37,7 @@ interface ViewerProps {
   meta?: boolean;
 }
 
-const claimUrl = `${window.location.protocol}//${window.location.host}/access/`;
+const claimUrl = `${window.location.protocol}//${window.location.host}/claim/`;
 
 export default function ReviewViewer({ pid, step, hashes, pData, meta = false }: ViewerProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts, IssuerProfile } =

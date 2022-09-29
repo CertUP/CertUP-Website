@@ -25,7 +25,7 @@ import textEncoding from 'text-encoding';
 import CopyButton from '../../components/CopyButton';
 const TextDecoder = textEncoding.TextDecoder;
 
-const claimUrl = `${window.location.protocol}//${window.location.host}/access/`;
+const claimUrl = `${window.location.protocol}//${window.location.host}/claim/`;
 
 interface ButtonProps {
   backHandler: () => void;
@@ -321,7 +321,10 @@ export default function Mint() {
                   >
                     View Transaction on Explorer →
                   </a>
-                  <h5 style={{ marginTop: '1.5rem' }}>Recipients can redeem their certs at:</h5>
+                  <h5 style={{ marginTop: '1.5rem' }}>
+                    You can download the certificate claim codes below.
+                  </h5>
+                  <h6>Recipients can redeem their certs at:</h6>
                   <p className={`${styles.accessText} ${styles.certLink} mx-2 mb-0`}>
                     {claimUrl}
                     <CopyButton text={claimUrl} className="mx-2" />
@@ -372,23 +375,6 @@ export default function Mint() {
                         'Generate'
                       )}
                     </CUButton>
-                    {/* <button
-                    className={
-                      loadingGenerate
-                        ? `${styles.processingButton} ${styles.cancelBtn}`
-                        : styles.cancelBtn
-                    }
-                    onClick={handleGenerate}
-                    disabled={loadingGenerate || !!imageHashes.length || !project || loaded}
-                  >
-                    {loadingGenerate ? (
-                      <>Processing</>
-                    ) : imageHashes.length || loaded ? (
-                      'Complete'
-                    ) : (
-                      'Generate'
-                    )}
-                  </button> */}
                     {loaded && (
                       <>
                         <br />
