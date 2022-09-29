@@ -7,9 +7,13 @@ import styles from './styles.module.scss';
 
 import ChooseFile from '../../assets/ChooseFile.svg';
 import { dataURLtoFile, fileToDataURI } from '../../utils/fileHelper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import Col from 'react-bootstrap/esm/Col';
+import Row from 'react-bootstrap/esm/Row';
 
 interface props {
-  set: (a: string) => void;
+  set: (a: string | undefined) => void;
   //external?: ExFile;
   externalUri?: string;
 }
@@ -73,41 +77,50 @@ export default function ImageDropzone({ set, externalUri }: props) {
     );
   });
 
-  // const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-  //   <li key={file.path}>
-  //     {file.path} - {file.size} bytes
-  //     <ul>
-  //       {errors.map((e) => (
-  //         <li key={e.code}>{e.message}</li>
-  //       ))}
-  //     </ul>
-  //   </li>
-  // ));
+  const handleReset = () => {
+    setFiles([]);
+    set(undefined);
+  };
 
   return (
-    <section className={styles.logoContainer}>
-      <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: 'pointer' }}>
-        <input {...getInputProps()} />
-        {files.length ? (
-          <Image
-            src={files[0].preview}
-            alt=""
-            fluid
-            style={{ maxHeight: '100px', cursor: 'pointer' }}
+    <Row>
+      <Col xs="auto">
+        <section className={styles.logoContainer}>
+          <div {...getRootProps({ className: 'dropzone' })} style={{ cursor: 'pointer' }}>
+            <input {...getInputProps()} />
+            {files.length ? (
+              <Image
+                src={files[0].preview}
+                alt=""
+                fluid
+                style={{ maxHeight: '100px', cursor: 'pointer' }}
+              />
+            ) : (
+              <>
+                <Image src={ChooseFile} alt="Choose File" style={{ cursor: 'pointer' }} />
+              </>
+            )}
+          </div>
+          <aside>
+            {files.length && files[0].path ? (
+              <span style={{ fontSize: '14px', textAlign: 'left' }}>
+                {files[0].path || files[0].name}
+              </span>
+            ) : null}
+          </aside>
+        </section>
+      </Col>
+
+      <Col xs="auto" className="d-flex align-items-center">
+        {!!files.length && (
+          <FontAwesomeIcon
+            icon={faTimesCircle}
+            size="lg"
+            onClick={() => handleReset()}
+            style={{ cursor: 'pointer' }}
           />
-        ) : (
-          <>
-            <Image src={ChooseFile} alt="Choose File" style={{ cursor: 'pointer' }} />
-          </>
         )}
-      </div>
-      <aside>
-        {files.length && files[0].path ? (
-          <span style={{ fontSize: '14px', textAlign: 'left' }}>
-            {files[0].path || files[0].name}
-          </span>
-        ) : null}
-      </aside>
-    </section>
+      </Col>
+    </Row>
   );
 }

@@ -224,12 +224,12 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     });
   };
 
-  const handleLogoChange = async (uri: string) => {
+  const handleLogoChange = async (uri: string | undefined) => {
     setDirty(true);
     updateRenderProps({ companyLogoUri: uri });
   };
 
-  const handleSigChange = async (uri: string) => {
+  const handleSigChange = async (uri: string | undefined) => {
     setDirty(true);
     updateRenderProps({ signerSignatureUri: uri });
   };
@@ -1008,7 +1008,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <Col md={2} className={styles.participantLabels}>
                   Signature
                 </Col>
-                <Col md="auto">
+                <Col>
                   <ImageDropzone
                     set={handleSigChange}
                     externalUri={renderProps.signerSignatureUri}
