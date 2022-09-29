@@ -49,7 +49,7 @@ export const logSizeInKilobytes = (description: string, obj: any) => {
 };
 
 export const numDaysBetween = function (d1: Date, d2: Date) {
-  var diff = Math.abs(d1.getTime() - d2.getTime());
+  const diff = Math.abs(d1.getTime() - d2.getTime());
   return diff / (1000 * 60 * 60 * 24);
 };
 
@@ -217,3 +217,51 @@ export const participantsToWorksheet = (participants: Participant[], projectName
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Project');
   XLSX.writeFile(workbook, `CertUP Project Review - ${projectName}.xlsx`);
 };
+
+export async function suggestTestnet() {
+  if (!window.keplr) throw new Error('Keplr wallet extension not found.');
+
+  await window.keplr.experimentalSuggestChain({
+    chainId: 'pulsar-2',
+    chainName: 'Secret Testnet',
+    rpc: 'https://pulsar-2.api.trivium.network:26657',
+    rest: 'https://pulsar-2.api.trivium.network:1317',
+    bip44: {
+      coinType: 529,
+    },
+    coinType: 529,
+    stakeCurrency: {
+      coinDenom: 'SCRT',
+      coinMinimalDenom: 'uscrt',
+      coinDecimals: 6,
+    },
+    bech32Config: {
+      bech32PrefixAccAddr: 'secret',
+      bech32PrefixAccPub: 'secretpub',
+      bech32PrefixValAddr: 'secretvaloper',
+      bech32PrefixValPub: 'secretvaloperpub',
+      bech32PrefixConsAddr: 'secretvalcons',
+      bech32PrefixConsPub: 'secretvalconspub',
+    },
+    currencies: [
+      {
+        coinDenom: 'SCRT',
+        coinMinimalDenom: 'uscrt',
+        coinDecimals: 6,
+      },
+    ],
+    feeCurrencies: [
+      {
+        coinDenom: 'SCRT',
+        coinMinimalDenom: 'uscrt',
+        coinDecimals: 6,
+      },
+    ],
+    gasPriceStep: {
+      low: 0.1,
+      average: 0.25,
+      high: 0.4,
+    },
+    features: ['secretwasm', 'ibc-go', 'ibc-transfer'],
+  });
+}

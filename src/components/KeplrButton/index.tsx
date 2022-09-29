@@ -10,7 +10,13 @@ import { useCookies } from 'react-cookie';
 import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
-import { getErrorMessage, numDaysBetween, reportError, sleep } from '../../utils/helpers';
+import {
+  getErrorMessage,
+  numDaysBetween,
+  reportError,
+  sleep,
+  suggestTestnet,
+} from '../../utils/helpers';
 import getPermits, {
   getCachedLoginToken,
   getCachedQueryPermit,
@@ -121,6 +127,7 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
         return;
       }
 
+      if (process.env.REACT_APP_CHAIN_ID.includes('pulsar')) await suggestTestnet();
       await window.keplr.enable(process.env.REACT_APP_CHAIN_ID as string);
 
       const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
