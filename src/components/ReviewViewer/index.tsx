@@ -256,7 +256,9 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
                         ).toLocaleDateString()
                       : null}
                   </td>
-                  <td style={{ width: step !== 'preload' ? '50%' : '20%' }}>{token.claim_code}</td>
+                  <td style={{ width: step !== 'preload' ? '50%' : '20%', wordWrap: 'break-word' }}>
+                    {token.claim_code}
+                  </td>
 
                   {step !== 'preload' ? (
                     loading ? (
