@@ -90,16 +90,14 @@ interface FormErrors {
 export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
   const { findProject, updateProject, addProject } = useProject();
-  const [projectInfo, setProjectInfo] = useState(pid ? findProject(pid) : undefined);
 
-  const [participants, setParticipants] = useState<Participant[]>(
-    projectInfo?.participants || [new Participant(), new Participant()],
-  );
-  const [renderProps, setRenderProps] = useState<RenderProps>(
-    projectInfo?.renderProps || defaultRenderProps,
-  );
-  const [certInfo, setCertInfo] = useState<CertInfo>(projectInfo?.certInfo || defaultCertInfo);
-  const [projectName, setProjectName] = useState<string>(projectInfo?.project_name || '');
+  const [participants, setParticipants] = useState<Participant[]>([
+    new Participant(),
+    new Participant(),
+  ]);
+  const [renderProps, setRenderProps] = useState<RenderProps>(defaultRenderProps);
+  const [certInfo, setCertInfo] = useState<CertInfo>(defaultCertInfo);
+  const [projectName, setProjectName] = useState<string>('');
 
   const [dirty, setDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
@@ -112,11 +110,24 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   const [showCsvModal, setShowCsvModal] = useState<boolean>(false);
 
-  const projectId = useRef<string | undefined>(projectInfo?._id || pid);
+  const projectId = useRef<string | undefined>(pid);
 
   const navigate = useNavigate();
 
   const scrollBarWidth = useScrollbarWidth();
+
+  //todo, do this after initial render?
+  useEffect(() => {
+    if (!pid) return;
+    const pInfo = findProject(pid);
+    if (pInfo) {
+      setParticipants(pInfo.participants);
+      setRenderProps(pInfo.renderProps);
+      setCertInfo(pInfo.certInfo);
+      setProjectName(pInfo.project_name);
+      projectId.current = pid;
+    } else toast.error(`Unable to load project with ID: ${pid}`);
+  }, [pid]);
 
   const updateFormErrors = (newErrors: FormErrors) => {
     const fullErrors: FormErrors = {

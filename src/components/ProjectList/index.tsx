@@ -31,25 +31,6 @@ export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Pr
   const { PendingProjects, LoadingPendingProjects, refreshPendingProjects } = useProject();
   const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
 
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const [projects, setProjects] = useState([]);
-  // useEffect(() => {
-  //   getProjects();
-  // }, [Address]);
-  // const getProjects = async () => {
-  //   console.log('running', LoginToken, Address);
-  //   const token = `Permit ${JSON.stringify(LoginToken)}`;
-  //   const url = new URL(`/projects/owner/${Address}`, process.env.REACT_APP_BACKEND);
-  //   const response = await axios.get(url.toString(), {
-  //     headers: {
-  //       Authorization: token,
-  //     },
-  //   });
-  //   console.log(response);
-  //   setProjects(response.data.data);
-  //   setLoading(false);
-  // };
-
   //refresh credits on mount if they are nto verified (to see if they became verified)
   useEffect(() => {
     if (!VerifiedIssuer) queryCredits();
