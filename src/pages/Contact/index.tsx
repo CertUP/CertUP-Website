@@ -38,7 +38,12 @@ export default function Contact() {
               <ul>
                 <li>
                   <span className={styles.contactTitle}>Email: </span>
-                  <a href="mailto:info@certup.net" className={`${styles.contactText} px-2`}>
+                  <a
+                    href="mailto:info@certup.net"
+                    className={`${styles.contactText} px-2`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     info@certup.net
                   </a>
                 </li>
@@ -46,7 +51,7 @@ export default function Contact() {
             </Row>
             {/* <Row>
             <span>Discord: </span>
-            <a href="https://discord.gg/jNZJYBDcZQ">
+            <a href="https://discord.gg/jNZJYBDcZQ" target="_blank" rel="noreferrer">
               <h4>https://discord.gg/CertUP</h4>
             </a>
           </Row> */}

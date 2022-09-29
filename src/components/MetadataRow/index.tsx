@@ -54,7 +54,9 @@ export default function MetadataRow({ cert }: MRProps) {
                       <li>{item.name}</li>
                       {item.url ? (
                         <li>
-                          <a href={item.url}>{item.url}</a>
+                          <a href={item.url} target="_blank" rel="noreferrer">
+                            {item.url}
+                          </a>
                         </li>
                       ) : null}
 

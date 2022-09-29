@@ -54,7 +54,11 @@ export default function IssuerInfo({ issuerId, title = 'Issued By', horizontal =
             {!!issuerData.name && (
               <h5 style={{ fontWeight: '700', marginBottom: '2px' }}>{issuerData.name}</h5>
             )}
-            {!!issuerData.website && <a href={issuerData.website}>{issuerData.website}</a>}
+            {!!issuerData.website && (
+              <a href={issuerData.website} target="_blank" rel="noreferrer">
+                {issuerData.website}
+              </a>
+            )}
             {issuerData.verified && (
               <OverlayTrigger
                 placement={'top'}

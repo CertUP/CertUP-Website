@@ -74,7 +74,9 @@ export default function About() {
                 </p>
               </Row>
               <Row className="text-end">
-                <a href="https://trivium.network">https://trivium.network</a>
+                <a href="https://trivium.network" target="_blank" rel="noreferrer">
+                  https://trivium.network
+                </a>
               </Row>
             </Col>
             {/* </div> */}
@@ -91,7 +93,9 @@ export default function About() {
                 </p>
               </Row>
               <Row className="text-end">
-                <a href="https://altermail.live">https://altermail.live</a>
+                <a href="https://altermail.live" target="_blank" rel="noreferrer">
+                  https://altermail.live
+                </a>
               </Row>
             </Col>
             {/* </div> */}
