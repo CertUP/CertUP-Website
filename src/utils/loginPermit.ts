@@ -111,7 +111,6 @@ export async function getLoginToken(
 
   let cachedToken = getCachedLoginToken(address);
   if (cachedToken) {
-    console.log('found cached token', cachedToken);
     if (!cachedToken.expires || isExpired(cachedToken)) cachedToken = undefined;
   }
   if (!refresh && cachedToken) return cachedToken;
@@ -167,7 +166,6 @@ export default async function getPermits(
   let finalToken: LoginToken | undefined;
 
   if (cachedToken) {
-    //console.log('found cached token', cachedToken);
     finalToken = JSON.parse(cachedToken);
     if (!finalToken?.expires || new Date(finalToken.expires) < new Date()) finalToken = undefined;
   }

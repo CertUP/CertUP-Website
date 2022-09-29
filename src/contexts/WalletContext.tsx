@@ -11,6 +11,7 @@ import {
 import { toast } from 'react-toastify';
 import { PermitSignature } from '../interfaces';
 import { Issuer, IssuerData, IssuerDataResponse } from '../interfaces/manager';
+import useQuery, { queryWithClient } from '../hooks/QueryHook';
 
 interface DummyWallet {
   wallet: SJSWallet;
@@ -29,12 +30,12 @@ interface UpdateClientProps {
 
 export interface WalletContextState {
   Client?: SecretNetworkClient;
-  Querier: SecretNetworkClient | undefined;
+  Querier?: SecretNetworkClient;
   ClientIsSigner: boolean;
-  Wallet: SJSWallet | undefined;
+  Wallet?: SJSWallet;
   Address: string;
-  LoginToken: LoginToken | undefined;
-  QueryPermit: PermitSignature | undefined;
+  LoginToken?: LoginToken;
+  QueryPermit?: PermitSignature;
   RemainingCerts: number;
   IssuerProfile?: Issuer;
   LoadingRemainingCerts: boolean;
@@ -152,9 +153,11 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
     setLoginToken(undefined);
   };
 
+  // query credits as soon as permit and querier are available
   useEffect(() => {
+    if (!Querier || !QueryPermit) return;
     queryCredits();
-  }, [QueryPermit]);
+  }, [QueryPermit, Querier]);
 
   useEffect(() => {
     getQuerier();
@@ -193,7 +196,7 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
   };
 
   const queryCredits = async (queryPermit = QueryPermit): Promise<number | undefined> => {
-    if (!queryPermit) return;
+    if (!queryPermit || !Querier) return;
     setLoadingRemainingCerts(true);
 
     const query = {
@@ -264,12 +267,16 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       }
     } catch (error: any) {
       console.error(error);
-      if (error.toString().includes('Network Error' || '503')) {
+      if (
+        error.toString().includes('Network Error') ||
+        error.toString().includes('503') ||
+        error.toString().includes('Response closed without headers')
+      ) {
         toast.error(
-          'Failed to query issuer status from network node. The node may be experiencing issues.',
+          'Failed to load issuer status: Failed to query network. The node may be experiencing issues.',
         );
       } else {
-        toast.error(error.toString());
+        toast.error(`Failed to load issuer status: ${error.toString()}`);
       }
     }
 

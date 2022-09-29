@@ -158,7 +158,6 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
 
       //check for LOGIN permit from storage
       const cachedToken = getCachedLoginToken(myAddress);
-      console.log('Cached Token', cachedToken);
       if (cachedToken && !isExpired(cachedToken)) {
         updateClient({
           client: secretjs,

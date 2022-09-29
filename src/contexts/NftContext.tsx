@@ -50,10 +50,16 @@ export const NftProvider = ({ children }: Props): ReactElement => {
   }, [QueryPermit, Address]);
 
   const refreshDossiers = async () => {
-    setLoading(true);
-    const response = await getOwnedCerts();
-    setDossiers(response);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const response = await getOwnedCerts();
+      setDossiers(response);
+    } catch (error: any) {
+      console.error('Error loading owned certs: ', error);
+      toast.error(`Error loading owned certs: ${error.toString()}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // find item by using id value
