@@ -22,7 +22,10 @@ import ReviewViewer from '../../components/ReviewViewer';
 
 //@ts-ignore
 import textEncoding from 'text-encoding';
+import CopyButton from '../../components/CopyButton';
 const TextDecoder = textEncoding.TextDecoder;
+
+const claimUrl = `${window.location.protocol}//${window.location.host}/access/`;
 
 interface ButtonProps {
   backHandler: () => void;
@@ -310,13 +313,20 @@ export default function Mint() {
             >
               <h2>Project Complete</h2>
               {!!txHash && (
-                <a
-                  href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  View Transaction on Explorer →
-                </a>
+                <>
+                  <a
+                    href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    View Transaction on Explorer →
+                  </a>
+                  <h5 style={{ marginTop: '1.5rem' }}>Recipients can redeem their certs at:</h5>
+                  <p className={`${styles.accessText} ${styles.certLink} mx-2 mb-0`}>
+                    {claimUrl}
+                    <CopyButton text={claimUrl} className="mx-2" />
+                  </p>
+                </>
               )}
             </Row>
           ) : (

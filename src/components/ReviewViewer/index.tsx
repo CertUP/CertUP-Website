@@ -27,6 +27,7 @@ import IssuerInfo from '../IssuerInfo';
 import { Link } from 'react-router-dom';
 import { NftDossier, BatchNftDossier } from '../../interfaces/721';
 import { MintOverview, ProjectToken } from '../../interfaces/manager';
+import CopyButton from '../CopyButton';
 
 interface ViewerProps {
   pid: string;
@@ -35,6 +36,8 @@ interface ViewerProps {
   pData?: Project;
   meta?: boolean;
 }
+
+const claimUrl = `${window.location.protocol}//${window.location.host}/access/`;
 
 export default function ReviewViewer({ pid, step, hashes, pData, meta = false }: ViewerProps) {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts, IssuerProfile } =
@@ -163,18 +166,29 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
               {projectInfo?.project_name}
             </h2>
             {mintOverview ? (
-              <h4>
-                {loading ? (
-                  <CUSpinner size="xs" />
-                ) : (
-                  <>
-                    {mintOverview?.minted_certs} /{' '}
-                    {parseInt(mintOverview?.pending_certs || '0', 10) +
-                      parseInt(mintOverview?.minted_certs || '0', 10)}{' '}
-                  </>
-                )}{' '}
-                certs have been claimed.
-              </h4>
+              <>
+                <h4 className="mb-4">
+                  {loading ? (
+                    <CUSpinner size="xs" />
+                  ) : (
+                    <>
+                      {mintOverview?.minted_certs} /{' '}
+                      {parseInt(mintOverview?.pending_certs || '0', 10) +
+                        parseInt(mintOverview?.minted_certs || '0', 10)}{' '}
+                    </>
+                  )}{' '}
+                  certs have been claimed.
+                </h4>
+                <h5 style={{ display: 'inline', marginRight: '.5rem' }}>
+                  Recipients can redeem their certs at:
+                </h5>
+
+                <br />
+                <p className={`${styles.accessText} ${styles.certLink} mx-2`}>
+                  {claimUrl}
+                  <CopyButton text={claimUrl} className="mx-2" />
+                </p>
+              </>
             ) : (
               <h4>
                 {projectInfo?.participants.length}{' '}
