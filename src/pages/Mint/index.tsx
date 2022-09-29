@@ -303,46 +303,66 @@ export default function Mint() {
         <Spacer height={50} />
         <Container>
           <BackButton backHandler={handleCancel} />
-          <Row className="justify-content-space-between mx-4 mt-4" style={{ marginBottom: '25px' }}>
-            <Col className={`${styles.stepColumnLeft} ${styles.stepColumn}`}>
-              <Row className="align-items-center mb-2">
-                <Col xs="auto" className="px-0">
-                  <h4
-                    className={!imageHashes.length && !loaded ? styles.activeStep : undefined}
-                    style={{ display: 'inline-block', marginBottom: 0 }}
-                  >
-                    Step 1
-                  </h4>
-                </Col>
-                {loadingGenerate && (
-                  <Col xs="auto">
-                    <CUSpinner size="custom" customSize={35} />
+          {loaded ? (
+            <Row
+              className="justify-content-space-between mx-4 mt-4 text-center"
+              style={{ marginBottom: '25px' }}
+            >
+              <h2>Project Complete</h2>
+              {!!txHash && (
+                <a
+                  href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View Transaction on Explorer →
+                </a>
+              )}
+            </Row>
+          ) : (
+            <Row
+              className="justify-content-space-between mx-4 mt-4"
+              style={{ marginBottom: '25px' }}
+            >
+              <Col className={`${styles.stepColumnLeft} ${styles.stepColumn}`}>
+                <Row className="align-items-center mb-2">
+                  <Col xs="auto" className="px-0">
+                    <h4
+                      className={!imageHashes.length && !loaded ? styles.activeStep : undefined}
+                      style={{ display: 'inline-block', marginBottom: 0 }}
+                    >
+                      Step 1
+                    </h4>
                   </Col>
-                )}
-              </Row>
-              <Row>
-                <p>
-                  Generate certificate images. This process may take several minutes for projects
-                  with a large number of participants.
-                </p>
-              </Row>
-              <Row className="justify-content-end">
-                <Col xs={'auto'} className="mx-4">
-                  <CUButton
-                    btnStyle="square"
-                    onClick={handleGenerate}
-                    disabled={loadingGenerate || !!imageHashes.length || !project || loaded}
-                    className={loadingGenerate ? `${styles.processingButton}` : undefined}
-                  >
-                    {loadingGenerate ? (
-                      <>Processing</>
-                    ) : imageHashes.length || loaded ? (
-                      'Complete'
-                    ) : (
-                      'Generate'
-                    )}
-                  </CUButton>
-                  {/* <button
+                  {loadingGenerate && (
+                    <Col xs="auto">
+                      <CUSpinner size="custom" customSize={35} />
+                    </Col>
+                  )}
+                </Row>
+                <Row>
+                  <p>
+                    Generate certificate images. This process may take several minutes for projects
+                    with a large number of participants.
+                  </p>
+                </Row>
+                <Row className="justify-content-end">
+                  <Col xs={'auto'} className="mx-4">
+                    <CUButton
+                      btnStyle="square"
+                      onClick={handleGenerate}
+                      disabled={loadingGenerate || !!imageHashes.length || !project || loaded}
+                      className={loadingGenerate ? `${styles.processingButton}` : undefined}
+                    >
+                      {loadingGenerate ? (
+                        <>Processing</>
+                      ) : imageHashes.length || loaded ? (
+                        'Complete'
+                      ) : (
+                        'Generate'
+                      )}
+                    </CUButton>
+                    {/* <button
                     className={
                       loadingGenerate
                         ? `${styles.processingButton} ${styles.cancelBtn}`
@@ -359,138 +379,95 @@ export default function Mint() {
                       'Generate'
                     )}
                   </button> */}
-                  {loaded && (
-                    <>
-                      <br />
-                      <br />
-                    </>
-                  )}
-                </Col>
-              </Row>
-            </Col>
-            <Col className={`${styles.stepColumn} justify-content-start`}>
-              <Row className="align-items-center mb-3">
-                <Col xs="auto" className="px-0">
-                  <h4 style={{ display: 'inline-block', marginBottom: 0 }}>Step 2</h4>
-                </Col>
-              </Row>
-              <Row>
-                <p>
-                  Review the final certificates and images below for accuracy. Go back and make any
-                  changes if needed.
-                </p>
-              </Row>
-            </Col>
-            <Col className={`${styles.stepColumnRight} ${styles.stepColumn}`}>
-              <Row className="align-items-center mb-2">
-                <Col xs="auto" className="px-0">
-                  <h4
-                    className={imageHashes.length && !loaded ? styles.activeStep : undefined}
-                    style={{ display: 'inline-block', marginBottom: 0 }}
-                  >
-                    Step 3
-                  </h4>
-                </Col>
-                {loadingPreload && (
-                  <Col xs="auto">
-                    <CUSpinner size="custom" customSize={35} />
+                    {loaded && (
+                      <>
+                        <br />
+                        <br />
+                      </>
+                    )}
                   </Col>
-                )}
-              </Row>
-              <Row>
-                <p>
-                  Complete the project and generate claim codes by uploading the certificate
-                  information to the blockchain.
-                </p>
-              </Row>
-              <Row className="justify-content-end">
-                <Col xs={'auto'} className="mx-4">
-                  {loaded ? (
-                    <>
-                      <CUButton btnStyle="square" disabled={true}>
-                        Complete
-                      </CUButton>
-                      {/* <button className={styles.cancelBtn} disabled={true}>
-                        Complete
-                      </button> */}
-                      <br />
-                      {!!txHash && (
-                        <a
-                          href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          View Transaction →
-                        </a>
-                      )}
-                    </>
-                  ) : (
-                    <CUButton
-                      btnStyle="square"
-                      className={loadingPreload ? `${styles.processingButton}` : undefined}
-                      onClick={handlePreload}
-                      disabled={ProcessingTx || loadingPreload || !imageHashes.length}
+                </Row>
+              </Col>
+              <Col className={`${styles.stepColumn} justify-content-start`}>
+                <Row className="align-items-center mb-3">
+                  <Col xs="auto" className="px-0">
+                    <h4 style={{ display: 'inline-block', marginBottom: 0 }}>Step 2</h4>
+                  </Col>
+                </Row>
+                <Row>
+                  <p>
+                    Review the final certificates and images below for accuracy. Go back and make
+                    any changes if needed.
+                  </p>
+                </Row>
+              </Col>
+              <Col className={`${styles.stepColumnRight} ${styles.stepColumn}`}>
+                <Row className="align-items-center mb-2">
+                  <Col xs="auto" className="px-0">
+                    <h4
+                      className={imageHashes.length && !loaded ? styles.activeStep : undefined}
+                      style={{ display: 'inline-block', marginBottom: 0 }}
                     >
-                      {loadingPreload ? 'Processing' : 'Finish'}
-                    </CUButton>
-                    // <button
-                    //   className={
-                    //     loadingPreload
-                    //       ? `${styles.processingButton} ${styles.cancelBtn}`
-                    //       : styles.cancelBtn
-                    //   }
-                    //   onClick={handlePreload}
-                    //   disabled={ProcessingTx || loadingPreload || !imageHashes.length}
-                    // >
-                    //   {loadingPreload ? 'Processing' : 'Finish'}
-                    // </button>
+                      Step 3
+                    </h4>
+                  </Col>
+                  {loadingPreload && (
+                    <Col xs="auto">
+                      <CUSpinner size="custom" customSize={35} />
+                    </Col>
                   )}
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-          <hr />
-
-          {/* <Row>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Cert #</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>DOB</th>
-                  <th>Claim Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                {project?.participants.map((participant: Participant, index: number) => {
-                  return (
-                    <tr key={`claim-row-${index}-${participant.cert_num}`}>
-                      <td>{participant.cert_num}</td>
-                      <td>{participant.name}</td>
-                      <td>{participant.surname}</td>
-                      <td>{participant.dob?.toLocaleDateString()}</td>
-                      <td>
-                        {participant.claim_code ? participant.claim_code : 'Not Yet Generated'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </Row>
-          {generated ? (
-            <Row className="justify-content-end">
-              <Col xs={2}>
-                <Image
-                  src={dlExcel}
-                  fluid={true}
-                  style={{ cursor: 'pointer' }}
-                  onClick={handleDl}
-                />
+                </Row>
+                <Row>
+                  <p>
+                    Complete the project and generate claim codes by uploading the certificate
+                    information to the blockchain.
+                  </p>
+                </Row>
+                <Row className="justify-content-end">
+                  <Col xs={'auto'} className="mx-4">
+                    {loaded ? (
+                      <>
+                        <CUButton btnStyle="square" disabled={true}>
+                          Complete
+                        </CUButton>
+                        <br />
+                        {!!txHash && (
+                          <a
+                            href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            View Transaction →
+                          </a>
+                        )}
+                      </>
+                    ) : (
+                      <CUButton
+                        btnStyle="square"
+                        className={loadingPreload ? `${styles.processingButton}` : undefined}
+                        onClick={handlePreload}
+                        disabled={ProcessingTx || loadingPreload || !imageHashes.length}
+                      >
+                        {loadingPreload ? 'Processing' : 'Finish'}
+                      </CUButton>
+                      // <button
+                      //   className={
+                      //     loadingPreload
+                      //       ? `${styles.processingButton} ${styles.cancelBtn}`
+                      //       : styles.cancelBtn
+                      //   }
+                      //   onClick={handlePreload}
+                      //   disabled={ProcessingTx || loadingPreload || !imageHashes.length}
+                      // >
+                      //   {loadingPreload ? 'Processing' : 'Finish'}
+                      // </button>
+                    )}
+                  </Col>
+                </Row>
               </Col>
             </Row>
-          ) : null} */}
+          )}
+          <hr />
         </Container>
         <ReviewViewer
           pid={location.state?.projectId}
