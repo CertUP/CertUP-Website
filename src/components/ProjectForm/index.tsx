@@ -118,6 +118,14 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   const scrollBarWidth = useScrollbarWidth();
 
+  const updateFormErrors = (newErrors: FormErrors) => {
+    const fullErrors: FormErrors = {
+      ...errors,
+      ...newErrors,
+    };
+    setErrors(fullErrors);
+  };
+
   const findFormErrors = (): FormErrors => {
     const { cert_name, pub_description, priv_description, issue_date, expire_date } = certInfo;
     const {
@@ -395,15 +403,48 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         console.log('surname', value);
         participant.surname = value || '';
         break;
-      case 'dob':
-        participant.dob = date;
+      case 'dob': {
+        if (!date) throw new Error('date must be set when field is "dob"');
+        let participantErrors = { ...errors.participants[index] };
+        if (date > new Date()) {
+          participantErrors = { ...participantErrors, dob: true };
+          const newErrors: FormErrors = {
+            participants: { ...errors.participants, [index]: participantErrors },
+          };
+          updateFormErrors(newErrors);
+          toast.error('DOB can not be in the future.');
+        } else {
+          participant.dob = date;
+          participantErrors = { ...participantErrors, dob: false };
+          const newErrors: FormErrors = {
+            participants: { ...errors.participants, [index]: participantErrors },
+          };
+          updateFormErrors(newErrors);
+        }
         break;
+      }
       case 'cert_num':
         participant.cert_num = value || '';
         break;
     }
     setParticipants(newAry);
     setDirty(true);
+  };
+
+  const changeExpireDate = (newDate: Date) => {
+    if (new Date() > newDate) {
+      const newErrors: FormErrors = {
+        expire_date: 'Expire date can not be in the past.',
+      };
+      updateFormErrors(newErrors);
+      toast.error('Expire date can not be in the past.');
+    } else {
+      const newErrors: FormErrors = {
+        expire_date: undefined,
+      };
+      updateFormErrors(newErrors);
+      updateCertInfo({ expire_date: newDate });
+    }
   };
 
   const onPick = (image: PickImage) => {
@@ -709,9 +750,10 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                     >
                       <DatePicker
                         value={certInfo.expire_date}
-                        onChange={(date: Date) => updateCertInfo({ expire_date: date })}
+                        onChange={(date: Date) => changeExpireDate(date)}
                         clearIcon={null}
                         format={getPickerFormat(renderProps.dateFormat)}
+                        className={errors.expire_date && `invalidSelection`}
                       />
                     </Form.Group>
                     {certInfo.expire_date ? (

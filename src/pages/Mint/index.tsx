@@ -127,7 +127,7 @@ export default function Mint() {
   const handleCancel = () => {
     navigate('/issuers', {
       replace: true,
-      state: { projectId: location.state?.projectId, show: true },
+      state: loaded ? undefined : { projectId: location.state?.projectId, show: true },
     });
   };
 
