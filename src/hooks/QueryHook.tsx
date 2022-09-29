@@ -128,8 +128,8 @@ export default function useQuery() {
       if (typeof response === 'string' || response instanceof String)
         response = JSON.parse(response as string) as QueryResponse;
 
-      console.log('Query:', query);
-      console.log('Response:', response);
+      // console.log('Query:', query);
+      // console.log('Response:', response);
       if (checkErrors) checkError(response);
       return response;
     } catch (error: any) {

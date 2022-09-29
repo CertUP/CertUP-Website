@@ -405,7 +405,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         break;
       case 'dob': {
         if (!date) throw new Error('date must be set when field is "dob"');
-        let participantErrors = { ...errors.participants[index] };
+        let participantErrors = errors.participants ? { ...errors.participants[index] } : {};
         if (date > new Date()) {
           participantErrors = { ...participantErrors, dob: true };
           const newErrors: FormErrors = {
