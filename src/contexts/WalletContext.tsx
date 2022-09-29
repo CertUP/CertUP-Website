@@ -264,7 +264,13 @@ export const WalletProvider = ({ children }: Props): ReactElement => {
       }
     } catch (error: any) {
       console.error(error);
-      toast.error(error.toString());
+      if (error.toString().includes('Network Error' || '503')) {
+        toast.error(
+          'Failed to query issuer status from network node. The node may be experiencing issues.',
+        );
+      } else {
+        toast.error(error.toString());
+      }
     }
 
     setLoadingRemainingCerts(false);

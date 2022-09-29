@@ -167,8 +167,7 @@ export default function useExecute() {
       /** ErrInsufficientFee to doc */
       case TxResultCode.ErrInsufficientFee:
         // const feeProvided = parseInt(tx.tx.authInfo.fee?.amount[0].amount || '0') / 10e5;
-        console.log('TX TODO Check this and make a better error', tx);
-        throw new Error('Insufficent fees');
+        throw new Error('Insufficent fees. Select a higher gas price.');
 
       /** ErrTooManySignatures to doc */
       case TxResultCode.ErrTooManySignatures:
@@ -551,7 +550,7 @@ export default function useExecute() {
     contract,
     hash,
     isRetry = false,
-  }: ExecuteProps) => {
+  }: ExecuteProps): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
 
     if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
@@ -559,7 +558,7 @@ export default function useExecute() {
     try {
       setProcessingTx(true);
 
-      let response = await Client.tx.compute.executeContract(
+      let response: Tx | ComputeTx = await Client.tx.compute.executeContract(
         {
           contractAddress: contract,
           codeHash: hash,
@@ -600,9 +599,15 @@ export default function useExecute() {
       if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
       return response;
     } catch (err: any) {
+      let errorMsg;
+      if (err.toString().includes(`account ${Address} not found`)) {
+        errorMsg = `Address is not active. Send some SCRT there to activate.`;
+      } else {
+        errorMsg = err.toString();
+      }
       setProcessingTx(false);
-      toast.update(toastRef, new ToastProps(err.toString(), 'error'));
-      throw err;
+      toast.update(toastRef, new ToastProps(errorMsg, 'error'));
+      throw new Error(errorMsg);
     }
   };
 
