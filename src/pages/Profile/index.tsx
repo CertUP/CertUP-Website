@@ -93,7 +93,7 @@ export default function Profile() {
           msg: editMsg,
         },
         {
-          gasLimit: 85_000,
+          gasLimit: 135_000,
         },
       );
       console.log('Edit Result:', result);
