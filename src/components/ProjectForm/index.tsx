@@ -156,6 +156,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
     if (!issue_date) newErrors = { ...newErrors, issue_date: 'Please enter an issue date' };
 
+    if (expire_date && new Date() > expire_date) {
+      newErrors = { ...newErrors, expire_date: 'Expire date can not be in the past.' };
+      toast.error('Expire date can not be in the past.');
+    }
+
     if (!certTitle)
       newErrors = {
         ...newErrors,
@@ -177,6 +182,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     if (!signerTitle)
       newErrors = { ...newErrors, signerTitle: 'Please enter a title for the certificate signer' };
 
+    let dobError = false;
     for (let i = 0; i < participants.length; i++) {
       let participantErrors = {};
       const participant = participants[i];
@@ -184,20 +190,36 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       if (!participant.name) participantErrors = { name: true };
       if (!participant.surname) participantErrors = { ...participantErrors, surname: true };
       if (!participant.dob) participantErrors = { ...participantErrors, dob: true };
+      else if (participant.dob > new Date()) {
+        toast.error(
+          <>
+            Participant Birth Date can not be in the future.
+            <br /> {`Check participant ${participant.name} ${participant.surname}`}
+          </>,
+        );
+        participantErrors = { ...participantErrors, dob: true };
+        dobError = true;
+      }
       if (!participant.cert_num) participantErrors = { ...participantErrors, cert_num: true };
 
+      // If no participant errors for this participant, delete it from newErrors
       if (!Object.keys(participantErrors).length) {
         if (newErrors.participants) delete newErrors.participants[i];
+        // Otherwise set the new participant errors in newErrors
       } else
         newErrors = {
           ...newErrors,
           participants: { ...newErrors.participants, [i]: participantErrors },
         };
     }
+
+    // If no participant errors, delete the empty array
     if (newErrors.participants && !Object.keys(newErrors.participants).length)
       delete newErrors.participants;
 
     console.log('Errors:', newErrors);
+    if (!newErrors.expire_date && !dobError && Object.keys(newErrors).length > 0)
+      toast.error('Please complete all required fields.');
     return newErrors;
   };
 
@@ -318,7 +340,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       if (Object.keys(newErrors).length > 0) {
         // We got errors!
         setErrors(newErrors);
-        toast.error('Please complete all required fields.');
         return;
       }
 
@@ -416,22 +437,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         break;
       case 'dob': {
         if (!date) throw new Error('date must be set when field is "dob"');
-        let participantErrors = errors.participants ? { ...errors.participants[index] } : {};
-        if (date > new Date()) {
-          participantErrors = { ...participantErrors, dob: true };
-          const newErrors: FormErrors = {
-            participants: { ...errors.participants, [index]: participantErrors },
-          };
-          updateFormErrors(newErrors);
-          toast.error('DOB can not be in the future.');
-        } else {
-          participant.dob = date;
-          participantErrors = { ...participantErrors, dob: false };
-          const newErrors: FormErrors = {
-            participants: { ...errors.participants, [index]: participantErrors },
-          };
-          updateFormErrors(newErrors);
-        }
+        participant.dob = date;
         break;
       }
       case 'cert_num':
@@ -443,19 +449,19 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   };
 
   const changeExpireDate = (newDate: Date) => {
-    if (new Date() > newDate) {
-      const newErrors: FormErrors = {
-        expire_date: 'Expire date can not be in the past.',
-      };
-      updateFormErrors(newErrors);
-      toast.error('Expire date can not be in the past.');
-    } else {
-      const newErrors: FormErrors = {
-        expire_date: undefined,
-      };
-      updateFormErrors(newErrors);
-      updateCertInfo({ expire_date: newDate });
-    }
+    // if (new Date() > newDate) {
+    //   const newErrors: FormErrors = {
+    //     expire_date: 'Expire date can not be in the past.',
+    //   };
+    //   updateFormErrors(newErrors);
+    //   toast.error('Expire date can not be in the past.');
+    // } else {
+    //   const newErrors: FormErrors = {
+    //     expire_date: undefined,
+    //   };
+    //   updateFormErrors(newErrors);
+    updateCertInfo({ expire_date: newDate });
+    // }
   };
 
   const onPick = (image: PickImage) => {
