@@ -16,6 +16,8 @@ import Container from 'react-bootstrap/Container';
 import { NftDossier } from '../../../interfaces/721';
 import { ModalButton } from '../../ModalButton';
 import CUButton from '../../CUButton';
+import { decryptFile, ipfsDownload } from '../../../utils/fileHelper';
+import { toast } from 'react-toastify';
 
 interface props {
   show: boolean;
@@ -33,51 +35,68 @@ function toDataURL(url: string) {
     });
 }
 
-async function download(url: string, name = 'download', type = 'png') {
+async function downloadUrl(url: string, name = 'download', type = 'png') {
+  const response = await fetch(url);
+  await downloadBlob(await response.blob());
+}
+
+async function downloadBlob(blob: Blob, name = 'CertUP Cert Download', type = 'png') {
+  const href = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.style.display = 'none';
-  a.href = await toDataURL(url);
-  a.download = name + '.' + type;
+  a.href = href;
+  a.download = `${name}.${type}`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  URL.revokeObjectURL(href);
 }
 
-const downloadJson = (data: object) => {
-  // create file in browser
-  const fileName = 'my-file';
+const downloadJson = (data: object, fileName = 'CertUP Cert Metadata') => {
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
-  const href = URL.createObjectURL(blob);
-
-  // create "a" HTLM element with href to file
-  const link = document.createElement('a');
-  link.href = href;
-  link.download = fileName + '.json';
-  document.body.appendChild(link);
-  link.click();
-
-  // clean up "a" element & remove ObjectURL
-  document.body.removeChild(link);
-  URL.revokeObjectURL(href);
+  downloadBlob(blob, fileName, 'json');
 };
 
 export default function SaveModal({ show, setShow, metadata }: props) {
   const handleClose = () => setShow(false);
-  //const [files, setFiles] = useState<File[]>([]);
 
   const handleDlImage = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const imageUrl = (metadata?.private_metadata?.extension?.media || [])[0].url.replace(
-      'ipfs.io',
-      process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
-    );
-    download(imageUrl);
+
+    // const imageUrl = (metadata?.private_metadata?.extension?.media || [])[0].url.replace(
+    //   'ipfs.io',
+    //   process.env.REACT_APP_IPFS_MIRROR || 'cloudflare-ipfs.com',
+    // );
+    // download(imageUrl);
+
+    try {
+      if (!metadata.private_metadata.extension.media) throw new Error('Media not Found');
+
+      let result = await ipfsDownload(metadata.private_metadata.extension.media[0].url);
+      if (metadata.private_metadata.extension.media[0].authentication?.key) {
+        result = decryptFile(
+          result,
+          metadata.private_metadata.extension.media[0].authentication.key,
+        );
+      }
+      console.log('DECRYPT RESULT', result);
+      const blob = new Blob([result]);
+      downloadBlob(blob, `${metadata.private_metadata.extension.certificate.name} Image`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to Download');
+    }
   };
 
   const handleDlMeta = () => {
-    console.log(metadata);
-    downloadJson(metadata);
+    try {
+      console.log(metadata);
+      downloadJson(metadata, `${metadata.private_metadata.extension.certificate.name} Metadata`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to Download');
+    }
   };
 
   return (
