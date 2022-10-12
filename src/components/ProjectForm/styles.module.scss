@@ -165,6 +165,12 @@ $gradient3: #a659f3;
   text-align: center;
 }
 
+@media (max-width: 767.98px) {
+  .participantLabels {
+    text-align: left !important;
+  }
+}
+
 .vr {
   border-left: 2px solid #f2f2f2;
   height: 100%;
@@ -196,4 +202,16 @@ $gradient3: #a659f3;
   max-height: 50vh;
   min-height: 30vh;
   align-content: flex-start;
+}
+
+@media (max-width: 767.98px) {
+  .participantInput {
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .tooltipLabel {
+    justify-content: center;
+  }
 }

@@ -315,7 +315,7 @@ export default function Mint() {
               {!!txHash && (
                 <>
                   <a
-                    href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                    href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${txHash}`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -337,7 +337,7 @@ export default function Mint() {
               className="justify-content-space-between mx-4 mt-4"
               style={{ marginBottom: '25px' }}
             >
-              <Col className={`${styles.stepColumnLeft} ${styles.stepColumn}`}>
+              <Col xs={12} md={4} className={`${styles.stepColumnLeft} ${styles.stepColumn}`}>
                 <Row className="align-items-center mb-2">
                   <Col xs="auto" className="px-0">
                     <h4
@@ -384,7 +384,7 @@ export default function Mint() {
                   </Col>
                 </Row>
               </Col>
-              <Col className={`${styles.stepColumn} justify-content-start`}>
+              <Col xs={12} md={4} className={`${styles.stepColumn} justify-content-start`}>
                 <Row className="align-items-center mb-3">
                   <Col xs="auto" className="px-0">
                     <h4 style={{ display: 'inline-block', marginBottom: 0 }}>Step 2</h4>
@@ -397,7 +397,7 @@ export default function Mint() {
                   </p>
                 </Row>
               </Col>
-              <Col className={`${styles.stepColumnRight} ${styles.stepColumn}`}>
+              <Col xs={12} md={4} className={`${styles.stepColumnRight} ${styles.stepColumn}`}>
                 <Row className="align-items-center mb-2">
                   <Col xs="auto" className="px-0">
                     <h4
@@ -429,7 +429,7 @@ export default function Mint() {
                         <br />
                         {!!txHash && (
                           <a
-                            href={`${process.env.REACT_APP_EXPLORER_URL}${txHash}`}
+                            href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${txHash}`}
                             target="_blank"
                             rel="noreferrer"
                           >

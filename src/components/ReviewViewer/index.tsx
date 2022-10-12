@@ -28,6 +28,8 @@ import { Link } from 'react-router-dom';
 import { NftDossier, BatchNftDossier } from '../../interfaces/721';
 import { MintOverview, ProjectToken } from '../../interfaces/manager';
 import CopyButton from '../CopyButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faX } from '@fortawesome/free-solid-svg-icons';
 
 interface ViewerProps {
   pid: string;
@@ -156,9 +158,9 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
           </Row>
         </Container>
       )}
-      <Container>
+      <Container fluid="md">
         <Row className="mb-4">
-          <Col xs="8" className="d-flex flex-column justify-content-center text-center">
+          <Col xs="6" md="8" className="d-flex flex-column justify-content-center text-center">
             <h2>
               <span style={{ fontWeight: '700' }}>Project: </span>
               {projectInfo?.project_name}
@@ -194,7 +196,7 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
               </h4>
             )}
           </Col>
-          <Col xs="4">
+          <Col xs={6} md="4">
             <Row>
               <IssuerInfo
                 issuerId={IssuerProfile?.id as string}
@@ -223,7 +225,12 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
               <th style={{ width: step !== 'preload' ? '6.8%' : '10%' }}>Cert #</th>
               <th style={{ width: step !== 'preload' ? '12.8%' : '25%' }}>First Name</th>
               <th style={{ width: step !== 'preload' ? '12.8%' : '25%' }}>Last Name</th>
-              <th style={{ width: step !== 'preload' ? '10%' : '20%' }}>DOB</th>
+              <th
+                className="d-none d-md-table-cell"
+                style={{ width: step !== 'preload' ? '10%' : '20%' }}
+              >
+                DOB
+              </th>
               <th style={{ width: step !== 'preload' ? '49.5%' : '20%' }}>Claim Code</th>
 
               {step !== 'preload' ? <th style={{ minWidth: '7%' }}>Claimed</th> : null}
@@ -239,17 +246,20 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
                   className={selected ? styles.selectedRow : styles.unselectedRow}
                   onClick={() => setSelectedParticipant(index)}
                 >
-                  <td style={{ width: step !== 'preload' ? '7%' : '10%' }}>
+                  <td style={{ width: step !== 'preload' ? '7%' : '10%', wordWrap: 'break-word' }}>
                     {token.preload_data.pub_metadata?.extension?.certificate?.cert_number ||
                       token.preload_data.priv_metadata.extension.certificate.cert_number}
                   </td>
-                  <td style={{ width: step !== 'preload' ? '13%' : '25%' }}>
+                  <td style={{ width: step !== 'preload' ? '13%' : '25%', wordWrap: 'break-word' }}>
                     {token.preload_data.priv_metadata.extension.certified_individual?.first_name}
                   </td>
-                  <td style={{ width: step !== 'preload' ? '13%' : '25%' }}>
+                  <td style={{ width: step !== 'preload' ? '13%' : '25%', wordWrap: 'break-word' }}>
                     {token.preload_data.priv_metadata.extension.certified_individual?.last_name}
                   </td>
-                  <td style={{ width: step !== 'preload' ? '10%' : '20%' }}>
+                  <td
+                    className="d-none d-md-table-cell"
+                    style={{ width: step !== 'preload' ? '10%' : '20%', wordWrap: 'break-word' }}
+                  >
                     {token.preload_data.priv_metadata.extension.certified_individual?.date_of_birth
                       ? new Date(
                           token.preload_data.priv_metadata.extension.certified_individual?.date_of_birth,
@@ -266,9 +276,15 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
                         <CUSpinner size="xs" />
                       </td>
                     ) : token.minted ? (
-                      <td style={{ color: 'green', width: '7%' }}>True</td>
+                      // <td style={{ color: 'green', width: '7%' }}>True</td>
+                      <td style={{ color: 'green', width: '7%' }}>
+                        <FontAwesomeIcon icon={faCheckCircle} />
+                      </td>
                     ) : (
-                      <td style={{ width: '7%' }}>False</td>
+                      // <td style={{ width: '7%' }}>False</td>
+                      <td style={{ color: 'red', width: '7%' }}>
+                        <FontAwesomeIcon icon={faX} />
+                      </td>
                     )
                   ) : null}
                 </tr>
@@ -281,7 +297,7 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
           <>
             {step !== 'preload' && (
               <Row className="justify-content-end">
-                <Col xs={2}>
+                <Col xs={6} sm={4} md={3} lg={2}>
                   <Image
                     src={dlExcel}
                     fluid={true}

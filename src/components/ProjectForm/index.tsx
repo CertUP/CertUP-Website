@@ -489,7 +489,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         <BackButton />
         <div style={{ height: '3vh' }} />
       </Container>
-      <Container>
+      <Container fluid="lg">
         <Form
           noValidate
           validated={validated}
@@ -505,7 +505,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           {/* \/ Project Name Section \/ */}
 
           <Row className="mb-4">
-            <Col md={'auto'} className="text-center">
+            <Col xs={'auto'} className="text-center">
               <MiniCircle />
               <div className={styles.vr} />
             </Col>
@@ -539,7 +539,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           {/* \/ Participants Section \/ */}
 
           <Row className="mb-4">
-            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+            <Col xs={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
               <MiniCircle />
               <div className={styles.vr} />
             </Col>
@@ -549,14 +549,17 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <hr className={styles.formHr} />
               </Row>
               {/* Labels Row */}
-              <Row style={{ paddingRight: scrollBarWidth * 2 }} className="justify-content-left">
+              <Row
+                style={{ paddingRight: scrollBarWidth * 2 }}
+                className="justify-content-left d-none d-md-flex"
+              >
                 <Col md={3} className={styles.participantLabels}>
                   Name
                 </Col>
                 <Col md={3} className={styles.participantLabels}>
                   Surname
                 </Col>
-                <Col md={2} className={styles.participantLabels}>
+                <Col md={3} lg={2} className={styles.participantLabels}>
                   Birth Date
                 </Col>
                 <Col md={2} className={styles.participantLabels}>
@@ -568,79 +571,122 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   let pErrors;
                   if (errors.participants) pErrors = errors.participants[index];
                   return (
-                    <Row
-                      key={`participant-${index}`}
-                      className={`mb-2`}
-                      style={{ paddingRight: 0 }}
-                    >
-                      <Form.Group as={Col} md="3" controlId="validationCustom02">
-                        <Form.Control
-                          required
-                          value={participants[index].name}
-                          onChange={(e) => changeParticipant(index, 'name', e.target.value)}
-                          type="text"
-                          placeholder="First name"
-                          isInvalid={!!pErrors?.name}
-                        />
-                      </Form.Group>
-
-                      <Form.Group as={Col} md="3" controlId="validationCustom02">
-                        <Form.Control
-                          required
-                          value={participants[index].surname}
-                          onChange={(e) => changeParticipant(index, 'surname', e.target.value)}
-                          type="text"
-                          placeholder="Last name"
-                          isInvalid={!!pErrors?.surname}
-                        />
-                      </Form.Group>
-
-                      <Form.Group
-                        as={Col}
-                        md="2"
-                        controlId="validationCustom02"
-                        className="text-center"
+                    <>
+                      <Row
+                        key={`participant-${index}`}
+                        className={`mb-2`}
+                        style={{ paddingRight: 0 }}
                       >
-                        <DatePicker
-                          value={participants[index].dob}
-                          onChange={(date: Date) =>
-                            changeParticipant(index, 'dob', undefined, date)
-                          }
-                          clearIcon={null}
-                          className={pErrors?.dob && `invalidSelection`}
-                          calendarIcon={null}
-                          format={getPickerFormat(renderProps.dateFormat)}
-                        />
-                      </Form.Group>
+                        <Col xs="auto" className="d-md-none">
+                          {`${index + 1}.`}
+                        </Col>
+                        <Col>
+                          <Row style={{ paddingRight: 0 }}>
+                            <Form.Group
+                              as={Col}
+                              xs="12"
+                              md="3"
+                              controlId="validationCustom02"
+                              className={styles.participantInput}
+                            >
+                              <Form.Label className="d-md-none">Name</Form.Label>
+                              <Form.Control
+                                required
+                                value={participants[index].name}
+                                onChange={(e) => changeParticipant(index, 'name', e.target.value)}
+                                type="text"
+                                placeholder="First name"
+                                isInvalid={!!pErrors?.name}
+                              />
+                            </Form.Group>
 
-                      <Form.Group as={Col} md="2" controlId="validationCustom02">
-                        <Form.Control
-                          required
-                          value={participants[index].cert_num}
-                          onChange={(e) => changeParticipant(index, 'cert_num', e.target.value)}
-                          type="text"
-                          placeholder="123456"
-                          isInvalid={!!pErrors?.cert_num}
-                        />
-                      </Form.Group>
+                            <Form.Group
+                              as={Col}
+                              xs="12"
+                              md="3"
+                              controlId="validationCustom02"
+                              className={styles.participantInput}
+                            >
+                              <Form.Label className="d-md-none">Surname</Form.Label>
+                              <Form.Control
+                                required
+                                value={participants[index].surname}
+                                onChange={(e) =>
+                                  changeParticipant(index, 'surname', e.target.value)
+                                }
+                                type="text"
+                                placeholder="Last name"
+                                isInvalid={!!pErrors?.surname}
+                              />
+                            </Form.Group>
 
-                      <Col md="auto" className="d-flex align-items-center">
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => deleteParticipant(index)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') deleteParticipant(index);
-                          }}
-                        >
-                          <div>
-                            <img src={trashImg} alt="trash" />
-                            <span className="d-none d-lg-inline-block">Delete</span>
-                          </div>
-                        </div>
-                      </Col>
-                    </Row>
+                            <Form.Group
+                              as={Col}
+                              xs="12"
+                              md="3"
+                              lg="2"
+                              controlId="validationCustom02"
+                              className={styles.participantInput}
+                              //className="text-center"
+                            >
+                              <Form.Label className="d-md-none">Birth Date</Form.Label>
+                              <br className="d-md-none" />
+                              <DatePicker
+                                value={participants[index].dob}
+                                onChange={(date: Date) =>
+                                  changeParticipant(index, 'dob', undefined, date)
+                                }
+                                clearIcon={null}
+                                className={pErrors?.dob && `invalidSelection`}
+                                calendarIcon={null}
+                                format={getPickerFormat(renderProps.dateFormat)}
+                              />
+                            </Form.Group>
+
+                            <Form.Group as={Col} xs="12" md="2" controlId="validationCustom02">
+                              <Form.Label className="d-md-none">Certificate Number</Form.Label>
+                              <Form.Control
+                                required
+                                value={participants[index].cert_num}
+                                onChange={(e) =>
+                                  changeParticipant(index, 'cert_num', e.target.value)
+                                }
+                                type="text"
+                                placeholder="123456"
+                                isInvalid={!!pErrors?.cert_num}
+                                className={styles.participantInput}
+                              />
+                            </Form.Group>
+
+                            <Col
+                              xs="12"
+                              md="auto"
+                              className={`d-flex align-items-center ${styles.participantInput}`}
+                            >
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => deleteParticipant(index)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') deleteParticipant(index);
+                                }}
+                              >
+                                <div>
+                                  <img src={trashImg} alt="trash" />
+                                  <span className="d-inline-block d-md-none d-lg-inline-block">
+                                    Delete
+                                  </span>
+                                </div>
+                              </div>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                      {index !== participants.length - 1 && (
+                        <hr className="d-md-none" style={{ marginBottom: '3rem' }} />
+                      )}
+                    </>
                   );
                 })}
               </Row>
@@ -670,7 +716,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           {/* \/ Cert Info Section \/ */}
 
           <Row className="mb-4">
-            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+            <Col xs={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
               <MiniCircle />
               <div className={styles.vr} />
             </Col>
@@ -700,9 +746,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 </Col>
               </Row>
               <Row className="mb-4">
-                <Col md={2} className={styles.participantLabels}>
+                <Col md={2} className={`${styles.participantLabels} d-flex d-md-block`}>
                   <Col xs="auto">Public Certificate Description</Col>
-                  <Col xs="auto">
+                  <Col xs="auto" style={{ margin: '0 .5rem' }}>
                     <CUTooltip text="An optional description that will be embedded in the public metadata of the certificate. This description will be visible to anyone with the certificate's unique ID." />
                   </Col>
                 </Col>
@@ -719,9 +765,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 </Col>
               </Row>
               <Row className="mb-4">
-                <Col md={2} className={styles.participantLabels}>
+                <Col md={2} className={`${styles.participantLabels} d-flex d-md-block`}>
                   <Col xs="auto">Private Certificate Description</Col>
-                  <Col xs="auto">
+                  <Col xs="auto" style={{ margin: '0 .5rem' }}>
                     <CUTooltip text="An optional description that will be embedded in the private metadata of the certificate. This description will only be visible to the recipient and anyone the recipient has granted access to." />
                   </Col>
                 </Col>
@@ -792,7 +838,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           {/* \/ Cert Image Section \/ */}
 
           <Row className="mb-4">
-            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+            <Col xs={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
               <MiniCircle />
               <div className={styles.vr} />
             </Col>
@@ -822,7 +868,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 </Col>
                 <Col>
                   <Row>
-                    <Col md="auto">
+                    <Col xs="auto">
                       <CUSelectButton
                         type="button"
                         selected={renderProps.templateLayout === 1}
@@ -831,7 +877,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                         Left
                       </CUSelectButton>
                     </Col>
-                    <Col md="auto">
+                    <Col xs="auto">
                       <CUSelectButton
                         type="button"
                         selected={renderProps.templateLayout === 2}
@@ -908,7 +954,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  <Row className="mx-0 justify-content-center">
+                  <Row className={`mx-0 ${styles.tooltipLabel}`}>
                     <Col xs="auto" className="px-0">
                       Display DOB
                     </Col>
@@ -946,9 +992,9 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               </Row>
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
-                  <Row className="mx-0 justify-content-center">
+                  <Row className={`mx-0 ${styles.tooltipLabel}`}>
                     <Col xs="auto" className="px-0">
-                      Extra Text
+                      Additional Line 2 Text
                     </Col>
                     <Col xs="auto" className="px-2">
                       <CUTooltip
@@ -1083,7 +1129,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
           {/* \/ Preview Section \/ */}
 
           <Row className="mb-2">
-            <Col md={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+            <Col xs={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
               <MiniCircle />
               <div style={{ width: '65px' }}></div>
             </Col>
@@ -1115,29 +1161,29 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
             </Col>
           </Row>
           <Row style={{ marginBottom: '10px' }} className="justify-content-between">
-            <Col md="3">
+            <Col xs="6" sm="5" lg="4" xl="3">
               <CUButton disabled={false} fill={true} onClick={handleSave}>
                 <Row className="justify-content-space-between text-center">
-                  <Col md={2} style={{ padding: '0px' }}>
+                  <Col xs={2} style={{ padding: '0px' }}>
                     <FontAwesomeIcon icon={faCloudArrowUp} />
                   </Col>
                   <Col style={{ padding: '0px', textAlign: 'center' }}>Save Project</Col>
-                  <Col md={2} style={{ padding: '0px' }}>
+                  {/* <Col xs={"auto"} md={2} style={{ padding: '0px' }} className="d-none d-md-block">
                     {' '}
-                  </Col>
+                  </Col> */}
                 </Row>
               </CUButton>
             </Col>
-            <Col md="3">
+            <Col xs="6" sm="5" lg="4" xl="3">
               <CUButton disabled={false} fill={true} onClick={scrtPayment} role="button">
                 <Row className="justify-content-space-between">
-                  <Col md={1} style={{ padding: '0px' }}>
+                  <Col xs={1} style={{ padding: '0px' }} className="d-none d-lg-inline-block">
                     {' '}
                   </Col>
-                  <Col md="auto" style={{ padding: '0px' }}>
+                  <Col xs={10} lg={9} style={{ padding: '0px' }}>
                     Proceed to Payment
                   </Col>
-                  <Col style={{ padding: '0px', textAlign: 'right' }}>
+                  <Col xs={2} style={{ padding: '0px', textAlign: 'right' }}>
                     <FontAwesomeIcon icon={faArrowRight} />
                   </Col>
                 </Row>

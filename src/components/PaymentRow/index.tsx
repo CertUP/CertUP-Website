@@ -191,13 +191,12 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
         string: 'Your transaction hash is',
         number: (
           <a
-            href={`https://secretnodes.com/secret/chains/${process.env.REACT_APP_CHAIN_ID}/transactions/${response.transactionHash}`}
+            href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${response.transactionHash}`}
             target="_blank"
             rel="noreferrer"
-            // style={{
-            //   textDecoration: 'underline',
-            //   color: '#0000EE',
-            // }}
+            style={{
+              lineBreak: 'anywhere',
+            }}
           >
             {response.transactionHash}
           </a>
@@ -225,7 +224,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
         <h4>Purchasing {numCerts} Certificate Credits</h4>
       </Row>
       <Row>
-        <Col className="d-flex flex-column">
+        <Col xs={12} sm={6} className="d-flex flex-column">
           <Row className="text-center my-4 justify-content-center">
             <Row className="text-center mb-2">
               <h4>Pay with $SCRT</h4>
@@ -238,7 +237,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
 
             {sScrtBalance > 0.1 && (
               <Row className="justify-content-center">
-                <Col md="auto">
+                <Col xs="auto">
                   <CUSelectButton
                     type="button"
                     selected={!payWithSSCRT}
@@ -253,7 +252,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
                     </span>
                   </CUSelectButton>
                 </Col>
-                <Col md="auto">
+                <Col xs="auto">
                   <CUSelectButton
                     type="button"
                     selected={payWithSSCRT}
@@ -278,10 +277,10 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
                 className="mb-3 justify-content-center"
                 controlId="formHorizontalEmail"
               >
-                <Form.Label column sm={4}>
+                <Form.Label column xs={4}>
                   Total
                 </Form.Label>
-                <Col sm={4}>
+                <Col xs="8" md="6">
                   <Form.Control
                     required
                     value={totalSCRTString}
@@ -293,7 +292,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
               </Form.Group>
 
               <Row className="justify-content-center">
-                <Col md="7">
+                <Col xs="10" md="8" lg="6">
                   <CUButton disabled={!totaluSCRT} fill={true} onClick={handleSCRTPayment}>
                     Pay with Keplr Wallet
                   </CUButton>
@@ -302,7 +301,10 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
             </Form>
           </Row>
         </Col>
-        <Col className="d-flex flex-column justify-content-between">
+        <Col xs={{ span: 10, offset: 1 }} className="d-sm-none mt-4">
+          <hr />
+        </Col>
+        <Col xs={12} sm={6} className="d-flex flex-column justify-content-between">
           <Row className="text-center my-4 justify-content-center">
             <Row className="mb-2">
               <h4>Pay with Coinbase</h4>
@@ -326,10 +328,10 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
                 className="mb-3 justify-content-center"
                 controlId="formHorizontalEmail"
               >
-                <Form.Label column sm={4}>
+                <Form.Label column xs={4}>
                   Total
                 </Form.Label>
-                <Col sm={4}>
+                <Col xs="8" md="6">
                   <Form.Control
                     required
                     value={totalUSDString}
@@ -341,7 +343,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
               </Form.Group>
 
               <Row className="justify-content-center">
-                <Col md="7">
+                <Col xs="10" md="8" lg="6">
                   <CoinbaseCommerceButton
                     chargeId={chargeId}
                     className={`${btnStyles.certupBtn} ${btnStyles.certupBtnSmall} ${btnStyles.certupButtonColor}`}

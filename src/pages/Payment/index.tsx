@@ -147,18 +147,14 @@ export default function Payment() {
 
         <Container>
           <Row>
-            <Col xs={2}>
-              {/* <button className={styles.cancelBtn} onClick={handleCancel}>
-                <FontAwesomeIcon icon={faArrowLeft} /> Go Back
-              </button> */}
+            <Col xs={'auto'} lg={3}>
               <CUButton btnStyle="square" className={styles.cancelBtn} onClick={handleCancel}>
                 <FontAwesomeIcon icon={faArrowLeft} /> Go Back
               </CUButton>
             </Col>
-            <Col className="text-center">
+            <Col className="text-center" xs={12} lg={6}>
               <span className={styles.aboutTitle}>Payment</span>
             </Col>
-            <Col xs={2}> </Col>
           </Row>
         </Container>
         <ProgressBar step={2} />
