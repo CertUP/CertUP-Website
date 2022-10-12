@@ -106,7 +106,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const { Rendering, requestRender, LastRender } = usePreview();
+  const { Rendering, requestRender, LastRender, LastGeneric } = usePreview();
 
   const [showCsvModal, setShowCsvModal] = useState<boolean>(false);
 
@@ -116,7 +116,15 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   const scrollBarWidth = useScrollbarWidth();
 
-  //todo, do this after initial render?
+  useEffect(() => {
+    document.title = `CertUP Project - ${projectName}`;
+  }, [projectName]);
+
+  // Re-Render Peview when data changes
+  useEffect(() => {
+    reRender();
+  }, [participants[0], renderProps, certInfo.issue_date, certInfo.expire_date]);
+
   useEffect(() => {
     if (!pid) return;
     const pInfo = findProject(pid);
@@ -246,11 +254,12 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       template: '2',
     };
 
+    // this is only used for Save, so we want to use the GenericRender since the image is stored unencrypted
     return new Project({
       _id: projectId.current,
       owner: Address,
       project_name: projectName,
-      lastPreview: LastRender,
+      lastPreview: LastGeneric,
       participants: participants,
       certInfo: cinfo,
       renderProps: rprops,
@@ -267,27 +276,18 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     updateRenderProps({ signerSignatureUri: uri });
   };
 
-  useEffect(() => {
-    document.title = `CertUP Project - ${projectName}`;
-  }, [projectName]);
-
-  // Re-Render Peview when data changes
-  useEffect(() => {
-    const run = async () => {
-      const input: GenerateInput = {
-        renderProps: renderProps,
-        certInfo: certInfo,
-        participant: participantToRender(),
-      };
-
-      requestRender({
-        id: '2',
-        layoutId: renderProps.templateLayout,
-        input,
-      });
+  const reRender = () => {
+    const input: GenerateInput = {
+      renderProps: renderProps,
+      certInfo: certInfo,
+      participant: participantToRender(participants[0]),
     };
-    run();
-  }, [participants[0], renderProps, certInfo.issue_date, certInfo.expire_date]);
+    requestRender({
+      id: '2',
+      layoutId: renderProps.templateLayout,
+      input,
+    });
+  };
 
   const handleBack = () => {
     if (!dirty) backHandler();

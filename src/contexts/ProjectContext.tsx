@@ -200,8 +200,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   const findProject = (id: string): Project | undefined => {
     const data = PendingProjects;
 
-    console.log('All Projects', data);
-
     // find the item's index to remove it
     const project = data.find((Project) => Project._id === id);
 

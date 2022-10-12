@@ -1,25 +1,30 @@
 import axios from 'axios';
-import { CertInfo, RenderProps } from '../interfaces/Project';
+import { CertInfo, Participant, RenderProps } from '../interfaces/Project';
 import { sleep } from './helpers';
 
-export interface GenerateInput {
+export class GenerateInput {
   renderProps: RenderProps;
   certInfo: CertInfo;
   participant: RenderParticipant;
-  // logoData: string;
-  // companyName: string;
-  // certTitle: string;
-  // fullName: string;
-  // dob?: string;
-  // certNum: string;
-  // issueDate?: string;
-  // expireDate?: string;
-  // signer: string;
-  // signerTitle: string;
-  // line1: string;
-  // line3?: string;
-  // templateBg: number;
-  // upload?: boolean;
+
+  constructor({
+    renderProps,
+    certInfo,
+    participant,
+  }: {
+    renderProps: RenderProps;
+    certInfo: CertInfo;
+    participant?: RenderParticipant;
+  }) {
+    this.renderProps = renderProps;
+    this.certInfo = certInfo;
+    this.participant = participant || {
+      name: 'John',
+      surname: 'Doe',
+      dob: new Date('01/01/1970').toISOString(),
+      cert_num: 'CERT123',
+    };
+  }
 }
 
 export interface RenderParticipant {
@@ -80,11 +85,20 @@ export const generateWithWait = async ({ id, layoutId, input }: GIProps) => {
 };
 
 export const generateImage = async ({ id, layoutId, input }: GIProps) => {
-  console.log('Generating With', input);
   // const url = new URL(`/templates/generate/${id}`, process.env.REACT_APP_BACKEND).toString();
   // const { data } = await axios.post(url, input);
-  const data = await generateMultiple({ id, layoutId, input: [input], upload: false });
-  return data[0];
+  const previewInput = new GenerateInput({
+    renderProps: input.renderProps,
+    certInfo: input.certInfo,
+  });
+  const data: string[] = await generateMultiple({
+    id,
+    layoutId,
+    input: [input, previewInput],
+    upload: false,
+  });
+
+  return data;
 };
 
 interface GMProps {

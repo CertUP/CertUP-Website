@@ -27,7 +27,6 @@ class ImagePicker extends Component<Props, State> {
     this.renderImage = this.renderImage.bind(this);
 
     if (props.selected) {
-      console.log('Pre-Selected BG Image', props.selected);
       const pickedImage = Map();
       const newerPickedImage = pickedImage.set(props.selected.value.toString(), props.selected.src);
       this.state = {

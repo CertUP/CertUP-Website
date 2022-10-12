@@ -17,6 +17,7 @@ interface RenderRequest {
 export interface PreviewContextState {
   NextRender?: RenderRequest;
   LastRender?: string;
+  LastGeneric?: string;
   Rendering: boolean;
   requestRender: (renderData: RenderRequest) => void;
 }
@@ -32,14 +33,18 @@ const contextDefaultValues: PreviewContextState = {
 // created context with default values
 const PreviewContext = createContext<PreviewContextState>(contextDefaultValues);
 
+let NextRender: RenderRequest | undefined;
+
 export const PreviewProvider = ({ children }: Props): ReactElement => {
   // set default values
-  const [NextRender, setNextRender] = useState<RenderRequest>();
+  //const [NextRender, setNextRender] = useState<RenderRequest>();
   const [LastRender, setLastRender] = useState<string>();
+  const [LastGeneric, setLastGeneric] = useState<string>();
   const [Rendering, setRendering] = useState<boolean>(contextDefaultValues.Rendering);
 
   const requestRender = (renderData: RenderRequest) => {
-    setNextRender(renderData);
+    //setNextRender(renderData);
+    NextRender = renderData;
     //render(renderData);
   };
 
@@ -47,16 +52,10 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
     if (Rendering) return;
     if (NextRender) {
       render(NextRender);
-      setNextRender(undefined);
+      //setNextRender(undefined);
+      NextRender = undefined;
     }
-  }, [Rendering]);
-
-  useEffect(() => {
-    if (!Rendering && NextRender) {
-      render(NextRender);
-      setNextRender(undefined);
-    }
-  }, [NextRender]);
+  }, [Rendering, NextRender]);
 
   const render = async (renderData: RenderRequest) => {
     // if (!renderData && NextRender) {
@@ -79,9 +78,10 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
           // input: NextRender.input,
           ...renderData,
         });
-        setLastRender(result);
+        setLastRender(result[0]);
+        setLastGeneric(result[1]);
         setRendering(false);
-        return;
+        break;
       } catch (error: any) {
         console.error('Error Rendering Preview: ', error);
         i++;
@@ -91,13 +91,13 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
         }
       }
     }
-    setRendering(false);
   };
 
   const values = {
     requestRender,
     NextRender,
     LastRender,
+    LastGeneric,
     Rendering,
   };
 
