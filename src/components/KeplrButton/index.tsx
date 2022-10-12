@@ -177,9 +177,8 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
 
       setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
       setLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       setLoading(false);
-      toast.error(error.toString());
       reportError({ message: getErrorMessage(error) });
     }
     setLoading(false);

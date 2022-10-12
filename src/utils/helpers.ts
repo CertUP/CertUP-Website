@@ -16,7 +16,7 @@ export function getErrorMessage(error: unknown) {
 
 export const reportError = ({ message }: { message: string }) => {
   console.error(message);
-  toast.error(message.toString());
+  toast.error(message);
 };
 
 export function sleep(ms: number) {
