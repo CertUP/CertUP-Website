@@ -34,6 +34,7 @@ const contextDefaultValues: PreviewContextState = {
 const PreviewContext = createContext<PreviewContextState>(contextDefaultValues);
 
 let NextRender: RenderRequest | undefined;
+let running = false;
 
 export const PreviewProvider = ({ children }: Props): ReactElement => {
   // set default values
@@ -43,29 +44,22 @@ export const PreviewProvider = ({ children }: Props): ReactElement => {
   const [Rendering, setRendering] = useState<boolean>(contextDefaultValues.Rendering);
 
   const requestRender = (renderData: RenderRequest) => {
-    //setNextRender(renderData);
     NextRender = renderData;
-    //render(renderData);
+    runQueue();
   };
 
-  useEffect(() => {
-    if (Rendering) return;
-    if (NextRender) {
-      render(NextRender);
-      //setNextRender(undefined);
+  const runQueue = async () => {
+    if (running) return;
+    running = true;
+    while (NextRender) {
+      const thisRender = { ...NextRender };
       NextRender = undefined;
+      await render(thisRender);
     }
-  }, [Rendering, NextRender]);
+    running = false;
+  };
 
   const render = async (renderData: RenderRequest) => {
-    // if (!renderData && NextRender) {
-    //   renderData = NextRender;
-    //   setNextRender(undefined);
-    // }
-    if (Rendering) {
-      console.log('Skipping render');
-      return;
-    }
     setRendering(true);
 
     const limit = 3;
