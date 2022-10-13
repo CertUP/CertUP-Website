@@ -123,7 +123,7 @@ export default function Profile() {
     setLoadingUpdate(false);
   };
 
-  if (!Wallet || !Address || !LoginToken)
+  if (!Wallet || !Address || !QueryPermit)
     return (
       <>
         <Layout>

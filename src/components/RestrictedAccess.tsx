@@ -20,12 +20,13 @@ export const RestrictedAccess = () => {
         <Row className="justify-content-center">
           <Col className="text-center" md={8} xs={12}>
             <h4>
-              <p>
-                You have not yet registered your issuer profile.{' '}
+              <p style={{ lineHeight: 1.5 }}>
+                You have not yet registered as an issuer.
+                <br />
                 <a href="#" onClick={() => toggleLoginModal('register')}>
                   Click Here
                 </a>{' '}
-                to complete your profile.
+                to register.
               </p>
             </h4>
           </Col>
