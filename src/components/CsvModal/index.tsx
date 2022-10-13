@@ -29,9 +29,9 @@ export default function CsvModal({ show, setShow, setParticipants }: props) {
 
   const handleParticipants = (data: Participant[]) => {
     setParticipants(data);
-    if (data.length > 150) {
+    if (data.length > 100) {
       toast.error(
-        `Projects are currently limited to 150 participants. Your uploaded ${data.length} participants.`,
+        `Projects are currently limited to 100 participants. Your uploaded ${data.length} participants.`,
       );
       return;
     }

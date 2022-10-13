@@ -140,9 +140,9 @@ export default function Mint() {
     if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
     if (!project.certInfo.issue_date) throw new Error('Project must have an issue date.');
 
-    if (project.participants.length > 150) {
+    if (project.participants.length > 100) {
       toast.error(
-        `Projects are currently limited to 150 participants. Your project contains ${project.participants.length} participants.`,
+        `Projects are currently limited to 100 participants. Your project contains ${project.participants.length} participants.`,
       );
       return;
     }
@@ -179,9 +179,9 @@ export default function Mint() {
       if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
       if (!imageHashes.length) throw new Error('Images Not Generated');
 
-      if (project.participants.length > 150) {
+      if (project.participants.length > 100) {
         toast.error(
-          `Projects are currently limited to 150 participants. Your project contains ${project.participants.length} participants.`,
+          `Projects are currently limited to 100 participants. Your project contains ${project.participants.length} participants.`,
         );
         return;
       }

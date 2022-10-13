@@ -330,8 +330,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     try {
       if (e) e.preventDefault();
 
-      if (participants.length > 150) {
-        toast.error('Projects are currently limited to 150 participants.');
+      if (participants.length > 100) {
+        toast.error('Projects are currently limited to 100 participants.');
         return;
       }
 
@@ -364,8 +364,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       toast.error("Please enter a 'Project Name'");
       return;
     }
-    if (participants.length > 150) {
-      toast.error('Projects are currently limited to 150 participants.');
+    if (participants.length > 100) {
+      toast.error('Projects are currently limited to 100 participants.');
       return;
     }
     const tid = toast.loading('Saving...');
@@ -409,8 +409,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
 
   const addParticipant = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    if (participants.length >= 150) {
-      toast.error('Projects are currently limited to 150 participants.');
+    if (participants.length >= 100) {
+      toast.error('Projects are currently limited to 100 participants.');
       return;
     }
     setParticipants([...participants, new Participant()]);
@@ -696,7 +696,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   <CUButton
                     btnStyle="small"
                     onClick={addParticipant}
-                    disabled={participants.length >= 150}
+                    disabled={participants.length >= 100}
                   >
                     + Add
                   </CUButton>
