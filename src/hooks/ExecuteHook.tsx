@@ -318,6 +318,32 @@ export default function useExecute() {
     return response as ComputeTx;
   };
 
+  const editProfile = async ({
+    name,
+    website,
+    logo_img_url,
+    toastRef,
+  }: RegisterProps): Promise<ComputeTx> => {
+    if (!Client) throw new Error('Client not available.');
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    const editMsg = {
+      edit_issuer: {
+        issuer_params: {
+          addr: Address,
+          name,
+          website,
+          logo_img_url,
+        },
+      },
+    };
+
+    const response = await executeManager(editMsg, 135_000, toastRef);
+
+    queryCredits();
+    return response as ComputeTx;
+  };
+
   const paySSCRT = async (numCerts: number, amount: string, toastRef: any): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
@@ -471,28 +497,7 @@ export default function useExecute() {
   };
 
   const executeManager = async (msg: any, gas = 50000, toastRef?: any) => {
-    // if (!Client) throw new Error('Client not available.');
-    // if (!QueryPermit) throw new Error('QueryPermit not available.');
-    // if (toastRef) toast.update(toastRef, { render: 'Processing Transaction...', isLoading: true });
-    // else toastRef = toast.loading('Processing Transaction...');
     try {
-      // setProcessingTx(true);
-
-      // const response = await Client.tx.compute.executeContract(
-      //   {
-      //     contractAddress: process.env.REACT_APP_MANAGER_ADDR,
-      //     codeHash: process.env.REACT_APP_MANAGER_HASH,
-      //     sender: Address,
-      //     msg: msg,
-      //   },
-      //   {
-      //     gasLimit: gas,
-      //     gasPriceInFeeDenom: parseFloat(process.env.REACT_APP_GAS_PRICE || '0.25'),
-      //   },
-      // );
-      // parseError(response as ComputeTx);
-      // setProcessingTx(false);
-      // if (toastRef) toast.update(toastRef, new ToastProps('Transaction Succeeded', 'success'));
       const response = await execute({
         msg,
         gas,
@@ -802,5 +807,6 @@ export default function useExecute() {
     revokeAccessGlobal,
     claimCert,
     registerIssuer,
+    editProfile,
   };
 }

@@ -2,53 +2,33 @@
 // import styles from "./styles.module.scss"
 import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
-import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import exampleCert from '../../assets/ExampleCert.svg';
 import { useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
-import ProjectList from '../../components/ProjectList';
 import { useEffect, useState } from 'react';
-import ProjectForm from '../../components/ProjectForm';
-import Project from '../../interfaces/Project';
-import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
-import { SecretNetworkClient, Tx } from 'secretjs';
 import { toast } from 'react-toastify';
-import StepNumber from '../../components/StepNumber';
-import { ProgressBar } from '../../components';
-import Table from 'react-bootstrap/Table';
-import { permissions, allowedTokens, permitName } from '../../utils/loginPermit';
-import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
-import ReactJson from 'react-json-view';
-import { Extension } from 'secretjs/dist/extensions/snip721/types';
-import useQuery from '../../hooks/QueryHook';
-import { useNft } from '../../contexts/NftContext';
-import PreloadImage from '../../components/PreloadImage';
-import { CertupExtension } from '../../interfaces/token';
 import { RestrictedAccess } from '../../components/RestrictedAccess';
 import CUSpinner from '../../components/CUSpinner';
-import { Issuer, IssuerData } from '../../interfaces/manager';
+import { Issuer } from '../../interfaces/manager';
+import useExecute from '../../hooks/ExecuteHook';
 
 export default function Profile() {
   const {
-    Client,
-    ClientIsSigner,
     Wallet,
     Address,
-    LoginToken,
     QueryPermit,
     IssuerProfile,
     VerifiedIssuer,
     LoadingRemainingCerts,
-    queryCredits,
     ProcessingTx,
   } = useWallet();
+
+  const { editProfile } = useExecute();
 
   const [newIssuerData, setNewIssuerData] = useState<Issuer | undefined>(IssuerProfile);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
@@ -68,49 +48,13 @@ export default function Profile() {
     });
   };
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoadingUpdate(true);
     const toastRef = toast.loading('Transaction Processing...');
     try {
-      const editMsg = {
-        edit_issuer: {
-          issuer_params: {
-            addr: Address,
-            ...newIssuerData,
-          },
-        },
-      };
-
-      const result = await Client?.tx.compute.executeContract(
-        {
-          sender: Address,
-          contractAddress: process.env.REACT_APP_MANAGER_ADDR as string,
-          codeHash: process.env.REACT_APP_MANAGER_HASH as string,
-          msg: editMsg,
-        },
-        {
-          gasLimit: 135_000,
-        },
-      );
+      const result = await editProfile({ ...newIssuerData, toastRef });
       console.log('Edit Result:', result);
-      if (!result) throw new Error('Something went wrong');
-      console.log('OK');
-      if (result.code) {
-        console.log(result);
-        throw new Error(result.rawLog);
-      }
-
-      toast.update(toastRef, {
-        render: 'Success!',
-        type: 'success',
-        isLoading: false,
-        autoClose: 5000,
-      });
-      queryCredits();
     } catch (error: any) {
       toast.update(toastRef, {
         render: error.toString(),
