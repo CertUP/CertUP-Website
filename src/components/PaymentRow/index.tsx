@@ -32,7 +32,7 @@ interface PRProps {
 }
 
 export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: PRProps) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, queryCredits } = useWallet();
+  const { Address, LoginToken, queryCredits } = useWallet();
 
   const [numCerts, setNumCerts] = useState<number>(num_certs);
 
@@ -46,13 +46,11 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
   const [totalUSD, setTotalUSD] = useState<number>(0);
   const [chargeId, setChargeId] = useState<string>();
 
-  const [gotError, setGotError] = useState<boolean>(false);
-
-  const [paid, setPaid] = useState<boolean>(false);
-  const [confirmation, setConfirmation] = useState<Confirmation>();
-
   const { paySSCRT, paySCRT } = useExecute();
+  const { ProcessingTx } = useWallet();
   const { queryCertPrice, getSSCRTBalance, getSCRTBalance } = useQuery();
+
+  const [loadingSCRT, setLoadingSCRT] = useState(false);
 
   const totalSCRTString = `${totaluSCRT / 10e5} ${payWithSSCRT ? 'sSCRT' : 'SCRT'}`;
   const totalUSDString = `$${(totalUSD / 10e1).toFixed(2)}`;
@@ -173,6 +171,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
 
   const handleSCRTPayment = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const toastRef = toast.loading('Transaction Processing...');
+    setLoadingSCRT(true);
     try {
       e.preventDefault();
       if (!numCerts) throw new Error('Number of Certs is undefined.');
@@ -186,7 +185,6 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
       console.log(response);
 
       toast.update(toastRef, new ToastProps('Success', 'success'));
-      setPaid(true);
       const confirm: Confirmation = {
         string: 'Your transaction hash is',
         number: (
@@ -202,10 +200,11 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
           </a>
         ),
       };
-      setConfirmation(confirm);
       if (onPaid) onPaid(confirm);
     } catch (error: any) {
       toast.update(toastRef, new ToastProps(error.toString(), 'error'));
+    } finally {
+      setLoadingSCRT(false);
     }
   };
 
@@ -293,8 +292,12 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
 
               <Row className="justify-content-center">
                 <Col xs="10" md="8" lg="6">
-                  <CUButton disabled={!totaluSCRT} fill={true} onClick={handleSCRTPayment}>
-                    Pay with Keplr Wallet
+                  <CUButton
+                    disabled={!totaluSCRT || ProcessingTx || loadingSCRT}
+                    fill={true}
+                    onClick={handleSCRTPayment}
+                  >
+                    {loadingSCRT ? <CUSpinner size="xs" /> : 'Pay with Keplr Wallet'}
                   </CUButton>
                 </Col>
               </Row>
