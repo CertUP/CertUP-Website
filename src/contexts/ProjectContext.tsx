@@ -1,7 +1,5 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
 import Project, { defaultCertInfo, MintedProject } from '../interfaces/Project';
-// import { getRandom } from '../utils/helpers';
-import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { useWallet } from '.';
 import axios from 'axios';
 import { toast } from 'react-toastify';

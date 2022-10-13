@@ -5,10 +5,6 @@ import { CertupExtension } from '../interfaces/token';
 import * as XLSX from 'xlsx';
 import { UploadResponse } from '../pages/Mint';
 
-export const changeThisFunction = () => {
-  return 'change me'; // TODO: CHANGE HERE
-};
-
 export function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   return String(error);

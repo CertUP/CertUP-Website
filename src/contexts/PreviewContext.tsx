@@ -1,6 +1,4 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-// import { getRandom } from '../utils/helpers';
-import { nanoid } from 'nanoid'; // TODO: DELETE HERE IF IT IS NOT NECESSARY
 import { generateImage, GenerateInput } from '../utils/backendHelper';
 import { toast } from 'react-toastify';
 

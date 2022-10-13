@@ -442,8 +442,6 @@ export default function useExecute() {
       },
     };
 
-    logSizeInBytes('Preload Msg', preloadMsg);
-    //todo: extimate gas based on number of participants
     const simulationGas = await simulateManager(preloadMsg);
     console.log('Sim result', simulationGas);
 
@@ -522,7 +520,7 @@ export default function useExecute() {
       });
       parseError(response as ComputeTx);
 
-      if (!response) throw new Error(); //todo handle this
+      if (!response) throw new Error('Transaction Simulation failed to return a response.'); //todo handle this
 
       console.log('Simulation Used:', response.gasInfo?.gasUsed);
 
@@ -592,7 +590,7 @@ export default function useExecute() {
 
         response = await execute({
           msg,
-          gas: gas * 1.8, //todo set to 1.25 once gas problem is fixed
+          gas: gas * 1.25, //todo set to 1.25 once gas problem is fixed
           //toastRef,
           contract,
           hash,
