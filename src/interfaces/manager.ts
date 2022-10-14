@@ -21,6 +21,7 @@ export interface Issuer extends NewIssuer {
   cert_num: string;
   /// # of remaining certs the issuer has purchased
   remaining_certs: string;
+  migrated: boolean;
 }
 
 export interface IssuerData {

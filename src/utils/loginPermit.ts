@@ -1,13 +1,17 @@
 import { Permission } from 'secretjs';
 import { PermitSignature } from '../interfaces';
-import { addHours } from './helpers';
+import { addHours, hashString } from './helpers';
+
+const baseAllowed = [process.env.REACT_APP_NFT_ADDR, process.env.REACT_APP_MANAGER_ADDR];
 
 export const permitName = 'CertUP-Query-Permit';
-export const allowedTokens: string[] = [
-  process.env.REACT_APP_NFT_ADDR as string,
-  process.env.REACT_APP_MANAGER_ADDR as string,
-];
+export const allowedTokens: string[] = process.env.REACT_APP_OLD_MANAGER_ADDR
+  ? [...baseAllowed, process.env.REACT_APP_OLD_MANAGER_ADDR]
+  : baseAllowed;
 export const permissions: Permission[] = ['owner', 'balance'];
+
+export const allowedHash = hashString(JSON.stringify(allowedTokens));
+console.log('Allowed Hash', allowedHash);
 
 export interface LoginToken {
   permit: PermitSignature;
@@ -20,11 +24,12 @@ export interface GetPermitResponse {
   queryPermit: PermitSignature;
 }
 
-const queryPermitString = `Certup-Query-Permit-v1-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`;
-const loginPermitString = `Certup-Login-Token-v1`;
+//const queryPermitString = `Certup-Query-Permit-v2-${process.env.REACT_APP_NFT_ADDR}-${process.env.REACT_APP_MANAGER_ADDR}`;
+const queryPermitString = `Certup-Query-Permit-v2`;
+const loginPermitString = `Certup-Login-Token-v2`;
 
 const getQueryString = (address: string) => {
-  return `${queryPermitString}-${address}`;
+  return `${queryPermitString}-${address}-${allowedHash.toString()}`;
 };
 
 const getLoginString = (address: string) => {

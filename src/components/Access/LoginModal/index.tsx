@@ -14,7 +14,7 @@ import styles from './styles.module.scss';
 import { NewIssuer } from '../../../interfaces/manager';
 import Form from 'react-bootstrap/esm/Form';
 import CUButton from '../../CUButton';
-import { toast } from 'react-toastify';
+import { Id, toast } from 'react-toastify';
 import useExecute from '../../../hooks/ExecuteHook';
 import CUSpinner from '../../CUSpinner';
 
@@ -36,6 +36,23 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
   const [newIssuerData, setNewIssuerData] = useState<NewIssuer>(blankIssuer);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
 
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  interface FormErrors {
+    name?: any;
+  }
+
+  const findFormErrors = (): FormErrors => {
+    const { name, website, logo_img_url } = newIssuerData;
+
+    let newErrors: FormErrors = {};
+    if (!name || name === '')
+      newErrors = { ...newErrors, name: `Please enter a company or individual's name.` };
+
+    console.log('Errors:', newErrors);
+    return newErrors;
+  };
+
   const updateIssuerData = (changedData: any) => {
     setNewIssuerData({
       ...newIssuerData,
@@ -45,9 +62,20 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoadingUpdate(true);
-    const toastRef = toast.loading('Processing Transaction...');
+
+    let toastRef = undefined;
     try {
+      const newErrors = findFormErrors();
+      // Conditional logic:
+      if (Object.keys(newErrors).length > 0) {
+        // We got errors!
+        setErrors(newErrors);
+        return;
+      }
+
+      setLoadingUpdate(true);
+      toastRef = toast.loading('Processing Transaction...');
+
       const result = await registerIssuer({
         name: newIssuerData?.name,
         website: newIssuerData?.website,
@@ -57,12 +85,13 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
       setLoadingUpdate(false);
       toggleLoginModal(undefined);
     } catch (error: any) {
-      toast.update(toastRef, {
-        render: error.toString(),
-        type: 'error',
-        isLoading: false,
-        autoClose: 5000,
-      });
+      if (toastRef)
+        toast.update(toastRef, {
+          render: error.toString(),
+          type: 'error',
+          isLoading: false,
+          autoClose: 5000,
+        });
       console.error(error);
     }
     setLoadingUpdate(false);
@@ -119,16 +148,15 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
                             value={newIssuerData?.name}
                             onChange={(e) => {
                               updateIssuerData({ name: e.target.value });
-                              //setDirty(true);
                             }}
                             type="text"
                             placeholder="Corporate Finance Institute"
                             className="mt-1"
                             disabled={loadingUpdate}
-                            //isInvalid={!!errors.projectName}
+                            isInvalid={!!errors.name}
                           />
                           <Form.Control.Feedback type="invalid">
-                            {/* {errors.projectName} */}
+                            {errors.name}
                           </Form.Control.Feedback>
                         </Col>
                       </Row>
@@ -143,7 +171,13 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
                           xs={{ span: 4, offset: 4 }}
                           md={{ span: 2, offset: 1 }}
                         >
-                          <Form.Label className={`${styles.largeLabel} mb-0`}>Website</Form.Label>
+                          <Form.Label className={`${styles.largeLabel} mb-0`}>
+                            <div>
+                              Website
+                              <br />
+                              <span className={styles.optional}>Optional</span>
+                            </div>
+                          </Form.Label>
                         </Col>
                         <Col style={{ paddingTop: '0vh' }} xs={12} md={8}>
                           <Form.Control
@@ -175,7 +209,13 @@ export default function LoginModal({ issuerLogin }: ModalProps) {
                           xs={{ span: 4, offset: 4 }}
                           md={{ span: 2, offset: 1 }}
                         >
-                          <Form.Label className={`${styles.largeLabel} mb-0`}>Logo URL</Form.Label>
+                          <Form.Label className={`${styles.largeLabel} mb-0`}>
+                            <div>
+                              Logo URL
+                              <br />
+                              <span className={styles.optional}>Optional</span>
+                            </div>
+                          </Form.Label>
                         </Col>
                         <Col style={{ paddingTop: '0vh' }} xs={12} md={8}>
                           <Form.Control

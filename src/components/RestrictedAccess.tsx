@@ -7,12 +7,38 @@ import { useEffect } from 'react';
 import { useWallet } from '../contexts';
 
 export const RestrictedAccess = () => {
-  const { toggleLoginModal, VerifiedIssuer } = useWallet();
+  const { toggleLoginModal, VerifiedIssuer, MigrationNeeded } = useWallet();
   useEffect(() => {
-    if (!VerifiedIssuer && process.env.REACT_APP_SELF_REGFISTER === 'true') {
+    if (
+      VerifiedIssuer === false &&
+      !MigrationNeeded &&
+      process.env.REACT_APP_SELF_REGFISTER === 'true'
+    ) {
       toggleLoginModal('register');
     }
   }, []);
+
+  if (MigrationNeeded) {
+    return (
+      <Container>
+        <Row className="justify-content-center">
+          <Col className="text-center" md={10} xs={12}>
+            <h4>
+              <p style={{ lineHeight: 1.5 }}>
+                We encounted an error migrating your issuer profile to our new contract.
+                <br />
+                Please{' '}
+                <a href="javascript:window.location.href=window.location.href">
+                  refresh the page
+                </a>{' '}
+                to try again or <Link to="/contact">Contact Us</Link> for asistance.
+              </p>
+            </h4>
+          </Col>
+        </Row>
+      </Container>
+    );
+  }
 
   if (process.env.REACT_APP_SELF_REGFISTER === 'true') {
     return (

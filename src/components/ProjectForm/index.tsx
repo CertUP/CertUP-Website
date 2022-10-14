@@ -571,7 +571,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   let pErrors;
                   if (errors.participants) pErrors = errors.participants[index];
                   return (
-                    <>
+                    <div key={index}>
                       <Row
                         key={`participant-${index}`}
                         className={`mb-2`}
@@ -686,7 +686,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                       {index !== participants.length - 1 && (
                         <hr className="d-md-none" style={{ marginBottom: '3rem' }} />
                       )}
-                    </>
+                    </div>
                   );
                 })}
               </Row>

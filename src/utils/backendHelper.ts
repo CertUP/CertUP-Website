@@ -130,3 +130,10 @@ export const claimCert = async (props: ClaimCertProps) => {
   const { data } = await axios.post(url, props);
   return data.data;
 };
+
+export const migrateIssuer = async (address: string) => {
+  const url = new URL(`/migrate`, process.env.REACT_APP_BACKEND).toString();
+
+  const { data } = await axios.post(url, { address });
+  return data.data;
+};

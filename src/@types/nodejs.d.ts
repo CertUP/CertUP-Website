@@ -10,6 +10,9 @@ declare namespace NodeJS {
     REACT_APP_MANAGER_ADDR: string;
     REACT_APP_MANAGER_HASH: string;
 
+    REACT_APP_OLD_MANAGER_ADDR: string;
+    REACT_APP_OLD_MANAGER_HASH: string;
+
     REACT_APP_SNIP20_ADDR: string;
     REACT_APP_SNIP20_HASH: string;
 
