@@ -231,10 +231,14 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
               >
                 DOB
               </th>
-              <th style={{ width: step !== 'preload' ? '49.5%' : '20%' }}>Claim Code</th>
+              {/* <th style={{ width: step !== 'preload' ? '49.5%' : '20%' }}>Claim Code</th> */}
+              <th style={{ width: '100%', display: 'flex' }} className="justify-content-between">
+                <div>Claim Code</div>
+                {step !== 'preload' && <div>Claimed</div>}
+              </th>
 
-              {step !== 'preload' ? <th style={{ minWidth: '7%' }}>Claimed</th> : null}
-              <th style={{ width: scrollBarWidth }}></th>
+              {/* {step !== 'preload' ? <th style={{ minWidth: '7%' }}>Claimed</th> : null} */}
+              {/* <th style={{ width: scrollBarWidth }}></th> */}
             </tr>
           </thead>
           <tbody className={styles.reviewTable}>
@@ -272,17 +276,28 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
 
                   {step !== 'preload' ? (
                     loading ? (
-                      <td style={{ width: '7%' }} className="text-center">
+                      <td
+                        style={{ width: '5%', verticalAlign: 'middle', textAlign: 'center' }}
+                        className="text-center"
+                      >
                         <CUSpinner size="xs" />
                       </td>
                     ) : token.minted ? (
-                      // <td style={{ color: 'green', width: '7%' }}>True</td>
-                      <td style={{ color: 'green', width: '7%' }}>
+                      <td
+                        className={styles.claimedCell}
+                        style={{
+                          color: 'green',
+                        }}
+                      >
                         <FontAwesomeIcon icon={faCheckCircle} />
                       </td>
                     ) : (
-                      // <td style={{ width: '7%' }}>False</td>
-                      <td style={{ color: 'red', width: '7%' }}>
+                      <td
+                        className={styles.claimedCell}
+                        style={{
+                          color: 'red',
+                        }}
+                      >
                         <FontAwesomeIcon icon={faX} />
                       </td>
                     )
