@@ -122,7 +122,13 @@ export default function CertUpNavbar() {
           <br />
           <b>20: </b> {process.env.REACT_APP_SNIP20_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
           <b>721: </b> {process.env.REACT_APP_NFT_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
+          {!!process.env.REACT_APP_OLD_MANAGER_ADDR && <br />}
           <b>Manager: </b> {process.env.REACT_APP_MANAGER_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
+          {!!process.env.REACT_APP_OLD_MANAGER_ADDR && (
+            <>
+              <b>Old Manager: </b> {process.env.REACT_APP_OLD_MANAGER_ADDR} &nbsp;&nbsp;&nbsp;&nbsp;
+            </>
+          )}
         </div>
       ) : null}
     </>
