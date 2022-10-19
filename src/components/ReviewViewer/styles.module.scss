@@ -83,6 +83,11 @@
   text-align: center;
   width: 3%;
 }
+@media (max-width: 992px) {
+  .claimedCell {
+    width: 5% !important;
+  }
+}
 
 // .fixed_header thead {
 //   background: black;

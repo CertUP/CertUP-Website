@@ -222,7 +222,12 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
         >
           <thead>
             <tr>
-              <th style={{ width: step !== 'preload' ? '6.8%' : '10%' }}>Cert #</th>
+              <th
+                style={{ width: step !== 'preload' ? '6.8%' : '10%' }}
+                className="d-none d-md-table-cell"
+              >
+                Cert #
+              </th>
               <th style={{ width: step !== 'preload' ? '12.8%' : '25%' }}>First Name</th>
               <th style={{ width: step !== 'preload' ? '12.8%' : '25%' }}>Last Name</th>
               <th
@@ -250,7 +255,10 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
                   className={selected ? styles.selectedRow : styles.unselectedRow}
                   onClick={() => setSelectedParticipant(index)}
                 >
-                  <td style={{ width: step !== 'preload' ? '7%' : '10%', wordWrap: 'break-word' }}>
+                  <td
+                    style={{ width: step !== 'preload' ? '7%' : '10%', wordWrap: 'break-word' }}
+                    className="d-none d-md-table-cell"
+                  >
                     {token.preload_data.pub_metadata?.extension?.certificate?.cert_number ||
                       token.preload_data.priv_metadata.extension.certificate.cert_number}
                   </td>
@@ -270,8 +278,27 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
                         ).toLocaleDateString()
                       : null}
                   </td>
-                  <td style={{ width: step !== 'preload' ? '50%' : '20%', wordWrap: 'break-word' }}>
-                    {token.claim_code}
+                  <td
+                    style={{
+                      width: '100%' /*step !== 'preload' ? '50%' : '20%'*/,
+                      wordWrap: 'break-word',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <>
+                      <div style={{ wordWrap: 'break-word', width: '95%' }}>{token.claim_code}</div>
+                      <div
+                        style={{
+                          width: '5%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'end',
+                        }}
+                      >
+                        <CopyButton text={token.claim_code} text2="Code" />
+                      </div>
+                    </>
                   </td>
 
                   {step !== 'preload' ? (
