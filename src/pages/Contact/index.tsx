@@ -31,7 +31,8 @@ export default function Contact() {
           <Col xs={{ span: 12, offset: 0 }} md={{ span: 6, offset: 3 }}>
             <Row>
               <p className={styles.contactParagraph}>
-                If you have any questions or would like to rquest early access, please get in touch!
+                If you have any questions or would like to request early access, please get in
+                touch!
               </p>
             </Row>
             <Row className="mx-4 px-4">
@@ -49,12 +50,21 @@ export default function Contact() {
                 </li>
               </ul>
             </Row>
-            {/* <Row>
-            <span>Discord: </span>
-            <a href="https://discord.gg/jNZJYBDcZQ" target="_blank" rel="noreferrer">
-              <h4>https://discord.gg/CertUP</h4>
-            </a>
-          </Row> */}
+            <Row className="mx-4 px-4">
+              <ul>
+                <li>
+                  <span className={styles.contactTitle}>Discord: </span>
+                  <a
+                    href="https://discord.gg/jNZJYBDcZQ"
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`${styles.contactText} px-2`}
+                  >
+                    https://discord.gg/jNZJYBDcZQ
+                  </a>{' '}
+                </li>
+              </ul>
+            </Row>
           </Col>
         </Container>
       </Layout>
