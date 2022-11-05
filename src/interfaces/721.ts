@@ -1,4 +1,4 @@
-import { CertupMetadata } from './token';
+import { CertupMetadata } from './common/token.interface';
 
 export interface DossierResponse {
   nft_dossier: NftDossier;

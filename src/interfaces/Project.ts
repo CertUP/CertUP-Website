@@ -1,27 +1,13 @@
 import { GenerateInput, RenderParticipant } from '../utils/backendHelper';
-import { CertupMetadata } from './token';
+import { Addition, CertupMetadata } from './common/token.interface';
+
+export type DataURI = string;
 
 export interface ProjectProps {
   _id?: string;
   owner?: string;
   project_name?: string;
   lastPreview?: string;
-  // template?: string;
-  // template_bg?: number;
-  // template_layout?: number;
-  // cert_title?: string;
-  // cert_name?: string;
-  // pub_description?: string;
-  // priv_description?: string;
-  // line1Text?: string;
-  // line3Text?: string;
-  // issue_date?: Date;
-  // expire_date?: Date;
-  // company_name?: string;
-  // company_logo_file?: File;
-  // company_logo_uri?: string;
-  // signer?: string;
-  // signer_title?: string;
   participants?: Participant[];
   certInfo?: CertInfo;
   renderProps?: RenderProps;
@@ -39,10 +25,10 @@ export interface RenderProps {
   displayEmployer: boolean;
   employerText: string;
   companyName: string;
-  companyLogoUri?: string; //data URI
+  companyLogoUri?: DataURI; //data URI
   signer: string;
   signerTitle: string;
-  signerSignatureUri?: string; //data URI
+  signerSignatureUri?: DataURI; //data URI
 }
 
 export const defaultRenderProps: RenderProps = {
@@ -65,6 +51,7 @@ interface BaseCertInfo {
   cert_name: string;
   pub_description: string;
   priv_description: string;
+  additions: Addition[];
 }
 
 export interface CertInfo extends BaseCertInfo {
@@ -82,6 +69,7 @@ export const defaultCertInfo: CertInfo = {
   pub_description: '',
   priv_description: '',
   issue_date: new Date(),
+  additions: [],
 };
 
 export interface MintedProject {
@@ -101,8 +89,8 @@ export interface ManagerPendingToken {
   name: string;
   date: string;
   cert_type: string;
-  pub_metadata?: CertupMetadata,
-  priv_metadata?: CertupMetadata,
+  pub_metadata?: CertupMetadata;
+  priv_metadata?: CertupMetadata;
 
   cert_num: string;
 
@@ -177,7 +165,14 @@ export class Participant {
   claim_code?: string;
   claimed?: boolean;
 
-  constructor(name?: string, surname?: string, dob?: Date, certNum?: string, claimCode?: string, claimed?: boolean) {
+  constructor(
+    name?: string,
+    surname?: string,
+    dob?: Date,
+    certNum?: string,
+    claimCode?: string,
+    claimed?: boolean,
+  ) {
     this.name = name || '';
     this.surname = surname || '';
     this.dob = dob;
@@ -188,7 +183,7 @@ export class Participant {
 }
 
 export const participantToRender = (participant?: Participant): RenderParticipant => {
-  if (!participant) participant = new Participant("John", "Doe", new Date('1/1/1970'), 'CERT123');
+  if (!participant) participant = new Participant('John', 'Doe', new Date('1/1/1970'), 'CERT123');
   return {
     ...participant,
     dob: participant.dob ? participant.dob.toLocaleDateString() : '',

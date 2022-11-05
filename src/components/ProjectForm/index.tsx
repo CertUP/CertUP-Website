@@ -34,7 +34,12 @@ import { ProgressBar } from '../../components';
 import StepNumber from '../StepNumber';
 import MiniCircle from '../MiniCircle';
 import ImageDropzone from '../ImageDropzone';
-import { generateImage, GenerateInput, generateWithWait } from '../../utils/backendHelper';
+import {
+  generateImage,
+  GenerateInput,
+  generateWithWait,
+  getTemplates,
+} from '../../utils/backendHelper';
 import { fileToDataURI } from '../../utils/fileHelper';
 
 import bg1 from '../../assets/bg1-thumb.jpg';
@@ -55,6 +60,12 @@ import '../../assets/Calendar.css';
 import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
 import { getPickerFormat } from '../../utils/helpers';
 import CUSpinner from '../CUSpinner';
+import { LoginToken } from '../../utils/loginPermit';
+import { Template, TemplateFeatures } from '../../interfaces/common/templates.interface';
+import { Addition, IssuingIndividual } from '../../interfaces/common/token.interface';
+import TemplateSelectButton from '../TemplateSelectButton';
+
+type InstructorFields = 'name' | 'company' | 'title';
 
 const bgList = [bg1, bg2, bg3];
 
@@ -85,6 +96,7 @@ interface FormErrors {
   signer?: any;
   signerTitle?: any;
   participants?: any;
+  additions?: any;
 }
 
 export default function ProjectForm({ pid, step, backHandler }: FormProps) {
@@ -99,6 +111,8 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const [certInfo, setCertInfo] = useState<CertInfo>(defaultCertInfo);
   const [projectName, setProjectName] = useState<string>('');
 
+  const [templates, setTemplates] = useState<Template[]>();
+
   const [dirty, setDirty] = useState(false);
   const [showExitModal, setShowExitModal] = useState(false);
 
@@ -106,25 +120,34 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const { Rendering, requestRender, LastRender, LastGeneric } = usePreview();
-
   const [showCsvModal, setShowCsvModal] = useState<boolean>(false);
 
+  const { Rendering, requestRender, LastRender, LastGeneric } = usePreview();
+
   const projectId = useRef<string | undefined>(pid);
-
   const navigate = useNavigate();
-
   const scrollBarWidth = useScrollbarWidth();
 
-  useEffect(() => {
-    document.title = `CertUP Project - ${projectName}`;
-  }, [projectName]);
+  const getTemplate = (): Template | undefined => {
+    if (templates && templates.length) {
+      const template = templates.find((e) => e.id === renderProps.template);
+      if (template) return template;
+    }
+  };
 
-  // Re-Render Peview when data changes
+  //reset hidden fields when changing templates
   useEffect(() => {
-    reRender();
-  }, [participants[0], renderProps, certInfo.issue_date, certInfo.expire_date]);
+    const features = getTemplate()?.features;
+    if (!features) return;
 
+    if (!features.company_name) updateRenderProps({ companyName: '' });
+    if (!features.expiration) updateCertInfo({ expire_date: undefined });
+    if (!features.instructors) updateCertInfo({ additions: [] });
+    if (!features.signer) updateRenderProps({ signer: undefined, signerTitle: undefined });
+    setDirty(true);
+  }, [renderProps.template]);
+
+  // Load data from saved project
   useEffect(() => {
     if (!pid) return;
     const pInfo = findProject(pid);
@@ -137,12 +160,38 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     } else toast.error(`Unable to load project with ID: ${pid}`);
   }, [pid]);
 
+  // Set Tab Title
+  useEffect(() => {
+    document.title = `CertUP Project - ${projectName}`;
+  }, [projectName]);
+
+  // Get templates from backend when LoginToken is available
+  useEffect(() => {
+    if (!LoginToken) return;
+    updateTemplates(LoginToken);
+  }, [LoginToken]);
+
+  // Re-Render Peview when data changes
+  useEffect(() => {
+    reRender();
+  }, [participants[0], renderProps, certInfo.issue_date, certInfo.expire_date]);
+
   const updateFormErrors = (newErrors: FormErrors) => {
     const fullErrors: FormErrors = {
       ...errors,
       ...newErrors,
     };
     setErrors(fullErrors);
+  };
+
+  const updateTemplates = async (token: LoginToken) => {
+    try {
+      const templates = await getTemplates(token);
+      setTemplates(templates);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load templates, please try again.');
+    }
   };
 
   const findFormErrors = (): FormErrors => {
@@ -175,19 +224,19 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         certTitle: 'Please enter a title to be displayed on the certificate image',
       };
 
-    if (!companyName)
+    if (!companyName && getTemplate()?.features.company_name)
       newErrors = {
         ...newErrors,
         companyName: 'Please enter a company name to be displayed on the certificate image',
       };
 
-    if (!signer)
+    if (!signer && getTemplate()?.features.signer)
       newErrors = {
         ...newErrors,
         signer: 'Please enter a signer name to be displayed on the certificate image',
       };
 
-    if (!signerTitle)
+    if (!signerTitle && getTemplate()?.features.signer_title)
       newErrors = { ...newErrors, signerTitle: 'Please enter a title for the certificate signer' };
 
     let dobError = false;
@@ -248,10 +297,11 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       priv_description: certInfo.priv_description,
       issue_date: certInfo.issue_date,
       expire_date: certInfo.expire_date,
+      additions: certInfo.additions,
     };
     const rprops: RenderProps = {
       ...renderProps,
-      template: '2',
+      //template: '2',
     };
 
     // this is only used for Save, so we want to use the GenericRender since the image is stored unencrypted
@@ -283,7 +333,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       participant: participantToRender(participants[0]),
     };
     requestRender({
-      id: '2',
+      id: renderProps.template,
       layoutId: renderProps.templateLayout,
       input,
     });
@@ -344,11 +394,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
       }
 
       await handleSave();
-      console.log('remain', RemainingCerts);
-
-      // if (RemainingCerts >= participants.length) {
-      //   navigate('/generate', { state: { projectId: projectId.current } });
-      // } else
       navigate('/payment', {
         state: { num_certificates: participants.length, projectId: projectId.current },
       });
@@ -432,7 +477,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         participant.name = value || '';
         break;
       case 'surname':
-        console.log('surname', value);
         participant.surname = value || '';
         break;
       case 'dob': {
@@ -445,6 +489,49 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
         break;
     }
     setParticipants(newAry);
+    setDirty(true);
+  };
+
+  const addInstructor = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    const blankAddition: Addition = {
+      addition_type: 'Instructor',
+      individual: {
+        name: '',
+        title: '',
+        company: '',
+      },
+    };
+
+    const newAdditions = [...certInfo.additions, blankAddition];
+    updateCertInfo({ additions: newAdditions });
+    setDirty(true);
+  };
+
+  const deleteInstructor = async (index: number) => {
+    const newAry = [...certInfo.additions];
+    newAry.splice(index, 1);
+    updateCertInfo({ additions: newAry });
+    setDirty(true);
+  };
+
+  const changeInstructor = async (index: number, field: InstructorFields, value?: string) => {
+    const newAry = [...certInfo.additions];
+    const addition = newAry[index];
+    const individual: IssuingIndividual = addition.individual || { name: '' };
+    switch (field) {
+      case 'name':
+        individual.name = value || '';
+        break;
+      case 'company':
+        individual.company = value || '';
+        break;
+      case 'title': {
+        individual.title = value || '';
+        break;
+      }
+    }
+    updateCertInfo({ additions: newAry });
     setDirty(true);
   };
 
@@ -465,7 +552,6 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   };
 
   const onPick = (image: PickImage) => {
-    console.log('Picked External:', image.value + 1);
     updateRenderProps({ templateBg: image.value + 1 });
   };
 
@@ -510,32 +596,56 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
               <div className={styles.vr} />
             </Col>
             <Col style={{ paddingTop: '0vh' }}>
-              <Form.Group as={Col} md="4" controlId="validationCustom01">
-                <Form.Label className={`${styles.largeLabel} mb-0`}>Project Name</Form.Label>
-                <p
-                  className={`${styles.sectionTitle} mx-2`}
-                  style={{ fontSize: '14px', lineHeight: '16px' }}
-                >
-                  Only visible to you
-                </p>
-                <Form.Control
-                  required
-                  value={projectName}
-                  onChange={(e) => {
-                    setProjectName(e.target.value);
+              <Row className="mb-4">
+                <Form.Group as={Col} md="4" controlId="validationCustom01">
+                  <Form.Label className={`${styles.largeLabel} mb-0`}>Project Name</Form.Label>
+                  <p
+                    className={`${styles.sectionTitle} mx-2`}
+                    style={{ fontSize: '14px', lineHeight: '16px' }}
+                  >
+                    Only visible to you
+                  </p>
+                  <Form.Control
+                    required
+                    value={projectName}
+                    onChange={(e) => {
+                      setProjectName(e.target.value);
 
-                    setDirty(true);
-                  }}
-                  type="text"
-                  placeholder="My Project"
-                  className="mt-1"
-                  isInvalid={!!errors.projectName}
-                />
-                <Form.Control.Feedback type="invalid">{errors.projectName}</Form.Control.Feedback>
-              </Form.Group>
+                      setDirty(true);
+                    }}
+                    type="text"
+                    placeholder="My Project"
+                    className="mt-1"
+                    isInvalid={!!errors.projectName}
+                  />
+                  <Form.Control.Feedback type="invalid">{errors.projectName}</Form.Control.Feedback>
+                </Form.Group>
+              </Row>
+              {!!(templates && templates.length > 1) && (
+                <>
+                  <Row>
+                    <p className={`${styles.medLabel}`}>Project Template</p>
+                  </Row>
+                  <Row className="mx-2 mb-4 align-items-stretch">
+                    {templates.map((template) => {
+                      return (
+                        <Col xs="auto" key={template.id}>
+                          <TemplateSelectButton
+                            type="button"
+                            selected={renderProps.template === template.id}
+                            templateId={template.id}
+                            onClick={() => updateRenderProps({ template: template.id })}
+                          >
+                            {template.name}
+                          </TemplateSelectButton>
+                        </Col>
+                      );
+                    })}
+                  </Row>
+                </>
+              )}
             </Col>
           </Row>
-
           {/* \/ Participants Section \/ */}
 
           <Row className="mb-4">
@@ -799,42 +909,193 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Expire Date
-                </Col>
-                <Col>
-                  <Row style={{ margin: 0 }}>
-                    <Form.Group
-                      as={Col}
-                      md="auto"
-                      controlId="validationCustom02"
-                      style={{ padding: 0 }}
-                    >
-                      <DatePicker
-                        value={certInfo.expire_date}
-                        onChange={(date: Date) => changeExpireDate(date)}
-                        clearIcon={null}
-                        format={getPickerFormat(renderProps.dateFormat)}
-                        className={errors.expire_date && `invalidSelection`}
-                      />
-                    </Form.Group>
-                    {certInfo.expire_date ? (
-                      <Col className="d-flex align-items-center mx-2">
-                        <FontAwesomeIcon
-                          icon={faTimesCircle}
-                          size="lg"
-                          onClick={() => updateCertInfo({ expire_date: undefined })}
-                          style={{ cursor: 'pointer' }}
+              {!!getTemplate()?.features.expiration && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    Expire Date
+                  </Col>
+                  <Col>
+                    <Row style={{ margin: 0 }}>
+                      <Form.Group
+                        as={Col}
+                        md="auto"
+                        controlId="validationCustom02"
+                        style={{ padding: 0 }}
+                      >
+                        <DatePicker
+                          value={certInfo.expire_date}
+                          onChange={(date: Date) => changeExpireDate(date)}
+                          clearIcon={null}
+                          format={getPickerFormat(renderProps.dateFormat)}
+                          className={errors.expire_date && `invalidSelection`}
                         />
-                      </Col>
-                    ) : null}
-                  </Row>
-                </Col>
-              </Row>
+                      </Form.Group>
+                      {certInfo.expire_date ? (
+                        <Col className="d-flex align-items-center mx-2">
+                          <FontAwesomeIcon
+                            icon={faTimesCircle}
+                            size="lg"
+                            onClick={() => updateCertInfo({ expire_date: undefined })}
+                            style={{ cursor: 'pointer' }}
+                          />
+                        </Col>
+                      ) : null}
+                    </Row>
+                  </Col>
+                </Row>
+              )}
             </Col>
           </Row>
 
+          {/* \/ Instructors Section \/ */}
+
+          {getTemplate()?.features.instructors && (
+            <Row className="mb-4">
+              <Col xs={'auto'} className="text-center" style={{ paddingTop: '5px' }}>
+                <MiniCircle />
+                <div className={styles.vr} />
+              </Col>
+              <Col>
+                <Row>
+                  <span className={`${styles.sectionTitle} mb-1`}>Instructors</span>
+                  <hr className={styles.formHr} />
+                </Row>
+                {/* Labels Row */}
+                <Row
+                  style={{ paddingRight: scrollBarWidth * 2 }}
+                  className="justify-content-left d-none d-md-flex px-2"
+                >
+                  <Col md={4} className={styles.participantLabels}>
+                    Name
+                  </Col>
+                  <Col md={4} className={`${styles.participantLabels}`}>
+                    Company
+                  </Col>
+                  <Col md={2} lg={2} className={styles.participantLabels}>
+                    Title
+                  </Col>
+                </Row>
+                <Row className={styles.instructorList}>
+                  {certInfo.additions.map((item, index) => {
+                    let aErrors;
+                    if (errors.additions) aErrors = errors.participants[index];
+                    return (
+                      <div key={index}>
+                        <Row
+                          key={`addition-${index}`}
+                          className={`mb-2`}
+                          style={{ paddingRight: 0 }}
+                        >
+                          <Col xs="auto" className="d-md-none">
+                            {`${index + 1}.`}
+                          </Col>
+                          <Col>
+                            <Row style={{ paddingRight: 0 }}>
+                              <Form.Group
+                                as={Col}
+                                xs="12"
+                                md="4"
+                                controlId="validationCustom02"
+                                className={styles.participantInput}
+                              >
+                                <Form.Label className="d-md-none">Name</Form.Label>
+                                <Form.Control
+                                  required
+                                  value={certInfo.additions[index].individual?.name}
+                                  onChange={(e) => changeInstructor(index, 'name', e.target.value)}
+                                  type="text"
+                                  placeholder="Name"
+                                  isInvalid={!!aErrors?.name}
+                                />
+                              </Form.Group>
+
+                              <Form.Group
+                                as={Col}
+                                xs="12"
+                                md="4"
+                                controlId="validationCustom02"
+                                className={styles.participantInput}
+                              >
+                                <Form.Label className="d-md-none">Company</Form.Label>
+                                <Form.Control
+                                  required
+                                  value={certInfo.additions[index].individual?.company}
+                                  onChange={(e) =>
+                                    changeInstructor(index, 'company', e.target.value)
+                                  }
+                                  type="text"
+                                  placeholder="Company"
+                                  isInvalid={!!aErrors?.company}
+                                />
+                              </Form.Group>
+
+                              <Form.Group as={Col} xs="12" md="2" controlId="validationCustom02">
+                                <Form.Label className="d-md-none">Title</Form.Label>
+                                <Form.Control
+                                  required
+                                  value={certInfo.additions[index].individual?.title}
+                                  onChange={(e) => changeInstructor(index, 'title', e.target.value)}
+                                  type="text"
+                                  placeholder="Title"
+                                  isInvalid={!!aErrors?.title}
+                                  className={styles.participantInput}
+                                />
+                              </Form.Group>
+
+                              <Col
+                                xs="12"
+                                md="auto"
+                                className={`d-flex align-items-center ${styles.participantInput}`}
+                              >
+                                <div
+                                  role="button"
+                                  tabIndex={0}
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => deleteInstructor(index)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') deleteInstructor(index);
+                                  }}
+                                >
+                                  <div>
+                                    <img src={trashImg} alt="trash" />
+                                    <span className="d-inline-block d-md-none d-lg-inline-block">
+                                      Delete
+                                    </span>
+                                  </div>
+                                </div>
+                              </Col>
+                            </Row>
+                          </Col>
+                        </Row>
+                        {index !== participants.length - 1 && (
+                          <hr className="d-md-none" style={{ marginBottom: '3rem' }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                  {!certInfo.additions.length && (
+                    <Row className="justify-content-center pt-4">
+                      <Col xs="auto" style={{ color: '#696969' }}>
+                        <h3>No Instructors Added</h3>
+                      </Col>
+                    </Row>
+                  )}
+                </Row>
+
+                <Row className="mt-2">
+                  <Col xs={'auto'}>
+                    <CUButton
+                      btnStyle="small"
+                      onClick={addInstructor}
+                      disabled={certInfo.additions.length >= 20}
+                    >
+                      + Add
+                    </CUButton>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          )}
           {/* \/ Cert Image Section \/ */}
 
           <Row className="mb-4">
@@ -847,76 +1108,82 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                 <span className={`${styles.sectionTitle} mb-1`}>Certificate Image</span>
                 <hr className={styles.formHr} />
               </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Template
-                </Col>
-                <Col>
-                  <ImagePicker
-                    images={bgList.map((image, i) => ({ src: image, value: i }))}
-                    onPick={onPick}
-                    selected={{
-                      src: bgList[renderProps.templateBg - 1],
-                      value: renderProps.templateBg - 1,
-                    }}
-                  />
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Layout
-                </Col>
-                <Col>
-                  <Row>
-                    <Col xs="auto">
-                      <CUSelectButton
-                        type="button"
-                        selected={renderProps.templateLayout === 1}
-                        onClick={() => updateRenderProps({ templateLayout: 1 })}
-                      >
-                        Left
-                      </CUSelectButton>
-                    </Col>
-                    <Col xs="auto">
-                      <CUSelectButton
-                        type="button"
-                        selected={renderProps.templateLayout === 2}
-                        onClick={() => updateRenderProps({ templateLayout: 2 })}
-                      >
-                        Center
-                      </CUSelectButton>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Company Name
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.companyName}
-                      onChange={(e) => updateRenderProps({ companyName: e.target.value })}
-                      type="text"
-                      placeholder="Corporate Finance Institute"
-                      isInvalid={!!errors.companyName}
+              {(getTemplate()?.backgrounds?.length || 0) > 1 && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    Background
+                  </Col>
+                  <Col>
+                    <ImagePicker
+                      images={bgList.map((image, i) => ({ src: image, value: i }))}
+                      onPick={onPick}
+                      selected={{
+                        src: bgList[renderProps.templateBg - 1],
+                        value: renderProps.templateBg - 1,
+                      }}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.companyName}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Company Logo
-                </Col>
-                <Col md="auto">
-                  <ImageDropzone set={handleLogoChange} externalUri={renderProps.companyLogoUri} />
-                </Col>
-              </Row>
+                  </Col>
+                </Row>
+              )}
+              {(getTemplate()?.layouts?.length || 0) > 1 && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    Layout
+                  </Col>
+                  <Col>
+                    <Row>
+                      {getTemplate()?.layouts?.map((layout) => {
+                        return (
+                          <Col xs="auto" key={layout.id}>
+                            <CUSelectButton
+                              type="button"
+                              selected={renderProps.templateLayout === layout.id}
+                              onClick={() => updateRenderProps({ templateLayout: layout.id })}
+                            >
+                              {layout.name}
+                            </CUSelectButton>
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  </Col>
+                </Row>
+              )}
+              {!!getTemplate()?.features.company_name && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    Company Name
+                  </Col>
+                  <Col>
+                    <Form.Group as={Col} md="6" controlId="validationCustom02">
+                      <Form.Control
+                        required
+                        value={renderProps.companyName}
+                        onChange={(e) => updateRenderProps({ companyName: e.target.value })}
+                        type="text"
+                        placeholder="Corporate Finance Institute"
+                        isInvalid={!!errors.companyName}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.companyName}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
+              {!!getTemplate()?.features.logo && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    Company Logo
+                  </Col>
+                  <Col md="auto">
+                    <ImageDropzone
+                      set={handleLogoChange}
+                      externalUri={renderProps.companyLogoUri}
+                    />
+                  </Col>
+                </Row>
+              )}
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
                   Certificate Title
@@ -952,87 +1219,91 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  <Row className={`mx-0 ${styles.tooltipLabel}`}>
-                    <Col xs="auto" className="px-0">
-                      Display DOB
-                    </Col>
-                    <Col xs="auto" className="px-2">
-                      <CUTooltip text="Choose if you want to display the participant's date of birth on the certificate image." />
-                    </Col>
-                  </Row>
-                </Col>
-                <Col>
-                  <Row>
-                    <Form.Group as={Col} md="2" controlId="validationCustom02">
-                      {/* <Form.Control
-                      required
-                      value={'1'}
-                      onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
-                      type="select"
-                      //placeholder="has completed Advanced Financial Training"
-                    > */}
-                      <Form.Select
-                        aria-label="Select Date of Birth display format"
-                        value={renderProps.displayDob.toString()}
-                        //onChange={(e) => updateDobFormat(e.target.value)}
-                        onChange={(e) =>
-                          updateRenderProps({
-                            displayDob: e.target.value === 'true' ? true : false,
-                          })
-                        }
-                      >
-                        <option value="true">Show</option>
-                        <option value="false">Hide</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Row>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  <Row className={`mx-0 ${styles.tooltipLabel}`}>
-                    <Col xs="auto" className="px-0">
-                      Additional Line 2 Text
-                    </Col>
-                    <Col xs="auto" className="px-2">
-                      <CUTooltip
-                        text={`Choose if you want to add extra text to the second line, e.g. "Employed at CertUP" or "Attending CertUP University". This text will be displayed after the participant's name and DOB (if shown).`}
-                      />
-                    </Col>
-                  </Row>
-                </Col>
-                <Col>
-                  <Row>
-                    <Form.Group as={Col} md="2" controlId="validationCustom02">
-                      <Form.Select
-                        aria-label="Select if Date of Birth should be displayed"
-                        value={renderProps.displayEmployer?.toString()}
-                        onChange={(e) =>
-                          updateRenderProps({
-                            displayEmployer: e.target.value === 'true' ? true : false,
-                          })
-                        }
-                      >
-                        <option value="true">Custom</option>
-                        <option value="false">None</option>
-                      </Form.Select>
-                    </Form.Group>
-                    {renderProps.displayEmployer && (
-                      <Form.Group as={Col} md="6" controlId="validationCustom02">
-                        <Form.Control
-                          required
-                          value={renderProps.employerText}
-                          onChange={(e) => updateRenderProps({ employerText: e.target.value })}
-                          type="text"
-                          placeholder="Employed at: "
-                        />
+              {!!getTemplate()?.features.dob && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    <Row className={`mx-0 ${styles.tooltipLabel}`}>
+                      <Col xs="auto" className="px-0">
+                        Display DOB
+                      </Col>
+                      <Col xs="auto" className="px-2">
+                        <CUTooltip text="Choose if you want to display the participant's date of birth on the certificate image." />
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col>
+                    <Row>
+                      <Form.Group as={Col} md="2" controlId="validationCustom02">
+                        {/* <Form.Control
+                        required
+                        value={'1'}
+                        onChange={(e) => updateRenderProps({ line3Text: e.target.value })}
+                        type="select"
+                        //placeholder="has completed Advanced Financial Training"
+                      > */}
+                        <Form.Select
+                          aria-label="Select Date of Birth display format"
+                          value={renderProps.displayDob.toString()}
+                          //onChange={(e) => updateDobFormat(e.target.value)}
+                          onChange={(e) =>
+                            updateRenderProps({
+                              displayDob: e.target.value === 'true' ? true : false,
+                            })
+                          }
+                        >
+                          <option value="true">Show</option>
+                          <option value="false">Hide</option>
+                        </Form.Select>
                       </Form.Group>
-                    )}
-                  </Row>
-                </Col>
-              </Row>
+                    </Row>
+                  </Col>
+                </Row>
+              )}
+              {!!getTemplate()?.features.line2 && (
+                <Row className="mb-4 align-items-center">
+                  <Col md={2} className={styles.participantLabels}>
+                    <Row className={`mx-0 ${styles.tooltipLabel}`}>
+                      <Col xs="auto" className="px-0">
+                        Additional Line 2 Text
+                      </Col>
+                      <Col xs="auto" className="px-2">
+                        <CUTooltip
+                          text={`Choose if you want to add extra text to the second line, e.g. "Employed at CertUP" or "Attending CertUP University". This text will be displayed after the participant's name and DOB (if shown).`}
+                        />
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col>
+                    <Row>
+                      <Form.Group as={Col} md="2" controlId="validationCustom02">
+                        <Form.Select
+                          aria-label="Select if Date of Birth should be displayed"
+                          value={renderProps.displayEmployer?.toString()}
+                          onChange={(e) =>
+                            updateRenderProps({
+                              displayEmployer: e.target.value === 'true' ? true : false,
+                            })
+                          }
+                        >
+                          <option value="true">Custom</option>
+                          <option value="false">None</option>
+                        </Form.Select>
+                      </Form.Group>
+                      {renderProps.displayEmployer && (
+                        <Form.Group as={Col} md="6" controlId="validationCustom02">
+                          <Form.Control
+                            required
+                            value={renderProps.employerText}
+                            onChange={(e) => updateRenderProps({ employerText: e.target.value })}
+                            type="text"
+                            placeholder="Employed at: "
+                          />
+                        </Form.Group>
+                      )}
+                    </Row>
+                  </Col>
+                </Row>
+              )}
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
                   Line 3 Text
@@ -1049,55 +1320,63 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Certificate Signer
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.signer}
-                      onChange={(e) => updateRenderProps({ signer: e.target.value })}
-                      type="text"
-                      placeholder="John Smith"
-                      isInvalid={!!errors.signer}
-                    />
-                    <Form.Control.Feedback type="invalid">{errors.signer}</Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Signature
-                </Col>
-                <Col>
-                  <ImageDropzone
-                    set={handleSigChange}
-                    externalUri={renderProps.signerSignatureUri}
-                  />
-                </Col>
-              </Row>
-              <Row className="mb-4 align-items-center">
-                <Col md={2} className={styles.participantLabels}>
-                  Signer Title
-                </Col>
-                <Col>
-                  <Form.Group as={Col} md="6" controlId="validationCustom02">
-                    <Form.Control
-                      required
-                      value={renderProps.signerTitle}
-                      onChange={(e) => updateRenderProps({ signerTitle: e.target.value })}
-                      type="text"
-                      placeholder="Director"
-                      isInvalid={!!errors.signerTitle}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.signerTitle}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-              </Row>
+              {!!getTemplate()?.features.signer && (
+                <>
+                  <Row className="mb-4 align-items-center">
+                    <Col md={2} className={styles.participantLabels}>
+                      Certificate Signer
+                    </Col>
+                    <Col>
+                      <Form.Group as={Col} md="6" controlId="validationCustom02">
+                        <Form.Control
+                          required
+                          value={renderProps.signer}
+                          onChange={(e) => updateRenderProps({ signer: e.target.value })}
+                          type="text"
+                          placeholder="John Smith"
+                          isInvalid={!!errors.signer}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.signer}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row className="mb-4 align-items-center">
+                    <Col md={2} className={styles.participantLabels}>
+                      Signature
+                    </Col>
+                    <Col>
+                      <ImageDropzone
+                        set={handleSigChange}
+                        externalUri={renderProps.signerSignatureUri}
+                      />
+                    </Col>
+                  </Row>
+                  {!!getTemplate()?.features.signer_title && (
+                    <Row className="mb-4 align-items-center">
+                      <Col md={2} className={styles.participantLabels}>
+                        Signer Title
+                      </Col>
+                      <Col>
+                        <Form.Group as={Col} md="6" controlId="validationCustom02">
+                          <Form.Control
+                            required
+                            value={renderProps.signerTitle}
+                            onChange={(e) => updateRenderProps({ signerTitle: e.target.value })}
+                            type="text"
+                            placeholder="Director"
+                            isInvalid={!!errors.signerTitle}
+                          />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.signerTitle}
+                          </Form.Control.Feedback>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  )}
+                </>
+              )}
               <Row className="mb-4 align-items-center">
                 <Col md={2} className={styles.participantLabels}>
                   Date Format

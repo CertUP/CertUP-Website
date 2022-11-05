@@ -10,7 +10,7 @@ export interface CertupExtension extends Extension {
   //certified_items: Items[];
   issuing_organizations?: IssuingOrg[];
   issuing_individuals?: IssuingIndividual[];
-  inclusions?: Inclusion[];
+  additions?: Addition[];
 }
 
 export interface CertificateInfo {
@@ -42,8 +42,10 @@ export interface IssuingIndividual {
   title?: string;
 }
 
-export interface Inclusion {
-  inclusion_type?: string;
-  name?: string;
+export interface Addition {
+  addition_type?: string;
   value?: string;
+  details?: string;
+  individual?: IssuingIndividual;
+  organization?: IssuingOrg;
 }

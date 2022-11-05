@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import useQuery from '../../hooks/QueryHook';
 import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
-import { CertupExtension } from '../../interfaces/token';
+import { CertupExtension } from '../../interfaces/common/token.interface';
 import useExecute from '../../hooks/ExecuteHook';
 import CUSpinner from '../../components/CUSpinner';
 import { claimCert as claimCertFree } from '../../utils/backendHelper';
@@ -148,7 +148,7 @@ export default function Access() {
               </div>
             ) : Dossiers.length ? (
               Dossiers.map((cert, index) => {
-                console.log('aaa', cert);
+                console.log('Dossier', cert);
 
                 const fakeMedia = [
                   {

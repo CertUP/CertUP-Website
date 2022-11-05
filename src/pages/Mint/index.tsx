@@ -55,7 +55,7 @@ function BackButton({ backHandler }: ButtonProps) {
 const generate = async (projectInput: Project): Promise<UploadResponse[]> => {
   const inputs = ProjectToCertList(projectInput);
   const hashes = await generateMultiple({
-    id: '2',
+    id: projectInput.renderProps.template,
     layoutId: projectInput.renderProps.templateLayout,
     input: inputs,
     upload: true,

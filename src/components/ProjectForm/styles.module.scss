@@ -90,6 +90,15 @@ $gradient3: #a659f3;
   color: #000000;
 }
 
+.medLabel {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 32px;
+  color: #000000;
+}
+
 .backFont {
   font-family: 'Poppins';
   font-style: normal;
@@ -201,6 +210,14 @@ $gradient3: #a659f3;
   overflow-y: auto;
   max-height: 50vh;
   min-height: 30vh;
+  align-content: flex-start;
+}
+
+.instructorList {
+  padding-top: 0.5rem;
+  overflow-y: auto;
+  max-height: 50vh;
+  // min-height: 30vh;
   align-content: flex-start;
 }
 

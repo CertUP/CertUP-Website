@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import { ProjectToken } from '../interfaces/manager';
 import Project, { Participant, CertInfo, RenderProps } from '../interfaces/Project';
-import { CertupExtension } from '../interfaces/token';
+import { CertupExtension } from '../interfaces/common/token.interface';
 import * as XLSX from 'xlsx';
 import { UploadResponse } from '../pages/Mint';
 
@@ -106,7 +106,7 @@ export const participantToExtensions = (
         title: renderProps.signerTitle,
       },
     ],
-    // inclusions: [
+    // additions: [
     //   {
     //     type: 'Course',
     //     name: 'Introduction to Finance',

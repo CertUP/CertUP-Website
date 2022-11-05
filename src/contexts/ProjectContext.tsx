@@ -190,7 +190,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     newProject._id = response.data.data._id;
     setPendingProjects((PendingProjects) => [...PendingProjects, { ...newProject }]);
 
-    console.log(response.data.data._id);
+    console.log('Save New Project Response', response.data.data._id);
     return response.data.data._id;
   };
 
@@ -281,7 +281,7 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
         Authorization: token,
       },
     });
-    console.log('Done', response);
+    console.log('Done Updating Remote Project', response);
   };
 
   const values = {

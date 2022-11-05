@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { Template } from '../interfaces/common/templates.interface';
 import { CertInfo, Participant, RenderProps } from '../interfaces/Project';
 import { sleep } from './helpers';
+import { LoginToken } from './loginPermit';
 
 export class GenerateInput {
   renderProps: RenderProps;
@@ -136,4 +138,29 @@ export const migrateIssuer = async (address: string) => {
 
   const { data } = await axios.post(url, { address });
   return data.data;
+};
+
+export const getTemplates = async (LoginToken: LoginToken): Promise<Template[]> => {
+  const token = `Permit ${JSON.stringify(LoginToken)}`;
+  const url = new URL(`/templates`, process.env.REACT_APP_BACKEND);
+  const response = await axios.get(url.toString(), {
+    headers: {
+      Authorization: token,
+    },
+  });
+  return response.data.data;
+};
+
+export const getTemplatePreview = async (
+  LoginToken: LoginToken,
+  templateId: string,
+): Promise<any> => {
+  const token = `Permit ${JSON.stringify(LoginToken)}`;
+  const url = new URL(`/templates/preview/${templateId}`, process.env.REACT_APP_BACKEND);
+  const response = await axios.get(url.toString(), {
+    headers: {
+      Authorization: token,
+    },
+  });
+  return response.data;
 };

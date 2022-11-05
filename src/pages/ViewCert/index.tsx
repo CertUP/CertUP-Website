@@ -38,7 +38,7 @@ import AllowModal from '../../components/Access/AllowModal';
 import { useNft } from '../../contexts/NftContext';
 import PreloadImage from '../../components/PreloadImage';
 import CopyButton from '../../components/CopyButton';
-import { CertupExtension, CertupMetadata } from '../../interfaces/token';
+import { CertupExtension, CertupMetadata } from '../../interfaces/common/token.interface';
 import MetadataRow from '../../components/MetadataRow';
 import ImageRow from '../../components/ImageRow';
 import KeplrButton from '../../components/KeplrButton';

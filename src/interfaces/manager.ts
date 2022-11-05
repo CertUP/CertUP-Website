@@ -1,5 +1,5 @@
 import { QueryResponse } from '.';
-import { CertupMetadata } from './token';
+import { CertupMetadata } from './common/token.interface';
 
 export interface NewIssuer {
   /// Name of the organization
