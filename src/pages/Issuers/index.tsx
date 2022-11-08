@@ -20,6 +20,7 @@ import { PreviewProvider } from '../../contexts/PreviewContext';
 import ProjectReview from '../ProjectReview';
 import ReviewViewer from '../../components/ReviewViewer';
 import { RestrictedAccess } from '../../components/RestrictedAccess';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
@@ -32,10 +33,10 @@ export default function Issuers() {
     Wallet,
     Address,
     LoginToken,
-    VerifiedIssuer,
-    LoadingRemainingCerts,
+
     QueryPermit,
   } = useWallet();
+  const { VerifiedIssuer, LoadingRemainingCerts } = useIssuer();
 
   const location = useLocation();
   const navigate = useNavigate();

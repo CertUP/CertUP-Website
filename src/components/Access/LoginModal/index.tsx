@@ -17,6 +17,7 @@ import CUButton from '../../CUButton';
 import { Id, toast } from 'react-toastify';
 import useExecute from '../../../hooks/ExecuteHook';
 import CUSpinner from '../../CUSpinner';
+import { useIssuer } from '../../../contexts/IssuerContext';
 
 interface ModalProps {
   issuerLogin?: boolean;
@@ -30,8 +31,8 @@ const blankIssuer: NewIssuer = {
 
 export default function LoginModal({ issuerLogin }: ModalProps) {
   const [loading, setLoading] = useState(false);
-  const { updateClient, ShowLoginModal, toggleLoginModal, Address, IssuerProfile, ProcessingTx } =
-    useWallet();
+  const { updateClient, ShowLoginModal, toggleLoginModal, Address, ProcessingTx } = useWallet();
+  const { IssuerProfile } = useIssuer();
   const { registerIssuer } = useExecute();
   const [newIssuerData, setNewIssuerData] = useState<NewIssuer>(blankIssuer);
   const [loadingUpdate, setLoadingUpdate] = useState(false);

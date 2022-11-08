@@ -64,6 +64,7 @@ import { LoginToken } from '../../utils/loginPermit';
 import { Template, TemplateFeatures } from '../../interfaces/common/templates.interface';
 import { Addition, IssuingIndividual } from '../../interfaces/common/token.interface';
 import TemplateSelectButton from '../TemplateSelectButton';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 type InstructorFields = 'name' | 'company' | 'title';
 
@@ -100,7 +101,8 @@ interface FormErrors {
 }
 
 export default function ProjectForm({ pid, step, backHandler }: FormProps) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const { RemainingCerts } = useIssuer();
   const { findProject, updateProject, addProject } = useProject();
 
   const [participants, setParticipants] = useState<Participant[]>([

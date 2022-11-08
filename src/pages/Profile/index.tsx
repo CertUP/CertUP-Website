@@ -16,17 +16,20 @@ import { RestrictedAccess } from '../../components/RestrictedAccess';
 import CUSpinner from '../../components/CUSpinner';
 import { Issuer } from '../../interfaces/manager';
 import useExecute from '../../hooks/ExecuteHook';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export default function Profile() {
   const {
     Wallet,
     Address,
     QueryPermit,
-    IssuerProfile,
-    VerifiedIssuer,
-    LoadingRemainingCerts,
+    // IssuerProfile,
+    // VerifiedIssuer,
+    // LoadingRemainingCerts,
     ProcessingTx,
   } = useWallet();
+
+  const { IssuerProfile, VerifiedIssuer, LoadingRemainingCerts } = useIssuer();
 
   const { editProfile } = useExecute();
 

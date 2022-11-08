@@ -1,25 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
-import {
-  Coin,
-  MsgExecuteContract,
-  SecretNetworkClient,
-  Snip20Querier,
-  Tx,
-  TxResultCode,
-} from 'secretjs';
-import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
+import { MsgExecuteContract, SecretNetworkClient, Tx, TxResultCode } from 'secretjs';
 import { useWallet } from '../contexts';
+import { useIssuer } from '../contexts/IssuerContext';
 import { useNft } from '../contexts/NftContext';
 import { ComputeTx, ComputeResultCode } from '../interfaces';
 import { PreLoad } from '../interfaces/manager';
-import { logSizeInBytes } from '../utils/helpers';
-import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
 import { ToastProps } from '../utils/toastHelper';
 
 export default function useExecute() {
-  const { Client, Address, QueryPermit, queryCredits, ProcessingTx, setProcessingTx, DummyWallet } =
-    useWallet();
+  const { Client, Address, QueryPermit, ProcessingTx, setProcessingTx, DummyWallet } = useWallet();
+  const { refreshIssuer } = useIssuer();
 
   const { refreshDossiers } = useNft();
   const querier = useRef<SecretNetworkClient>();
@@ -314,7 +305,7 @@ export default function useExecute() {
 
     const response = await executeManager(msg, 175000, toastRef);
 
-    queryCredits();
+    refreshIssuer();
     return response as ComputeTx;
   };
 
@@ -340,7 +331,7 @@ export default function useExecute() {
 
     const response = await executeManager(editMsg, 135_000, toastRef);
 
-    queryCredits();
+    refreshIssuer();
     return response as ComputeTx;
   };
 
@@ -379,7 +370,7 @@ export default function useExecute() {
     //   },
     // );
 
-    queryCredits();
+    refreshIssuer();
     return response as ComputeTx;
   };
 
@@ -448,7 +439,7 @@ export default function useExecute() {
     //   },
     // );
     parseError(response as ComputeTx);
-    queryCredits();
+    refreshIssuer();
     return response as ComputeTx;
   };
 
@@ -473,7 +464,7 @@ export default function useExecute() {
 
     const response = await executeManager(preloadMsg, simulationGas, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
-    queryCredits();
+    refreshIssuer();
     return response;
   };
 

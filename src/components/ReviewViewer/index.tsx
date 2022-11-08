@@ -30,6 +30,7 @@ import { MintOverview, ProjectToken } from '../../interfaces/manager';
 import CopyButton from '../CopyButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faX } from '@fortawesome/free-solid-svg-icons';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 interface ViewerProps {
   pid: string;
@@ -42,8 +43,8 @@ interface ViewerProps {
 const claimUrl = `${window.location.protocol}//${window.location.host}/claim/`;
 
 export default function ReviewViewer({ pid, step, hashes, pData, meta = false }: ViewerProps) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts, IssuerProfile } =
-    useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  const { RemainingCerts, IssuerProfile } = useIssuer();
   const scrollBarWidth = useScrollbarWidth();
   const {
     findProject,

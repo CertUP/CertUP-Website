@@ -10,6 +10,7 @@ import { AuthenticateButton } from '../AuthenticateButton';
 import { useCookies } from 'react-cookie';
 import { numDaysBetween } from '../../utils/helpers';
 import { getLoginToken } from '../../utils/loginPermit';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 interface Props {
   text?: string;
@@ -17,15 +18,8 @@ interface Props {
 }
 
 export default function ConnectBanner({ text, issuer }: Props) {
-  const {
-    updateClient,
-    Wallet,
-    Address,
-    LoginToken,
-    QueryPermit,
-    toggleLoginModal,
-    VerifiedIssuer,
-  } = useWallet();
+  const { updateClient, Wallet, Address, LoginToken, QueryPermit, toggleLoginModal } = useWallet();
+  const { VerifiedIssuer } = useIssuer();
 
   const [cookies, setCookie, removeCookie] = useCookies(['IssuerLogin']);
 

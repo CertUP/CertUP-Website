@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
+import { createContext, useState, useContext, ReactElement, ReactNode } from 'react';
 import { generateImage, GenerateInput } from '../utils/backendHelper';
 import { toast } from 'react-toastify';
 

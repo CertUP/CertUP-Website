@@ -1,13 +1,8 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import Project from '../interfaces/Project';
 import { useWallet } from '.';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-import { dataURLtoFile } from '../utils/fileHelper';
 import { BatchNftDossier, NftDossier } from '../interfaces/721';
 import useQuery from '../hooks/QueryHook';
-
-const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
 export interface NftContextState {
   Dossiers: BatchNftDossier[];

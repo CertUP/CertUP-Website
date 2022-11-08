@@ -17,10 +17,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import PaymentRow, { Confirmation } from '../../components/PaymentRow';
 import CUSpinner from '../../components/CUSpinner';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export default function Payment() {
-  const { Wallet, Address, LoginToken, queryCredits, RemainingCerts, LoadingRemainingCerts } =
-    useWallet();
+  const { Wallet, Address, LoginToken } = useWallet();
+  const { RemainingCerts, LoadingRemainingCerts } = useIssuer();
+  const { refreshIssuer } = useIssuer();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ export default function Payment() {
   }, [Address]);
 
   const init = async () => {
-    await queryCredits();
+    await refreshIssuer();
     console.log('Credits', RemainingCerts);
 
     // calculateNumCerts();

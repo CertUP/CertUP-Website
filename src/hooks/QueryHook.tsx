@@ -1,12 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Permit, SecretNetworkClient, Snip20Querier } from 'secretjs';
 import { Snip721GetTokensResponse } from 'secretjs/dist/extensions/snip721/msg/GetTokens';
 import { useWallet } from '../contexts';
-import { PermitSignature, QueryResponse } from '../interfaces';
-import { BatchDossierResponse, DossierResponse, NftDossier } from '../interfaces/721';
+import {
+  BatchDossierResponse,
+  DossierResponse,
+  NftDossier,
+  TokenApprovals,
+  TokenApprovalsResponse,
+} from '../interfaces/721';
 import {
   RemainingCertsResponse,
-  IssuerData,
   IssuerDataResponse,
   PubIssuerData,
   GetIssuerResponse,
@@ -16,228 +18,21 @@ import {
   ProjectDataResponse,
   Issuer,
 } from '../interfaces/manager';
-import { permissions, allowedTokens, permitName } from '../utils/loginPermit';
-
-export class PermitQuery {
-  with_permit: {
-    query: any;
-    permit: {
-      params: {
-        permit_name: string;
-        allowed_tokens: (string | undefined)[];
-        chain_id: string;
-        permissions: string[];
-      };
-      signature: PermitSignature;
-    };
-  };
-  constructor(query: any, signature: PermitSignature) {
-    this.with_permit = {
-      query,
-      permit: {
-        params: {
-          permit_name: permitName,
-          allowed_tokens: allowedTokens,
-          chain_id: process.env.REACT_APP_CHAIN_ID,
-          permissions: permissions,
-        },
-        signature,
-      },
-    };
-  }
-}
-
-interface TokenApprovalsResponse {
-  token_approvals: TokenApprovals;
-}
-
-export interface TokenApprovals {
-  owner_is_public: boolean;
-  public_ownership_expiration: Snip721Expiration;
-  private_metadata_is_public: boolean;
-  private_metadata_is_public_expiration: Snip721Expiration;
-  token_approvals: Snip721Approval[];
-}
-
-export interface Snip721Approval {
-  address: string;
-  view_owner_expiration: Snip721Expiration;
-  view_private_metadata_expiration: Snip721Expiration;
-  transfer_expiration: Snip721Expiration;
-}
-
-enum Snip721Expiration {
-  'never',
-  TimeExpiration,
-  HeightExpiration,
-}
-
-interface TimeExpiration {
-  at_time: number;
-}
-interface HeightExpiration {
-  at_height: number;
-}
-
-export class WithPermit {
-  query: object;
-  permit: Permit;
-  constructor(query: object, signature: PermitSignature) {
-    this.query = query || {};
-    this.permit = {
-      params: {
-        permit_name: permitName,
-        allowed_tokens: allowedTokens,
-        chain_id: process.env.REACT_APP_CHAIN_ID as string,
-        permissions: permissions,
-      },
-      signature: signature,
-    };
-  }
-}
-
-const checkError = (queryResponse: any) => {
-  if (typeof queryResponse === 'string' || queryResponse instanceof String)
-    queryResponse = JSON.parse(queryResponse as string) as IssuerDataResponse;
-
-  if (queryResponse.parse_err || queryResponse.generic_err) {
-    if (queryResponse.generic_err?.msg.includes('not a verified issuer')) return;
-
-    console.error(queryResponse.parse_err || queryResponse.generic_err);
-    if (queryResponse.parse_err) {
-      throw new Error(queryResponse.parse_err.msg || queryResponse.parse_err);
-    } else if (queryResponse.generic_err) {
-      throw new Error(queryResponse.generic_err.msg || queryResponse.generic_err);
-    } else {
-      throw new Error(JSON.stringify(queryResponse));
-    }
-  }
-};
-
-export const queryWithClient = async (
-  query: any,
-  contract: string,
-  hash: string,
-  client: SecretNetworkClient,
-  checkErrors = true,
-): Promise<QueryResponse> => {
-  let response = (await client.query.compute.queryContract({
-    contractAddress: contract,
-    codeHash: hash,
-    query: query,
-  })) as QueryResponse | string; // wtf secret.js
-
-  if (typeof response === 'string' || response instanceof String)
-    response = JSON.parse(response as string) as QueryResponse;
-
-  console.log('Query:', query);
-  console.log('Response:', response);
-  if (checkErrors) checkError(response);
-  return response;
-};
+import { RemainingCertsQueryMsg } from '../utils/queries';
+import { checkError, queryManagerContract, queryNFTContract } from '../utils/queryWrapper';
 
 export default function useQuery() {
   const { Address, QueryPermit, Querier } = useWallet();
 
-  const queryWrapper = async (
-    query: any,
-    contract: string,
-    hash: string,
-    checkErrors = true,
-  ): Promise<QueryResponse> => {
-    try {
-      if (!Querier) throw new Error('Querier Client not available.');
-
-      let response = (await Querier.query.compute.queryContract({
-        contractAddress: contract,
-        codeHash: hash,
-        query: query,
-      })) as QueryResponse | string; // wtf secret.js
-
-      if (typeof response === 'string' || response instanceof String)
-        response = JSON.parse(response as string) as QueryResponse;
-
-      // console.log('Query:', query);
-      // console.log('Response:', response);
-      if (checkErrors) checkError(response);
-      return response;
-    } catch (error: any) {
-      console.error(error);
-      if (
-        error.toString().includes('Network Error') ||
-        error.toString().includes('503') ||
-        error.toString().includes('Response closed without headers')
-      ) {
-        throw 'Failed to query network. The node may be experiencing issues.';
-      } else {
-        throw error;
-      }
-    }
-  };
-
-  const queryNFTContract = async (query: object, withPermit = false) => {
-    if (withPermit)
-      query = {
-        with_permit: {
-          query: query,
-          permit: {
-            params: {
-              permit_name: permitName,
-              allowed_tokens: allowedTokens,
-              chain_id: process.env.REACT_APP_CHAIN_ID,
-              permissions: permissions,
-            },
-            signature: QueryPermit,
-          },
-        },
-      };
-
-    const response = await queryWrapper(
-      query,
-      process.env.REACT_APP_NFT_ADDR,
-      process.env.REACT_APP_NFT_HASH,
-    );
-    return response;
-  };
-
-  const queryManagerContract = async (query: object, withPermit = false, checkErrors = true) => {
-    if (withPermit)
-      query = {
-        with_permit: {
-          query: query,
-          permit: {
-            params: {
-              permit_name: permitName,
-              allowed_tokens: allowedTokens,
-              chain_id: process.env.REACT_APP_CHAIN_ID,
-              permissions: permissions,
-            },
-            signature: QueryPermit,
-          },
-        },
-      };
-
-    const response = await queryWrapper(
-      query,
-      process.env.REACT_APP_MANAGER_ADDR,
-      process.env.REACT_APP_MANAGER_HASH,
-      checkErrors,
-    );
-    return response;
-  };
-
   const queryCredits = async () => {
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
-    const query = {
-      remaining_certs: {
-        viewer: {
-          address: Address,
-        },
-      },
-    };
+    const query = new RemainingCertsQueryMsg(Address);
 
-    const response: RemainingCertsResponse | undefined = await queryManagerContract(query, true);
+    const response: RemainingCertsResponse | undefined = await queryManagerContract({
+      query,
+      signature: QueryPermit,
+    });
     return parseInt(response?.remaining_certs?.certs || '0', 10);
   };
 
@@ -253,7 +48,10 @@ export default function useQuery() {
       },
     };
 
-    const response = (await queryManagerContract(query, true)) as IssuerDataResponse;
+    const response = (await queryManagerContract({
+      query,
+      signature: QueryPermit,
+    })) as IssuerDataResponse;
     return response?.issuer_data.issuer;
   };
 
@@ -266,7 +64,7 @@ export default function useQuery() {
       },
     };
 
-    const response = (await queryManagerContract(query)) as GetIssuerResponse;
+    const response = (await queryManagerContract({ query })) as GetIssuerResponse;
     return response?.get_issuer;
   };
 
@@ -277,7 +75,7 @@ export default function useQuery() {
       display_cost: {},
     };
 
-    const response = (await queryManagerContract(query)) as CertPriceResponse;
+    const response = (await queryManagerContract({ query })) as CertPriceResponse;
     return parseInt(response?.display_cost.cost_data.amount, 10);
     //return parseInt(response?.cert_price.pay_data.amount, 10);
   };
@@ -290,7 +88,10 @@ export default function useQuery() {
       list_projects: {},
     };
 
-    const response = (await queryManagerContract(query, true)) as ListProjectsResponse;
+    const response = (await queryManagerContract({
+      query,
+      signature: QueryPermit,
+    })) as ListProjectsResponse;
     return response?.list_projects?.data_list;
   };
 
@@ -305,7 +106,10 @@ export default function useQuery() {
       },
     };
 
-    const response = (await queryManagerContract(query, true)) as ProjectDataResponse;
+    const response = (await queryManagerContract({
+      query,
+      signature: QueryPermit,
+    })) as ProjectDataResponse;
     console.log(response);
     checkError(response);
 
@@ -316,35 +120,41 @@ export default function useQuery() {
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query owned token IDs
-    const tokensQuery = {
+    const tokenQuery = {
       tokens: {
         owner: Address,
       },
     };
 
-    const { token_list } = (await queryNFTContract(tokensQuery, true)) as Snip721GetTokensResponse;
+    const { token_list } = (await queryNFTContract({
+      query: tokenQuery,
+      signature: QueryPermit,
+    })) as Snip721GetTokensResponse;
     if (!token_list.tokens.length) return [];
 
     // query NFT metadata
-    const dossierQuery = {
+    const dossiersQuery = {
       batch_nft_dossier: {
         token_ids: token_list.tokens,
       },
     };
 
-    const response = (await queryNFTContract(dossierQuery, true)) as BatchDossierResponse;
+    const response = (await queryNFTContract({
+      query: dossiersQuery,
+      signature: QueryPermit,
+    })) as BatchDossierResponse;
     return response.batch_nft_dossier.nft_dossiers;
   };
 
   const getCertPub = async (token_id: string) => {
     // query NFT metadata
-    const dossierQuery = {
+    const query = {
       nft_dossier: {
         token_id: token_id,
       },
     };
 
-    const response = (await queryNFTContract(dossierQuery)) as DossierResponse;
+    const response = (await queryNFTContract({ query })) as DossierResponse;
 
     return response.nft_dossier;
   };
@@ -353,27 +163,30 @@ export default function useQuery() {
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query NFT metadata
-    const dossierQuery = {
+    const query = {
       nft_dossier: {
         token_id: token_id,
       },
     };
 
-    const response = (await queryNFTContract(dossierQuery, true)) as DossierResponse;
+    const response = (await queryNFTContract({
+      query,
+      signature: QueryPermit,
+    })) as DossierResponse;
 
     return response.nft_dossier;
   };
 
   const getCertAccessCode = async (token_id: string, access_code: string) => {
     // query NFT metadata
-    const dossierQuery = {
+    const query = {
       nft_dossier: {
         token_id,
         access_code,
       },
     };
 
-    const response = (await queryNFTContract(dossierQuery)) as DossierResponse;
+    const response = (await queryNFTContract({ query })) as DossierResponse;
 
     return response.nft_dossier;
   };
@@ -428,14 +241,17 @@ export default function useQuery() {
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query NFT metadata
-    const approvalQuery = {
+    const query = {
       token_approvals: {
         token_id: token_id,
         include_expired: true,
       },
     };
 
-    const response = (await queryNFTContract(approvalQuery, true)) as TokenApprovalsResponse;
+    const response = (await queryNFTContract({
+      query,
+      signature: QueryPermit,
+    })) as TokenApprovalsResponse;
 
     return response.token_approvals;
   };
@@ -444,21 +260,19 @@ export default function useQuery() {
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     // query NFT metadata
-    const approvalQuery = {
+    const query = {
       nft_dossier: {
         token_id: token_id,
       },
     };
 
-    const response = await queryNFTContract(approvalQuery, true);
+    const response = await queryNFTContract({ query, signature: QueryPermit });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     return response.nft_dossier;
   };
 
   return {
-    queryNFTContract,
-    queryManagerContract,
     queryCredits,
     queryIssuerData,
     getOwnedCerts,

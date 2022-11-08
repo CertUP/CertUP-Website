@@ -1,12 +1,13 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
-import Project, { defaultCertInfo, MintedProject } from '../interfaces/Project';
+import Project, { defaultCertInfo } from '../interfaces/Project';
 import { useWallet } from '.';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { dataURLtoFile } from '../utils/fileHelper';
 import useQuery from '../hooks/QueryHook';
 import { ExportProject } from '../interfaces/manager';
 import { isExpired } from '../utils/loginPermit';
+import { defaultFunction } from '../utils/helpers';
+import { useIssuer } from './IssuerContext';
 
 const projectsUrl = new URL('/projects', process.env.REACT_APP_BACKEND).toString();
 
@@ -22,7 +23,6 @@ export interface ProjectContextState {
   findMintedProject: (id: string) => ExportProject | undefined;
   addProject: (newProject: Project) => Promise<string>;
   removeProject: (id: string) => void;
-  removeAll: () => void;
   updateProject: (id: string, data: Project) => Promise<void>;
 }
 
@@ -38,15 +38,9 @@ const contextDefaultValues: ProjectContextState = {
   MintedProjects: [],
   LoadingMintedProjects: false,
 
-  refreshProjects: function (): void {
-    throw new Error('Function not implemented.');
-  },
-  refreshPendingProjects: function (): void {
-    throw new Error('Function not implemented.');
-  },
-  refreshMintedProjects: function (): void {
-    throw new Error('Function not implemented.');
-  },
+  refreshProjects: defaultFunction,
+  refreshPendingProjects: defaultFunction,
+  refreshMintedProjects: defaultFunction,
   findProject: function (): Project {
     throw new Error('Function not implemented.');
   },
@@ -56,12 +50,7 @@ const contextDefaultValues: ProjectContextState = {
   addProject: async function (): Promise<string> {
     throw new Error('Function not implemented.');
   },
-  removeProject: function (): void {
-    throw new Error('Function not implemented.');
-  },
-  removeAll: function (): void {
-    throw new Error('Function not implemented.');
-  },
+  removeProject: defaultFunction,
   updateProject: async function (): Promise<void> {
     throw new Error('Function not implemented.');
   },
@@ -86,8 +75,8 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
   );
 
   const { queryProjects } = useQuery();
-
-  const { Address, LoginToken, QueryPermit, VerifiedIssuer, clearToken } = useWallet();
+  const { Address, LoginToken, QueryPermit, clearToken } = useWallet();
+  const { VerifiedIssuer } = useIssuer();
 
   useEffect(() => {
     if (!Address || !LoginToken || !QueryPermit || !VerifiedIssuer) return;
@@ -126,7 +115,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 
       const projects: Project[] = [];
 
-      //= response.data.data.map((project: any) => {
       for (let i = 0; i < returnedProjects.length; i++) {
         const project: Project = returnedProjects[i];
         if (project.certInfo) {
@@ -194,34 +182,23 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     return response.data.data._id;
   };
 
-  // find item by using id value
   const findProject = (id: string): Project | undefined => {
     const data = PendingProjects;
-
-    // find the item's index to remove it
     const project = data.find((Project) => Project._id === id);
 
-    // to check if the item exist in the list
     if (!project) {
       return;
     }
 
-    //return project;
     return new Project(project);
   };
 
-  // find item by using id value
   const findMintedProject = (id: string): ExportProject | undefined => {
     const data = MintedProjects;
-
-    // find the item's index to remove it
     const project = data.find((Project) => Project.project_id === id);
-
-    //return project;
     return project;
   };
 
-  // remove item by using id value
   const removeProject = (id: string) => {
     const data = PendingProjects;
 
@@ -242,14 +219,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     setPendingProjects([...data]);
   };
 
-  // Firstly, check if there any value exists in the list.
-  // If does exist, set item list to an empty array otherwise, give alert to inform user.
-  const removeAll = () =>
-    PendingProjects.length === 0
-      ? alert('There are no tasks found in the list!')
-      : setPendingProjects([]);
-
-  // Update item with id and item values.
   const updateProject = async (id: string, project: Project) => {
     if (!project.project_name) {
       throw new Error("Please enter a 'Project Name'");
@@ -271,10 +240,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     console.log('Updating Remote Project:', project);
 
     const url = new URL(`/projects/${project._id}`, process.env.REACT_APP_BACKEND);
-    // const remoteProject: RemoteProject = {
-    //   ...project,
-    //   company_logo: '',
-    // };
 
     const response = await axios.put(url.toString(), project, {
       headers: {
@@ -296,7 +261,6 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
     findMintedProject,
     addProject,
     removeProject,
-    removeAll,
     updateProject,
   };
 
@@ -305,4 +269,4 @@ export const ProjectProvider = ({ children }: Props): ReactElement => {
 };
 
 // created custom hook
-export const useProject = () => useContext(ProjectContext);
+export const useProject = () => useContext<ProjectContextState>(ProjectContext);

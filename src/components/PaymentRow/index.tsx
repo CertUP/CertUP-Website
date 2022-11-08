@@ -19,6 +19,7 @@ import CUSelectButton from '../CUSelectButton';
 
 import styles from './styles.module.scss';
 import CUSpinner from '../CUSpinner';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export interface Confirmation {
   string: string;
@@ -32,7 +33,7 @@ interface PRProps {
 }
 
 export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: PRProps) {
-  const { Address, LoginToken, queryCredits } = useWallet();
+  const { Address, LoginToken } = useWallet();
 
   const [numCerts, setNumCerts] = useState<number>(num_certs);
 
@@ -189,7 +190,7 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
         string: 'Your transaction hash is',
         number: (
           <a
-            href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${response.transactionHash}`}
+            href={`${process.env.REACT_APP_EXPLORER_URL}/${response.transactionHash}`}
             target="_blank"
             rel="noreferrer"
             style={{

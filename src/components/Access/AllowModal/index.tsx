@@ -23,7 +23,7 @@ import Container from 'react-bootstrap/Container';
 import { NftDossier } from '../../../interfaces/721';
 import { ModalButton } from '../../ModalButton';
 import { CUButton } from '../../CUButton';
-import useQuery, { Snip721Approval } from '../../../hooks/QueryHook';
+import useQuery from '../../../hooks/QueryHook';
 
 import useExecute from '../../../hooks/ExecuteHook';
 import CopyButton from '../../CopyButton';

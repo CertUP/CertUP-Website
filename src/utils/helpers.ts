@@ -274,3 +274,7 @@ export const hashString = (input: string): number => {
   }
   return hash;
 };
+
+export const defaultFunction = (): void => {
+  throw new Error('Function not implemented.');
+};

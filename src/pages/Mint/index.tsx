@@ -315,7 +315,7 @@ export default function Mint() {
               {!!txHash && (
                 <>
                   <a
-                    href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${txHash}`}
+                    href={`${process.env.REACT_APP_EXPLORER_URL}/${txHash}`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -429,7 +429,7 @@ export default function Mint() {
                         <br />
                         {!!txHash && (
                           <a
-                            href={`${process.env.REACT_APP_EXPLORER_URL}/transactions/${txHash}`}
+                            href={`${process.env.REACT_APP_EXPLORER_URL}/${txHash}`}
                             target="_blank"
                             rel="noreferrer"
                           >

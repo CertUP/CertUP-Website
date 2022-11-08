@@ -34,6 +34,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useNavigate } from 'react-router-dom';
 import { ButtonProps } from 'react-bootstrap';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 type DivProps = JSX.IntrinsicElements['div'];
 
@@ -77,7 +78,8 @@ interface KeplrButtonProps {
 }
 
 export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactElement {
-  const { Address, updateClient, IssuerProfile, toggleLoginModal } = useWallet();
+  const { Address, updateClient, toggleLoginModal } = useWallet();
+  const { IssuerProfile } = useIssuer();
   const [loading, setLoading] = useState(false);
 
   const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr', 'IssuerLogin']);

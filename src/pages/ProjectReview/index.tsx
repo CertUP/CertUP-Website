@@ -29,9 +29,10 @@ import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
 import Layout from '../../components/Layout';
 import ConnectBanner from '../../components/ConnectBanner';
 import ReviewViewer from '../../components/ReviewViewer';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export default function ProjectReview() {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken, RemainingCerts } = useWallet();
+  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
 
   const location = useLocation();
   const { projectid } = useParams();

@@ -20,6 +20,7 @@ import { RestrictedAccess } from '../RestrictedAccess';
 import CUSpinner from '../CUSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 interface Props {
   setProjectIdForm: (projectId?: string) => void;
@@ -29,11 +30,11 @@ interface Props {
 export default function ProjectList({ setProjectIdForm, setProjectIdReview }: Props) {
   //const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
   const { PendingProjects, LoadingPendingProjects, refreshPendingProjects } = useProject();
-  const { VerifiedIssuer, LoadingRemainingCerts, queryCredits } = useWallet();
+  const { VerifiedIssuer, LoadingRemainingCerts, refreshIssuer } = useIssuer();
 
   //refresh credits on mount if they are nto verified (to see if they became verified)
   useEffect(() => {
-    if (!VerifiedIssuer) queryCredits();
+    if (!VerifiedIssuer) refreshIssuer();
   }, []);
 
   if (!LoadingRemainingCerts && !VerifiedIssuer)
