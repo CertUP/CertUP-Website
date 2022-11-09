@@ -1,7 +1,7 @@
 import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import Image from 'react-bootstrap/Image';
-import { useWallet } from '../../contexts';
-import { getTemplatePreview } from '../../utils/backendHelper';
+import { useWallet } from '../../../contexts';
+import { getTemplatePreview } from '../../../utils/backendHelper';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 

@@ -46,7 +46,6 @@ export const ipfsDownload = async (url: string) => {
     const newUrl = url.replace('ipfs.io', mirror);
     try {
       const response = await download(newUrl, 8000);
-      console.log(response);
       if (response.data) {
         final = response.data;
         break;

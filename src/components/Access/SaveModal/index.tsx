@@ -80,7 +80,6 @@ export default function SaveModal({ show, setShow, metadata }: props) {
           metadata.private_metadata.extension.media[0].authentication.key,
         );
       }
-      console.log('DECRYPT RESULT', result);
       const blob = new Blob([result]);
       downloadBlob(blob, `${metadata.private_metadata.extension.certificate.name} Image`);
     } catch (error) {

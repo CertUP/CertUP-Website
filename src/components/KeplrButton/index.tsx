@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ReactElement, ReactNode, useEffect, useState, forwardRef } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';
@@ -7,8 +7,7 @@ import { toast } from 'react-toastify';
 
 import { useCookies } from 'react-cookie';
 
-import { useGlobalState } from '../../state';
-import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
+import { SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import {
   getErrorMessage,
@@ -17,21 +16,13 @@ import {
   sleep,
   suggestTestnet,
 } from '../../utils/helpers';
-import getPermits, {
-  getCachedLoginToken,
-  getCachedQueryPermit,
-  isExpired,
-  LoginToken,
-} from '../../utils/loginPermit';
+import { getCachedLoginToken, getCachedQueryPermit, isExpired } from '../../utils/loginPermit';
 import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import { useNavigate } from 'react-router-dom';
 import { ButtonProps } from 'react-bootstrap';
 import { useIssuer } from '../../contexts/IssuerContext';
@@ -122,6 +113,7 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
   const handleConnect = async () => {
     if (loading) return;
     try {
+      console.log('Connecting to Keplr');
       setLoading(true);
       if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
         toast.error('Keplr Extension Not Found');
@@ -147,6 +139,7 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
 
       //check for QUERY permit from storage, use modal if it isnt there
       const cachedPermit = getCachedQueryPermit(myAddress);
+      console.log('Permit', cachedPermit);
       if (!cachedPermit) {
         updateClient({
           client: secretjs,

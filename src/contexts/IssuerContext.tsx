@@ -46,30 +46,63 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
     contextDefaultValues.VerifiedIssuer,
   );
 
+  const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timer>();
+
   const { Querier, QueryPermit, Address, refreshQueryPermit } = useWallet();
 
   // query credits as soon as permit and querier are available
   useEffect(() => {
-    if (!Querier || !QueryPermit) return;
+    if (!QueryPermit) return;
+    console.log('Permit Updated!', QueryPermit);
     refreshIssuer(undefined, true);
-  }, [QueryPermit, Querier]);
+  }, [QueryPermit]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('Checking for credits...');
-      refreshCredits();
-    }, 60_000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!Address) return;
+    console.log('RemainingCerts updated', RemainingCerts);
+    const key = `CertUP-Cert-Credits-v1-${Address}`;
 
-  const refreshCredits = async () => {
+    const storedCredits = localStorage.getItem(key);
+    if (storedCredits) {
+      const previousRemaining = parseInt(storedCredits);
+      if (RemainingCerts && RemainingCerts > previousRemaining) {
+        const diff = RemainingCerts - previousRemaining;
+        const message = (
+          <>
+            {diff.toLocaleString()} certificate credits have been credited to your account.
+            <br />
+            You now have {RemainingCerts.toLocaleString()} credits.
+          </>
+        );
+        toast.info(message, {
+          autoClose: false,
+        });
+      }
+    }
+    localStorage.setItem(key, RemainingCerts.toString());
+  }, [RemainingCerts]);
+
+  useEffect(() => {
+    if (refreshInterval) clearInterval(refreshInterval);
+
+    if (!QueryPermit) return;
+    const interval = setInterval(() => {
+      console.log('Checking for credits...', QueryPermit);
+      refreshCredits(QueryPermit);
+    }, 10_000);
+    setRefreshInterval(interval);
+    return () => clearInterval(interval);
+  }, [QueryPermit]);
+
+  const refreshCredits = async (queryPermit = QueryPermit) => {
+    if (!queryPermit) return;
     //setLoadingRemainingCerts(true);
     try {
       const query = new IssuerDataQueryMsg(Address);
 
       const response = (await queryManagerContract({
         query,
-        signature: QueryPermit,
+        signature: queryPermit,
       })) as IssuerDataResponse;
 
       if (!response) {
@@ -78,12 +111,13 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
       }
 
       const result = parseInt(response.issuer_data.issuer.remaining_certs || '0', 10);
-      if (result > (RemainingCerts || 9999999)) {
-        const diff = result - RemainingCerts;
-        toast.success(`${diff} certificate credits have been credited to your account.`, {
-          autoClose: false,
-        });
-      }
+      setRemainingCerts(result);
+      // if (result > (RemainingCerts || 9999999)) {
+      //   const diff = result - RemainingCerts;
+      //   toast.success(`${diff} certificate credits have been credited to your account.`, {
+      //     autoClose: false,
+      //   });
+      // }
     } catch (error) {
       console.error(error);
     } finally {

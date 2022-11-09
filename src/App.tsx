@@ -35,6 +35,7 @@ function App() {
               pauseOnFocusLoss
               draggable
               pauseOnHover
+              style={{ width: '360px' }}
             />
             <BrowserRouter>
               <Routes>

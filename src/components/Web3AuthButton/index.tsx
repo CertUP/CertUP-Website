@@ -9,7 +9,6 @@ import { Web3Auth } from '@web3auth/web3auth';
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base';
 import { OpenloginAdapter } from '@web3auth/openlogin-adapter';
 
-import { useGlobalState } from '../../state';
 import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
@@ -40,10 +39,6 @@ export default function Web3AuthButton(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-
-  //const [secretJs, setSecretJs] = useGlobalState('secretJs');
-  //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
-  //const [isSigner, setIsSigner] = useGlobalState('isSigner');
 
   // const handleConnect = async () => {
   //   try {

@@ -5,22 +5,22 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import ConnectBanner from '../ConnectBanner';
-import { Spacer } from '../../components';
+import ConnectBanner from '../../ConnectBanner';
+import { Spacer } from '../..';
 import axios from 'axios';
-import { useWallet } from '../../contexts/WalletContext';
+import { useWallet } from '../../../contexts/WalletContext';
 
 import styles from './styles.module.scss';
 import ProjectTile from '../ProjectTile';
-import Project from '../../interfaces/Project';
-import CUButton from '../CUButton';
-import { useProject } from '../../contexts/ProjectContext';
+import Project from '../../../interfaces/Project';
+import CUButton from '../../CUButton';
+import { useProject } from '../../../contexts/ProjectContext';
 import { Link } from 'react-router-dom';
-import { RestrictedAccess } from '../RestrictedAccess';
-import CUSpinner from '../CUSpinner';
+import { RestrictedAccess } from '../../RestrictedAccess';
+import CUSpinner from '../../CUSpinner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { useIssuer } from '../../contexts/IssuerContext';
+import { useIssuer } from '../../../contexts/IssuerContext';
 
 interface Props {
   setProjectIdForm: (projectId?: string) => void;

@@ -148,8 +148,6 @@ export default function Access() {
               </div>
             ) : Dossiers.length ? (
               Dossiers.map((cert, index) => {
-                console.log('Dossier', cert);
-
                 const fakeMedia = [
                   {
                     url: '',

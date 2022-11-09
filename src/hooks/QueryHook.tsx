@@ -37,7 +37,6 @@ export default function useQuery() {
   };
 
   const queryIssuerData = async (): Promise<Issuer> => {
-    if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     const query = {
@@ -56,8 +55,6 @@ export default function useQuery() {
   };
 
   const queryPubIssuerData = async (issuerId: string): Promise<PubIssuerData> => {
-    if (!Querier) throw new Error('Client not available.');
-
     const query = {
       get_issuer: {
         issuer_id: issuerId,
@@ -69,8 +66,6 @@ export default function useQuery() {
   };
 
   const queryCertPrice = async (): Promise<number> => {
-    if (!Querier) throw new Error('Client not available.');
-
     const query = {
       display_cost: {},
     };
@@ -81,7 +76,6 @@ export default function useQuery() {
   };
 
   const queryProjects = async () => {
-    if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     const query = {
@@ -96,7 +90,6 @@ export default function useQuery() {
   };
 
   const queryProjectData = async (projectId: string): Promise<ProjectToken[]> => {
-    if (!Querier) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
     const query = {

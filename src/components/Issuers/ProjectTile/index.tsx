@@ -2,13 +2,13 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
-import Project from '../../interfaces/Project';
+import Project from '../../../interfaces/Project';
 
 import styles from './styles.module.scss';
 import { useEffect, useRef, useState } from 'react';
-import { useProject } from '../../contexts';
+import { useProject } from '../../../contexts';
 
-import CUSpinner from '../CUSpinner';
+import CUSpinner from '../../CUSpinner';
 
 interface Props {
   projectIn: Project;

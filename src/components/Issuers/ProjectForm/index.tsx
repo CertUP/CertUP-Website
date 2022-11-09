@@ -8,13 +8,13 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import Image from 'react-bootstrap/Image';
-import { Spacer } from '../../components';
+import { Spacer } from '../..';
 import DatePicker from 'react-date-picker/dist/entry.nostyle';
-import ImagePicker, { PickImage } from '../ImagePicker';
+import ImagePicker, { PickImage } from '../../ImagePicker';
 //import 'react-image-picker/dist/index.css';
 
 import styles from './styles.module.scss';
-import DeleteButton from '../DeleteButton';
+import DeleteButton from '../../DeleteButton';
 import Project, {
   CertInfo,
   defaultCertInfo,
@@ -22,49 +22,49 @@ import Project, {
   Participant,
   participantToRender,
   RenderProps,
-} from '../../interfaces/Project';
-import trashImg from '../../assets/trash-2.svg';
-import CUButton from '../CUButton';
+} from '../../../interfaces/Project';
+import trashImg from '../../../assets/trash-2.svg';
+import CUButton from '../../CUButton';
 import { useRef } from 'react';
 import axios from 'axios';
-import { useProject, useWallet } from '../../contexts';
+import { useProject, useWallet } from '../../../contexts';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { ProgressBar } from '../../components';
-import StepNumber from '../StepNumber';
-import MiniCircle from '../MiniCircle';
-import ImageDropzone from '../ImageDropzone';
+import { ProgressBar } from '../..';
+import StepNumber from '../../StepNumber';
+import MiniCircle from '../../MiniCircle';
+import ImageDropzone from '../../ImageDropzone';
 import {
   generateImage,
   GenerateInput,
   generateWithWait,
   getTemplates,
-} from '../../utils/backendHelper';
-import { fileToDataURI } from '../../utils/fileHelper';
+} from '../../../utils/backendHelper';
+import { fileToDataURI } from '../../../utils/fileHelper';
 
-import bg1 from '../../assets/bg1-thumb.jpg';
-import bg2 from '../../assets/bg2-thumb.jpg';
-import bg3 from '../../assets/bg3-thumb.jpg';
+import bg1 from '../../../assets/bg1-thumb.jpg';
+import bg2 from '../../../assets/bg2-thumb.jpg';
+import bg3 from '../../../assets/bg3-thumb.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faArrowRight, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
-import CUSelectButton from '../CUSelectButton';
+import CUSelectButton from '../../CUSelectButton';
 import CsvModal from '../CsvModal';
 
-import ImportFile from '../../assets/importfile.svg';
-import { SaveExitModal } from '../Issuers';
-import { PreviewProvider, usePreview } from '../../contexts/PreviewContext';
-import CUTooltip from '../Tooltip';
+import ImportFile from '../../../assets/importfile.svg';
+import { SaveExitModal } from '..';
+import { PreviewProvider, usePreview } from '../../../contexts/PreviewContext';
+import CUTooltip from '../../Tooltip';
 
-import '../../assets/DatePicker.css';
-import '../../assets/Calendar.css';
-import { useScrollbarWidth } from '../../hooks/ScroolbarWidthHook';
-import { getPickerFormat } from '../../utils/helpers';
-import CUSpinner from '../CUSpinner';
-import { LoginToken } from '../../utils/loginPermit';
-import { Template, TemplateFeatures } from '../../interfaces/common/templates.interface';
-import { Addition, IssuingIndividual } from '../../interfaces/common/token.interface';
+import '../../../assets/DatePicker.css';
+import '../../../assets/Calendar.css';
+import { useScrollbarWidth } from '../../../hooks/ScroolbarWidthHook';
+import { getPickerFormat } from '../../../utils/helpers';
+import CUSpinner from '../../CUSpinner';
+import { LoginToken } from '../../../utils/loginPermit';
+import { Template, TemplateFeatures } from '../../../interfaces/common/templates.interface';
+import { Addition, IssuingIndividual } from '../../../interfaces/common/token.interface';
 import TemplateSelectButton from '../TemplateSelectButton';
-import { useIssuer } from '../../contexts/IssuerContext';
+import { useIssuer } from '../../../contexts/IssuerContext';
 
 type InstructorFields = 'name' | 'company' | 'title';
 
@@ -303,7 +303,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
     };
     const rprops: RenderProps = {
       ...renderProps,
-      //template: '2',
+      //template: 'certup',
     };
 
     // this is only used for Save, so we want to use the GenericRender since the image is stored unencrypted

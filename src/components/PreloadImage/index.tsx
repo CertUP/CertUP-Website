@@ -35,7 +35,6 @@ export default function PreloadImage({ url, decryptionKey, ...rest }: PreloadIma
         setStatus('Decrypting...');
         result = decryptFile(result, decryptionKey);
       }
-      console.log('DECRYPT RESULT', result);
       setStatus('Processing...');
       result = arrayBufferToDataURI(result, 'image/png');
       setSrc(result);

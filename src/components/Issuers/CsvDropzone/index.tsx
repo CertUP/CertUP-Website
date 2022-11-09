@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 import Col from 'react-bootstrap/Col';
 import xlsx from 'node-xlsx';
-import { Participant } from '../../interfaces/Project';
+import { Participant } from '../../../interfaces/Project';
 
 interface props {
   setParticipants: (a: any) => void;

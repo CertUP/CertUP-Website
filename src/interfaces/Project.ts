@@ -32,7 +32,7 @@ export interface RenderProps {
 }
 
 export const defaultRenderProps: RenderProps = {
-  template: '2',
+  template: 'certup',
   templateBg: 1,
   templateLayout: 2,
   certTitle: '',

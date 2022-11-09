@@ -14,7 +14,7 @@ import Row from 'react-bootstrap/Row';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Container from 'react-bootstrap/Container';
-import { Participant } from '../../interfaces/Project';
+import { Participant } from '../../../interfaces/Project';
 import { toast } from 'react-toastify';
 
 interface props {
