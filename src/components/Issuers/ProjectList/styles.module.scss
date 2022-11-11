@@ -1,0 +1,28 @@
+@use '../../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.aboutTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 108px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.certLabel {
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 48px;
+}
+
+.certStatus {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 177.5%;
+  color: #676767;
+}

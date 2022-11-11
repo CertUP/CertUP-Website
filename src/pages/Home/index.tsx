@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark } from '../../components';
+import { CUButton } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -7,9 +7,15 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import styles from './styles.module.scss';
-import bannerImage from '../../assets/BannerImage.svg';
+import bannerImage from '../../assets/BannerImage2.svg';
+import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function Home() {
+  useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
   return (
     <>
       <Layout>
@@ -29,11 +35,9 @@ export default function Home() {
               </Row>
               <Row className={styles.gsButtonRow}>
                 <Col xs={'auto'}>
-                  {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                    <CUButton disabled={true}>Coming Soon</CUButton>
-                  ) : (
-                    <CUButton>Get Started</CUButton>
-                  )}
+                  <Link to="/issuers">
+                    <CUButton btnStyle="large">Get Started</CUButton>
+                  </Link>
                 </Col>
               </Row>
             </Col>
@@ -148,11 +152,9 @@ export default function Home() {
             </Row>
             <Row className="justify-content-center">
               <Col xs="auto">
-                {parseInt(process.env.REACT_APP_HOME_ONLY as string, 10) ? (
-                  <CUButtonDark disabled={true}>Coming Soon</CUButtonDark>
-                ) : (
-                  <CUButtonDark>Get Started</CUButtonDark>
-                )}
+                <Link to="/issuers">
+                  <CUButton btnStyle="dark">Get Started</CUButton>
+                </Link>
               </Col>
             </Row>
           </div>

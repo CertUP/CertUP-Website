@@ -1,99 +1,122 @@
-import { SecretNetworkClient, Wallet } from 'secretjs';
-import { classicNameResolver } from 'typescript';
-import { LoginToken } from '../utils/loginPermit';
+import { ArrayLog, TxContent, TxResultCode } from 'secretjs';
 
-export interface Item {
-  id: string;
+interface PermitParams {
+  permit_name: string;
+  allowed_tokens: string[];
+  chain_id: string;
+  permissions: string[];
+}
+
+interface Permit {
+  params: PermitParams;
+  signature: PermitSignature;
+}
+
+export interface TendermintPubKey {
+  type: string;
   value: string;
 }
 
-export type Items = Item[];
-
-export interface ItemContextState {
-  Items: Items;
-  addItem: (newItem: Item) => void;
-  removeItem: (id: string) => void;
-  removeAll: () => void;
-  updateItem: (id: string, data: Item) => void;
+export interface PermitSignature {
+  pub_key: TendermintPubKey;
+  signature: string;
 }
 
-export interface WalletContextState {
-  Client: SecretNetworkClient | undefined;
-  ClientIsSigner: boolean;
-  Wallet: Wallet | undefined;
-  Address: string;
-  LoginToken: LoginToken | undefined;
-  updateClient: (
-    client: SecretNetworkClient,
-    wallet: Wallet,
-    address: string,
-    token: LoginToken,
-  ) => void;
+export interface QueryResponse {
+  parse_err?: ErrorResponse;
+  generic_err?: ErrorResponse;
 }
 
-// export interface Project {
-//   _id?: string;
-//   owner: string;
-//   project_name: string;
-//   pub_description: string;
-//   priv_description: string;
-//   template: number;
-//   // issue_d: number;
-//   // issue_m: number;
-//   // issue_y: number;
-//   issue_date: Date | undefined;
-//   issuer: string;
-//   participants: Participant[];
-// }
-
-export class Project {
-  _id?: string;
-  owner: string;
-  project_name: string;
-  pub_description: string;
-  priv_description: string;
-  template: number;
-  // issue_d: number;
-  // issue_m: number;
-  // issue_y: number;
-  issue_date: Date | undefined;
-  issuer: string;
-  participants: Participant[];
-
-  constructor(
-    owner?: string,
-    project_name?: string,
-    pub_description?: string,
-    priv_description?: string,
-    template?: number,
-    issue_date?: Date,
-    issuer?: string,
-    participants?: Participant[],
-  ) {
-    this.owner = owner || '';
-    this.project_name = project_name || '';
-    this.pub_description = pub_description || '';
-    this.priv_description = priv_description || '';
-    this.template = template || 0;
-    this.issue_date = issue_date;
-    this.issuer = issuer || '';
-    this.participants = participants || [new Participant(), new Participant()];
-  }
+interface ErrorResponse {
+  msg: string;
 }
 
-export class Participant {
-  name: string;
-  surname: string;
-  // dob_d: number;
-  // dob_m: number;
-  // dob_y: number;
-  dob: Date | undefined;
-  cert_num: string;
+export enum ComputeResultCode {
+  // ErrInstantiateFailed error for rust instantiate contract failure
+  ErrInstantiateFailed = 2, // "instantiate contract failed")
 
-  constructor(name?: string, surname?: string, dob?: Date, certNum?: string) {
-    this.name = name || '';
-    this.surname = surname || '';
-    this.dob = dob;
-    this.cert_num = certNum || '';
-  }
+  // ErrExecuteFailed error for rust execution contract failure
+  ErrExecuteFailed = 3, // "execute contract failed")
+
+  // ErrQueryFailed error for rust smart query contract failure
+  ErrQueryFailed = 4, // "query contract failed")
+
+  // ErrMigrationFailed error for rust execution contract failure
+  ErrMigrationFailed = 5, // "migrate contract failed")
+
+  // ErrAccountExists error for a contract account that already exists
+  ErrAccountExists = 6, // "contract account already exists")
+
+  // ErrGasLimit error for out of gas
+  ErrGasLimit = 7, // "insufficient gas")
+
+  // ErrInvalidGenesis error for invalid genesis file syntax
+  ErrInvalidGenesis = 8, // "invalid genesis")
+
+  // ErrNotFound error for an entry not found in the store
+  ErrNotFound = 9, // "not found")
+
+  // ErrInvalidMsg error when we cannot process the error returned from the contract
+  ErrInvalidMsg = 10, // "invalid CosmosMsg from the contract")
+
+  // ErrEmpty error for empty content
+  ErrEmpty = 11, // "empty")
+
+  // ErrLimit error for content that exceeds a limit
+  ErrLimit = 12, // "exceeds limit")
+
+  // ErrInvalid error for content that is invalid in this context
+  ErrInvalid = 13, // "invalid")
+
+  // ErrDuplicate error for content that exsists
+  ErrDuplicate = 14, // "duplicate")
+
+  // ErrCreateFailed error for wasm code that has already been uploaded or failed
+  ErrCreateFailed = 15, // "create contract failed")
+
+  // ErrSigFailed error for wasm code that has already been uploaded or failed
+  ErrSigFailed = 16, // "parse signature failed")
+  /** Success is returned if the transaction executed successfuly */
+  Success = 0,
 }
+
+export type ComputeTx = {
+  readonly height: number;
+  /** Transaction hash (might be used as transaction ID). Guaranteed to be non-empty upper-case hex */
+  readonly transactionHash: string;
+  /** Transaction execution error code. 0 on success. See {@link TxResultCode}. */
+  readonly code: TxResultCode | ComputeResultCode;
+  // /** Transaction execution error codespace. Empty or compute */
+  // readonly codespace: string;
+  /**
+   * If code != 0, rawLog contains the error.
+   *
+   * If code = 0 you'll probably want to use `jsonLog` or `arrayLog`. Values are not decrypted.
+   */
+  readonly rawLog: string;
+  /** If code = 0, `jsonLog = JSON.parse(rawLow)`. Values are decrypted if possible. */
+  readonly jsonLog?: any;
+  /** If code = 0, `arrayLog` is a flattened `jsonLog`. Values are decrypted if possible. */
+  readonly arrayLog?: ArrayLog;
+  /** Return value (if there's any) for each input message */
+  readonly data: Array<Uint8Array>;
+  /**
+   * Decoded transaction input.
+   */
+  readonly tx: TxContent;
+  /**
+   * Raw transaction bytes stored in Tendermint.
+   *
+   * If you hash this, you get the transaction hash (= transaction ID):
+   *
+   * ```js
+   * import { sha256 } from "@noble/hashes/sha256";
+   * import { toHex } from "@cosmjs/encoding";
+   *
+   * const transactionHash = toHex(sha256(indexTx.tx)).toUpperCase();
+   * ```
+   */
+  readonly txBytes: Uint8Array;
+  readonly gasUsed: number;
+  readonly gasWanted: number;
+};

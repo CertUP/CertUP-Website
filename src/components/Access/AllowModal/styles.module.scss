@@ -1,0 +1,54 @@
+@use '../../../global/_variables.scss' as vars;
+
+.dlContainer {
+  // height: 100px;
+  // width: 250px;
+  border: 1px dashed #9191918c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 10px;
+  max-width: 250px;
+  width: 100%;
+  height: 100%;
+}
+
+.dropzoneText {
+  color: #696969;
+  margin-bottom: 0px;
+  // font-style: italic;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.dropzoneSubText {
+  color: #696969;
+  font-style: italic;
+  font-size: 0.75rem;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.modalBody {
+  // font-size: .75rem;
+}
+
+.blankButton {
+  border: none;
+  background-color: inherit;
+  padding: 0px 3px;
+}
+
+.unlockedText {
+  // background-color: #31b5c7;
+  color: #258996dc !important;
+}
+
+.accessText {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+
+  color: #676767;
+}

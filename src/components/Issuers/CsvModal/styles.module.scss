@@ -1,0 +1,31 @@
+.dlContainer {
+  // height: 100px;
+  // width: 250px;
+  border: 1px dashed #9191918c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 10px;
+  max-width: 250px;
+  width: 100%;
+  height: 100%;
+}
+
+.dropzoneText {
+  color: #696969;
+  margin-bottom: 0px;
+  // font-style: italic;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.dropzoneSubText {
+  color: #696969;
+  font-style: italic;
+  font-size: 0.75rem;
+  // font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+
+.modalBody {
+  // font-size: .75rem;
+}

@@ -1,0 +1,30 @@
+@use '../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.sqButton {
+  border-radius: 11.8356px;
+  padding: 0.3rem 2rem;
+  box-shadow: 0 0 6px 0 $gradient1;
+  border: solid 2px transparent;
+  background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
+    vars.$certupBtnGradient;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  box-shadow: 2px 1000px 1px #fff inset;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 33px;
+  letter-spacing: 0.02em;
+  color: #666666;
+}
+.sqButton:hover {
+  box-shadow: none;
+}
+.sqButton:disabled {
+  box-shadow: 0 0 6px 0 $gradient1;
+}

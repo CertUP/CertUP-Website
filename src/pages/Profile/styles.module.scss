@@ -1,0 +1,97 @@
+@use '../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.aboutTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 108px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.payInFont {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 42px;
+
+  color: #000000;
+}
+
+.cancelBtn {
+  border-radius: 11.8356px;
+  padding: 0.3rem 2rem;
+  box-shadow: 0 0 6px 0 $gradient1;
+  border: solid 2px transparent;
+  background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
+    vars.$certupBtnGradient;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  box-shadow: 2px 1000px 1px #fff inset;
+
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 33px;
+  letter-spacing: 0.02em;
+  color: #666666;
+}
+.cancelBtn:hover {
+  box-shadow: none;
+}
+.cancelBtn:disabled {
+  box-shadow: 0 0 6px 0 $gradient1;
+}
+
+.certName {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 33px;
+  color: #000000;
+}
+
+.largeLabel {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 36px;
+  color: #000000;
+}
+
+.smallLabel {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 28px;
+  color: #000000;
+  margin-right: 5px;
+}
+
+.certupInputForm input {
+  background: #f2f2f2;
+  border-radius: 38px;
+}
+.certupInputForm input:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.certupInputForm select {
+  background-color: #f2f2f2;
+  border-radius: 38px;
+}
+.certupInputForm select:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.lineBreak {
+  word-break: break-all;
+}

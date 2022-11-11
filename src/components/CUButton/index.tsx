@@ -1,5 +1,4 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 
@@ -16,7 +15,14 @@ export interface ButtonProps
     React.AriaAttributes {
   large?: boolean;
   fill?: boolean;
+  btnStyle?: 'large' | 'square' | 'dark' | 'default' | 'small';
 }
+
+// enum ButtonStyle { wtf
+//   'large' = 'large',
+//   'square' = 'square',
+//   'dark' = 'dark',
+// }
 
 // export function CUButton2({
 //   children,
@@ -44,28 +50,84 @@ export interface ButtonProps
 //     );
 // }
 
-export const CUButton: React.FC<ButtonProps> = (props) => {
-  const { children, large, fill, ...rest } = props;
+export const CUButton: React.FC<ButtonProps> = (props: ButtonProps) => {
+  const { children, fill, btnStyle, style, className, ...rest } = props;
+  switch (btnStyle) {
+    case 'large':
+      return (
+        <button
+          {...rest}
+          className={`${styles.certupBtn} ${styles.certupButtonColor}`}
+          style={fill ? { width: '100%' } : undefined}
+        >
+          {children}
+        </button>
+      );
+      break;
+    case 'square':
+      return (
+        <button
+          {...rest}
+          className={`${styles.certupBtn} ${styles.certupBtnSq} ${styles.certupButtonColor} ${className}`}
+          style={fill ? { width: '100%' } : { width: 'auto' }}
+        >
+          {children}
+        </button>
+      );
+      break;
+    case 'dark':
+      return (
+        <button
+          {...rest}
+          className={`${styles.certupBtn} ${styles.certupBtnDark} ${styles.certupButtonColor}`}
+          style={fill ? { ...style, width: '100%' } : style}
+        >
+          {children}
+        </button>
+      );
+      break;
+    case 'default':
+      return (
+        <button
+          {...rest}
+          className={`${styles.certupButtonColor} ${styles.defaultBtn}`}
+          style={fill ? { ...style, width: '100%' } : style}
+        >
+          {children}
+        </button>
+      );
+      break;
+    default:
+      return (
+        <button
+          {...rest}
+          className={`${styles.certupBtn} ${
+            btnStyle === 'small' ? styles.xsmall : styles.certupBtnSmall
+          } ${styles.certupButtonColor}`}
+          style={fill ? { width: '100%' } : undefined}
+        >
+          {children}
+        </button>
+      );
+      break;
+  }
 
-  // return (
-  //     <button {...rest}>{children}</button>
-  // )
-  if (large)
-    return (
-      <button {...rest} className={styles.certupBtn}>
-        {children}
-      </button>
-    );
-  else
-    return (
-      <button
-        {...rest}
-        className={`${styles.certupBtn} ${styles.certupBtnSmall}`}
-        style={fill ? { width: '100%' } : undefined}
-      >
-        {children}
-      </button>
-    );
+  // if (large)
+  //   return (
+  //     <button {...rest} className={styles.certupBtn}>
+  //       {children}
+  //     </button>
+  //   );
+  // else
+  //   return (
+  //     <button
+  //       {...rest}
+  //       className={`${styles.certupBtn} ${styles.certupBtnSmall} ${styles.certupButtonColor}`}
+  //       style={fill ? { width: '100%' } : undefined}
+  //     >
+  //       {children}
+  //     </button>
+  //   );
 };
 
 export default CUButton;

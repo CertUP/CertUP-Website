@@ -1,0 +1,19 @@
+@use '../../global/_variables.scss' as vars;
+
+.Header {
+  font-size: vars.$font-size-h3;
+}
+
+.keplrButton {
+  border: 1px solid #666666;
+  box-sizing: border-box;
+  border-radius: 10px;
+  padding: 12px 5px;
+  width: 200px;
+}
+
+.keplrLogo {
+  height: 26px !important;
+  width: 26px !important;
+  margin-right: 10px;
+}

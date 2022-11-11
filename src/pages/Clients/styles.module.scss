@@ -33,6 +33,16 @@ $gradient3: #a659f3;
   color: #6c6c6c;
 }
 
+.aboutInfoText38 {
+  font-family: 'Catamaran';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 40px;
+
+  color: #6c6c6c;
+}
+
 .infoBox {
   //background: linear-gradient(114.11deg, rgba(116, 235, 213, 0.75) -7.36%, rgba(159, 172, 230, 0.75) 101.34%);
   border: solid 5px transparent;
@@ -43,6 +53,7 @@ $gradient3: #a659f3;
   border-radius: 50px;
   box-shadow: 2px 1000px 1px #fff inset;
   padding: 45px;
+  // height: 100%;
 }
 
 .infoTitle {

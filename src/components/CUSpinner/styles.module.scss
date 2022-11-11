@@ -1,0 +1,13 @@
+@use '../../global/_variables.scss' as vars;
+
+.flashAnimation {
+  animation: '2s linear 0s infinite normal none running flash';
+  // animation-name: "flash";
+  // animation-duration: 2s;
+  // animation-timing-function: linear;
+  // animation-delay: 0s;
+  // animation-iteration-count: infinite;
+  // animation-direction: normal;
+  // animation-fill-mode: none;
+  // animation-play-state: running;
+}

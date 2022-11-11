@@ -31,7 +31,8 @@ $gradient3: #a659f3;
   //left: -180px;
   text-align: center;
   left: auto;
-  top: 40vh;
+  top: 60vh;
+  right: auto;
 }
 
 container {
@@ -54,6 +55,42 @@ container {
   line-height: 60px;
   letter-spacing: 0.02em;
   padding-bottom: 12px;
+}
+
+.guideSubtitle {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 36px;
+
+  /* identical to box height */
+  letter-spacing: 0.02em;
+
+  color: #000000;
+  text-align: center;
+}
+
+.guideStep {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 42px;
+
+  color: #000000;
+}
+
+.keplrSupports {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 30px;
+
+  /* identical to box height */
+
+  color: #979797;
 }
 
 .aboutInfoText {

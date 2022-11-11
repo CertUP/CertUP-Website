@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer, StepNumber } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -12,7 +12,17 @@ import leftBlobs from '../../assets/leftBlobs.svg';
 import rightBlobs from '../../assets/rightBlobs.svg';
 import centerLines from '../../assets/centerLines.svg';
 
+import stepsImg from '../../assets/steps.svg';
+import connectImg from '../../assets/connectKeplr.svg';
+import step3Img from '../../assets/step3.svg';
+import step4Img from '../../assets/step4.svg';
+import { useEffect } from 'react';
+
 export default function Guide() {
+  useEffect(() => {
+    document.title = `CertUP Guide`;
+  }, []);
+
   return (
     <>
       <Layout>
@@ -26,67 +36,82 @@ export default function Guide() {
         <Container>
           <Row>
             <span className={styles.aboutTitle}>Guide</span>
+            <span className={styles.guideSubtitle}>How to create and issue your certificates</span>
           </Row>
         </Container>
 
         <Spacer height={50} />
 
-        <Container>
-          <div className={styles.infoBox}>
-            <Row>
-              <span className={styles.aboutSubtitle}>Info</span>
-            </Row>
-
-            <Row>
-              <p className={styles.aboutInfoText}>
-                You get certificates as proof of completing your school education, high school,
-                college, and university education. Furthermore, certificates help you find jobs with
-                potential employers when you need to show off your skills. Unfortunately, Most
-                certificate platforms only make use of publicly accessible information with little
-                to no consideration for sensitive and personal data held within. With secretNFT
-                Certificates you will be able to make finetune your usage of public and private data
-                to perfectly meet your needs. Use-cases include: events, education, manufacturing,
-                space, military and more!{' '}
-              </p>
-            </Row>
-          </div>
+        <Container style={{ paddingLeft: '0.75rem' }}>
+          <Row className="justify-content-around" style={{ marginBottom: '3rem' }}>
+            <Col md="5">
+              <Row>
+                <Col md="2">
+                  <StepNumber>1.</StepNumber>
+                </Col>
+                <Col md="10">
+                  <div>
+                    <p className={`${styles.guideStep}`}>Login with Keplr Wallet</p>
+                    <p className={styles.keplrSupports}>(supported on Chrome/Brave browsers)</p>
+                    <CUButton btnStyle="square" style={{ color: '#000', width: '50%' }}>
+                      Get Keplr
+                    </CUButton>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <Image className="mt-3" src={connectImg} fluid />
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+            <Col md="5">
+              <Row style={{ height: '50%' }}></Row>
+              <Row style={{ height: '50%' }}>
+                <Col md="2">
+                  <StepNumber>2.</StepNumber>
+                </Col>
+                <Col md="10">
+                  <p className={`${styles.guideStep} mb-4`}>Create a new certificate project</p>
+                  <Image src={stepsImg} fluid />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+          <Row className="justify-content-around">
+            <Col md="5">
+              <Row>
+                <Col md="2">
+                  <StepNumber>3.</StepNumber>
+                </Col>
+                <Col md="10">
+                  <div>
+                    <p className={`${styles.guideStep}`}>
+                      Insert all relevant information for the secretNFT Certificate
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <Image className="mt-3" src={step3Img} fluid />
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+            <Col md="5">
+              <Row style={{ height: '50%' }}></Row>
+              <Row style={{ height: '50%' }}>
+                <Col md="2">
+                  <StepNumber>4.</StepNumber>
+                </Col>
+                <Col md="10">
+                  <p className={`${styles.guideStep} mb-4`}>
+                    Select the amount of certificates and proceed to payment
+                  </p>
+                  <Image src={step4Img} fluid />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
         </Container>
 
         <Spacer height={150} />
-
-        <Container>
-          <span className={styles.aboutSubtitle}>Team</span>
-        </Container>
-
-        <Container>
-          <span className={styles.aboutSubtitle}>Product</span>
-          <p className={styles.productText}>
-            The product works on a SNIP-721 smart contract technology provided by Secret Network.
-            Having the possibility to have private and public meta-data enables any industry to
-            easily setup the certificate as a non-fungible token and issue to the relevant party.
-          </p>
-        </Container>
-
-        <Spacer height={130} />
-
-        <Container>
-          <Image src={exampleCert} fluid />
-        </Container>
-
-        <Spacer height={135} />
-
-        <Container>
-          <span className={styles.aboutSubtitle}>Use-cases</span>
-          <p className={styles.productText}>
-            Many schools, educational events and manufacturing sectors are facing the reality of
-            tracking issued certificates and proof of certification from that particular industry.
-            The secretNFT Certificate resolves the consensus side between the issuer with real-time
-            track recording, for the certificate receiver can easily proof the certificate and
-            verification.
-          </p>
-
-          <CUButton>Get Started</CUButton>
-        </Container>
       </Layout>
     </>
   );

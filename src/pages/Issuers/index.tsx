@@ -1,5 +1,5 @@
 // import styles from "./styles.module.scss"
-import { CUButton, CUButtonDark, Spacer } from '../../components';
+import { CUButton, Spacer } from '../../components';
 import Layout from '../../components/Layout';
 import CertUpButton from '../../components/CUButton';
 import Container from 'react-bootstrap/Container';
@@ -10,36 +10,85 @@ import styles from './styles.module.scss';
 import exampleCert from '../../assets/ExampleCert.svg';
 import { useWallet } from '../../contexts';
 import ConnectBanner from '../../components/ConnectBanner';
-import ProjectList from '../../components/ProjectList';
-import { useState } from 'react';
-import ProjectForm from '../../components/ProjectForm';
-import { Project } from '../../interfaces';
+import ProjectList from '../../components/Issuers/ProjectList';
+import { useEffect, useState } from 'react';
+import ProjectForm from '../../components/Issuers/ProjectForm';
+import Project from '../../interfaces/Project';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { PreviewProvider } from '../../contexts/PreviewContext';
+import ProjectReview from '../ProjectReview';
+import ReviewViewer from '../../components/ReviewViewer';
+import { RestrictedAccess } from '../../components/RestrictedAccess';
+import { useIssuer } from '../../contexts/IssuerContext';
 
 export default function Issuers() {
   const [showProject, setShowProject] = useState(false);
-  const [projectInfo, setProjectInfo] = useState<Project | undefined>();
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
+  //const [projectInfo, setProjectInfo] = useState<Project | undefined>();
+  const [projectId, setProjectId] = useState<string>();
+  const [projectStep, setProjectStep] = useState();
+  const {
+    Client,
+    ClientIsSigner,
+    Wallet,
+    Address,
+    LoginToken,
 
-  const setProject = (project: Project) => {
-    //convert issue date string from DB into Date
-    if (project.issue_date) project.issue_date = new Date(project.issue_date);
+    QueryPermit,
+  } = useWallet();
+  const { VerifiedIssuer, LoadingRemainingCerts } = useIssuer();
 
-    // convert participant dob strings from DB to Date
-    for (let i = 0; i < project.participants.length; i++) {
-      if (project.participants[i].dob)
-        project.participants[i].dob = new Date(project.participants[i].dob || '');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = `CertUP`;
+  }, []);
+
+  useEffect(() => {
+    processReturn();
+  }, []);
+
+  const processReturn = async () => {
+    console.log('Issuers Page passed State', location.state);
+    if (location.state?.projectId) {
+      if (location.state?.step) setProjectStep(location.state?.step);
+      if (location.state?.show) setShowProject(true);
+
+      //const project = await getProject(location.state?.projectId);
+      console.log('projectId', location.state?.projectId);
+      setProjectId(location.state?.projectId);
     }
+  };
 
-    setProjectInfo(project);
+  const getProject = async (projectId: string): Promise<Project> => {
+    console.log('running', LoginToken, Address);
+    const token = `Permit ${JSON.stringify(LoginToken)}`;
+    const url = new URL(`/projects/${projectId}`, process.env.REACT_APP_BACKEND);
+    const response = await axios.get(url.toString(), {
+      headers: {
+        Authorization: token,
+      },
+    });
+    console.log(response);
+    return response.data.data;
+  };
+
+  const setProject = (projectId?: string) => {
+    setProjectId(projectId);
     setShowProject(true);
   };
 
+  const setReview = (projectId?: string) => {
+    navigate(`/issuers/review/${projectId}`, { state: { projectId: projectId } });
+  };
+
   const showList = () => {
-    setProjectInfo(undefined);
+    setProjectId(undefined);
     setShowProject(false);
   };
 
-  if (!Wallet || !Address || !LoginToken)
+  if (!Wallet || !Address || !QueryPermit || (VerifiedIssuer && !LoginToken))
     return (
       <>
         <Layout>
@@ -47,27 +96,52 @@ export default function Issuers() {
 
           <Container>
             <Row>
-              <span className={styles.aboutTitle}>For Issuers</span>
+              <span className={styles.aboutTitle}>Issue Certificate</span>
             </Row>
           </Container>
           <Spacer height={50} />
 
-          <ConnectBanner />
+          <ConnectBanner text="Connect a wallet to start issuing certifificates." issuer={true} />
 
           <Spacer height={150} />
         </Layout>
       </>
     );
-  return (
-    <>
+
+  if (!VerifiedIssuer && !LoadingRemainingCerts)
+    return (
+      <>
+        <Layout>
+          <Spacer height={100} />
+
+          <Container>
+            <Row>
+              <span className={styles.aboutTitle}>Issue Certificate</span>
+            </Row>
+          </Container>
+          <Spacer height={50} />
+
+          <RestrictedAccess />
+
+          <Spacer height={150} />
+        </Layout>
+      </>
+    );
+
+  if (showProject)
+    return (
       <Layout>
         <Spacer height={100} />
-        {showProject ? (
-          <ProjectForm projectInfo={projectInfo} backHandler={showList} />
-        ) : (
-          <ProjectList setProject={setProject} />
-        )}
+        <PreviewProvider>
+          <ProjectForm pid={projectId} backHandler={showList} step={projectStep} />
+        </PreviewProvider>
       </Layout>
-    </>
+    );
+
+  return (
+    <Layout>
+      <Spacer height={100} />
+      <ProjectList setProjectIdForm={setProject} setProjectIdReview={setReview} />
+    </Layout>
   );
 }

@@ -1,56 +1,119 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ReactElement, ReactNode, useState } from 'react';
-import { useItem } from '../../contexts';
+import { ReactElement, useEffect, useState } from 'react';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 import logo from './keplrLogo.svg';
 import { toast } from 'react-toastify';
 
-import { useGlobalState } from '../../state';
-import { EncryptionUtils, SecretNetworkClient, Wallet } from 'secretjs';
+import { useCookies } from 'react-cookie';
+
+import { SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
-import { getErrorMessage, reportError } from '../../utils/helpers';
-import getLoginPermit, { LoginToken } from '../../utils/loginPermit';
+import {
+  getErrorMessage,
+  numDaysBetween,
+  reportError,
+  sleep,
+  suggestTestnet,
+} from '../../utils/helpers';
+import { getCachedLoginToken, getCachedQueryPermit, isExpired } from '../../utils/loginPermit';
+import Dropdown from 'react-bootstrap/Dropdown';
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-export interface KeplrWindow extends Window {
-  keplr: any;
-  getEnigmaUtils(_: string): EncryptionUtils;
-  getOfflineSigner(): Wallet;
-  getOfflineSignerOnlyAmino(_: string): Wallet;
-  enable(_: string): Function;
-  getAccounts(): Function;
-}
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
-// declare interface Date {
-//   addHours(h: number): Date;
-// }
+import { useNavigate } from 'react-router-dom';
+import { ButtonProps } from 'react-bootstrap';
+import { useIssuer } from '../../contexts/IssuerContext';
 
-// Date.prototype.addHours = function(h: number) {
-//   this.setTime(this.getTime() + (h*60*60*1000));
-//   return this;
-// }
+type DivProps = JSX.IntrinsicElements['div'];
 
-const addHours = (date: Date, hours: number): Date => {
-  date.setTime(date.getTime() + hours * 60 * 60 * 1000);
-  return date;
+// eslint-disable-next-line react/display-name
+const CustomMenu = React.forwardRef<HTMLDivElement, DivProps>((props, ref) => {
+  // eslint-disable-next-line react/prop-types
+  const { children, style, className, 'aria-labelledby': labeledBy } = props;
+
+  return (
+    <div ref={ref} style={{ width: '100%' }} className="d-flex justify-content-end">
+      <div style={style} className={className} aria-labelledby={labeledBy}>
+        <ul className="list-unstyled mb-1">
+          {React.Children.toArray(children).map((child) => child)}
+          {/* {React.Children.toArray(children).filter(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-ignore
+          (child) => !value || child.props.children.toLowerCase().startsWith(value),
+        )} */}
+        </ul>
+      </div>
+    </div>
+  );
+});
+
+const handleCopy = async (address: string) => {
+  navigator.clipboard.writeText(address);
+  toast.success(`Address copied to clipboard.`, {
+    autoClose: 1500,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+  });
 };
-
-declare let window: KeplrWindow;
 
 const truncateAddress = (address: string) => {
   return `secret1...${address.substring(address.length - 7)}`;
 };
 
-export default function KeplrButton(): ReactElement {
-  const { Address, updateClient } = useWallet();
+interface KeplrButtonProps {
+  // Determines if the button will attempt to autoconnect if a recent logon cookie is found.
+  autoConnect?: boolean;
+}
+
+export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactElement {
+  const { Address, updateClient, toggleLoginModal } = useWallet();
+  const { IssuerProfile } = useIssuer();
   const [loading, setLoading] = useState(false);
 
-  //const [secretJs, setSecretJs] = useGlobalState('secretJs');
-  //const [acctAddr, setAcctAddr] = useGlobalState('walletAddress');
-  //const [isSigner, setIsSigner] = useGlobalState('isSigner');
+  const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr', 'IssuerLogin']);
+
+  const navigate = useNavigate();
+
+  // eslint-disable-next-line react/display-name
+  const CustomToggle = React.forwardRef<HTMLButtonElement, ButtonProps>(
+    // eslint-disable-next-line react/prop-types
+    ({ onClick }, ref) => (
+      <button className={styles.keplrButton} onClick={onClick} ref={ref}>
+        <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
+        <span>{truncateAddress(Address)}</span>
+        <FontAwesomeIcon icon={faAngleDown} style={{ paddingLeft: '.5rem' }} />
+      </button>
+    ),
+  );
+
+  useEffect(() => {
+    if (!autoConnect) return;
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(100);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(300);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      sleep(500);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
+      return;
+
+    if (cookies.ConnectedKeplr) {
+      if (
+        numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) <
+        15 /* && getCachedQueryPermit(Address) */
+      ) {
+        handleConnect();
+      }
+    }
+  }, [window.keplr]);
 
   const handleConnect = async () => {
+    if (loading) return;
     try {
+      console.log('Connecting to Keplr');
       setLoading(true);
       if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
         toast.error('Keplr Extension Not Found');
@@ -58,9 +121,10 @@ export default function KeplrButton(): ReactElement {
         return;
       }
 
-      await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
+      if (process.env.REACT_APP_CHAIN_ID.includes('pulsar')) await suggestTestnet();
+      await window.keplr.enable(process.env.REACT_APP_CHAIN_ID as string);
 
-      const keplrOfflineSigner: Wallet = window.getOfflineSignerOnlyAmino(
+      const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
         process.env.REACT_APP_CHAIN_ID as string,
       );
       const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
@@ -73,11 +137,60 @@ export default function KeplrButton(): ReactElement {
         encryptionUtils: window.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
       });
 
-      const issueDate = new Date();
-      const expDate = addHours(new Date(), 12);
-      const token: LoginToken = await getLoginPermit(myAddress, issueDate, expDate);
+      //check for QUERY permit from storage, use modal if it isnt there
+      const cachedPermit = getCachedQueryPermit(myAddress);
+      console.log('Permit', cachedPermit);
+      if (!cachedPermit) {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+        });
+        toggleLoginModal('true');
+        setLoading(false);
+        return; //modal will handle the rest
+      }
 
-      await updateClient(secretjs, keplrOfflineSigner, myAddress, token);
+      //check for LOGIN permit from storage
+      const cachedToken = getCachedLoginToken(myAddress);
+      if (cachedToken && !isExpired(cachedToken)) {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+          permit: cachedPermit,
+          token: cachedToken,
+        });
+      } else {
+        updateClient({
+          client: secretjs,
+          wallet: keplrOfflineSigner as Wallet,
+          address: myAddress,
+          permit: cachedPermit,
+        });
+      }
+
+      setCookie('ConnectedKeplr', new Date().toISOString(), { path: '/' });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      reportError({ message: getErrorMessage(error) });
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+      if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+        toast.error('Keplr Extension Not Found');
+        setLoading(false);
+        return;
+      }
+
+      updateClient({ force: true });
+      removeCookie('ConnectedKeplr', { path: '/' });
+      removeCookie('IssuerLogin', { path: '/' });
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -85,18 +198,57 @@ export default function KeplrButton(): ReactElement {
     }
   };
 
+  const handleProfile = () => {
+    navigate('/profile');
+  };
+
   //const { Items } = useItem();
   //console.log(Items);
+  // return loading ? (
+  //   <button className={styles.keplrButton} style={{ cursor: 'wait' }}>
+  //     <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
+  //     <span>Connecting Keplr</span>
+  //   </button>
+  // ) : Address ? (
+  //   <button className={styles.keplrButton} style={{ cursor: 'default' }}>
+  //     <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
+  //     <span>{truncateAddress(Address)}</span>
+  //   </button>
+  // ) : (
+  //   <button className={styles.keplrButton} onClick={() => handleConnect()}>
+  //     <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
+  //     <span>Connect to Keplr!</span>
+  //   </button>
+  // );
   return loading ? (
     <button className={styles.keplrButton} style={{ cursor: 'wait' }}>
       <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
-      <span>Connecting Keplr</span>
+      <span>Loading Keplr</span>
     </button>
   ) : Address ? (
-    <button className={styles.keplrButton} style={{ cursor: 'default' }}>
-      <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
-      <span>{truncateAddress(Address)}</span>
-    </button>
+    // <DropdownButton className={styles.keplrButton} style={{ cursor: 'default' }}>
+    //   <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />
+    //   <span>{truncateAddress(Address)}</span>
+    // </DropdownButton>
+    <Dropdown>
+      <Dropdown.Toggle as={CustomToggle} id="dropdown-custom-components">
+        Custom toggle
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu align="end" as={CustomMenu} className="text-center">
+        <Dropdown.Item eventKey="1" onClick={() => handleCopy(Address)}>
+          Copy Wallet Address
+        </Dropdown.Item>
+        {IssuerProfile ? (
+          <Dropdown.Item eventKey="2" onClick={() => handleProfile()}>
+            Issuer Profile
+          </Dropdown.Item>
+        ) : null}
+        <Dropdown.Item eventKey="3" onClick={() => handleLogout()}>
+          Logout
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   ) : (
     <button className={styles.keplrButton} onClick={() => handleConnect()}>
       <img src={logo} alt="Keplr Wallet" className={styles.keplrLogo} />

@@ -1,5 +1,4 @@
 import { ReactElement, ReactNode } from 'react';
-import { useItem } from '../../contexts';
 // import cn from 'classnames';
 import styles from './styles.module.scss';
 
@@ -8,13 +7,13 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function CUButtonDark({ children, disabled = false }: Props): ReactElement {
-  const { Items } = useItem();
-  console.log(Items);
+// export default function CUButtonDark({ children, disabled = false }: Props): ReactElement {
+//   const { Items } = useItem();
+//   console.log(Items);
 
-  return (
-    <button disabled={disabled} className={styles.certupBtn}>
-      {children}
-    </button>
-  );
-}
+//   return (
+//     <button disabled={disabled} className={styles.certupBtn}>
+//       {children}
+//     </button>
+//   );
+// }
