@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
+import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Button from '../CUButton';
 import KeplrButton from '../KeplrButton';
