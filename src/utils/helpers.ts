@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { ProjectToken } from '../interfaces/manager';
+import { Issuer, IssuerData, ProjectToken } from '../interfaces/manager';
 import Project, { Participant, CertInfo, RenderProps } from '../interfaces/Project';
 import { CertupExtension } from '../interfaces/common/token.interface';
 import * as XLSX from 'xlsx';
@@ -72,6 +72,7 @@ export const participantToExtensions = (
   participant: Participant,
   certInfo: CertInfo,
   renderProps: RenderProps,
+  issuerProfile: Issuer,
   hashPair?: UploadResponse,
 ) => {
   const pubMeta: CertupExtension = {
@@ -94,10 +95,10 @@ export const participantToExtensions = (
       date_of_birth: participant.dob?.toISOString(),
     },
     issuing_organizations: [
-      {
-        name: renderProps.companyName,
-        //url: 'https://cfi.org',
-      },
+      // {
+      //   name: renderProps.companyName,
+      //   //url: 'https://cfi.org',
+      // },
     ],
     issuing_individuals: [
       {
@@ -117,6 +118,7 @@ export const participantToExtensions = (
     //     name: 'Jane Smith',
     //   },
     // ],
+    additions: certInfo.additions,
     attributes: [
       {
         trait_type: 'Certificate Number',
@@ -146,10 +148,24 @@ export const participantToExtensions = (
     protected_attributes: [],
   };
 
+  if (issuerProfile.name)
+    privMeta.issuing_organizations?.push({
+      name: issuerProfile.name,
+      url: issuerProfile.website,
+    });
+  else if (renderProps.companyName)
+    privMeta.issuing_organizations?.push({
+      name: renderProps.companyName,
+    });
+
   return { pubMeta, privMeta };
 };
 
-export const projectToPreload = (project: Project, hashes?: UploadResponse[]): ProjectToken[] => {
+export const projectToPreload = (
+  project: Project,
+  issuerProfile: Issuer,
+  hashes?: UploadResponse[],
+): ProjectToken[] => {
   const response: ProjectToken[] = [];
 
   for (let i = 0; i < project.participants.length; i++) {
@@ -159,6 +175,7 @@ export const projectToPreload = (project: Project, hashes?: UploadResponse[]): P
       participant,
       project.certInfo,
       project.renderProps,
+      issuerProfile,
       hashes && hashes.length ? hashes[i] : undefined,
     );
 

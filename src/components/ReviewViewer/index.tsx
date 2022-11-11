@@ -131,10 +131,11 @@ export default function ReviewViewer({ pid, step, hashes, pData, meta = false }:
     if (pData) projectData = pData;
     else projectData = findProject(pid);
     if (!projectData) throw new Error('Couldnt find project data.');
+    if (!IssuerProfile) throw new Error('Issuer Profile not loaded.');
 
     setProjectInfo(projectData);
     if (step === 'preload') {
-      const mintedInfo = projectToPreload(projectData, hashes);
+      const mintedInfo = projectToPreload(projectData, IssuerProfile, hashes);
       setMintedInfo(mintedInfo);
     } else {
       const overview = findMintedProject(pid);

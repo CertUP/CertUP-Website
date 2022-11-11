@@ -4,6 +4,7 @@ import { NftDossier } from '../../interfaces/721';
 import ReactJson from 'react-json-view';
 
 import styles from './styles.module.scss';
+import { Addition } from '../../interfaces/common/token.interface';
 
 interface MRProps {
   cert: NftDossier;
@@ -114,6 +115,48 @@ export default function MetadataRow({ cert }: MRProps) {
               ) : null}
             </ul>
           </Col>
+          {cert.private_metadata.extension.additions &&
+            cert.private_metadata.extension.additions.length && (
+              <Col md={6}>
+                <h4>Additional Details</h4>
+                <Row>
+                  {cert.private_metadata.extension.additions?.map(
+                    (item: Addition, index: number) => {
+                      return (
+                        <Col xs="auto" key={`${item.addition_type}-${index}`}>
+                          <ul>
+                            <li>
+                              <b>{item.addition_type}</b>
+                            </li>
+                            {!!item.value && <li>{item.value}</li>}
+                            {!!item.individual && (
+                              <>
+                                <li>{item.individual.name}</li>
+                                {!!item.individual.title && <li>{item.individual.title}</li>}
+                                {!!item.individual.company && <li>{item.individual.company}</li>}
+                              </>
+                            )}
+                            {!!item.organization && (
+                              <>
+                                <li>{item.organization.name}</li>
+                                {!!item.organization.url && <li>{item.organization.url}</li>}
+                                {!!item.organization.address && (
+                                  <li>{item.organization.address}</li>
+                                )}
+                              </>
+                            )}
+
+                            {!!item.details && <li>{item.details}</li>}
+
+                            {/* {item. ? <li>{item.address}</li> : null} */}
+                          </ul>
+                        </Col>
+                      );
+                    },
+                  )}
+                </Row>
+              </Col>
+            )}
         </Row>
         <Row>
           <h4 className="mb-0">Raw Metadata</h4>

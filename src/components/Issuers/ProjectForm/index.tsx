@@ -520,6 +520,7 @@ export default function ProjectForm({ pid, step, backHandler }: FormProps) {
   const changeInstructor = async (index: number, field: InstructorFields, value?: string) => {
     const newAry = [...certInfo.additions];
     const addition = newAry[index];
+    addition.addition_type = 'Instructor';
     const individual: IssuingIndividual = addition.individual || { name: '' };
     switch (field) {
       case 'name':

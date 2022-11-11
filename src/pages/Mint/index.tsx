@@ -23,6 +23,7 @@ import ReviewViewer from '../../components/ReviewViewer';
 //@ts-ignore
 import textEncoding from 'text-encoding';
 import CopyButton from '../../components/CopyButton';
+import { useIssuer } from '../../contexts/IssuerContext';
 const TextDecoder = textEncoding.TextDecoder;
 
 const claimUrl = `${window.location.protocol}//${window.location.host}/claim/`;
@@ -30,6 +31,7 @@ const claimUrl = `${window.location.protocol}//${window.location.host}/claim/`;
 interface ButtonProps {
   backHandler: () => void;
 }
+
 function BackButton({ backHandler }: ButtonProps) {
   return (
     <div
@@ -70,6 +72,7 @@ export interface UploadResponse {
 
 export default function Mint() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken, ProcessingTx } = useWallet();
+  const { IssuerProfile } = useIssuer();
   const {
     findProject,
     LoadingPendingProjects,
@@ -178,6 +181,7 @@ export default function Mint() {
       if (!project) throw new Error('Project Data Not Found');
       if (!project._id) throw new Error('Project ID Not Found'); // todo handle this better (save and get ID)
       if (!imageHashes.length) throw new Error('Images Not Generated');
+      if (!IssuerProfile) throw new Error('Issuer Profile Not Loaded');
 
       if (project.participants.length > 100) {
         toast.error(
@@ -195,6 +199,7 @@ export default function Mint() {
             participant,
             project.certInfo,
             project.renderProps,
+            IssuerProfile,
             imageHashes[i],
           );
 
