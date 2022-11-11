@@ -198,7 +198,12 @@ export default function Payment() {
               </Row>
             </>
           ) : (
-            <PaymentRow num_certs={numToPurchase} editable={false} onPaid={callback} />
+            <>
+              <Row className="text-center">
+                <h4>Purchasing {numToPurchase} Certificate Credits</h4>
+              </Row>
+              <PaymentRow num_certs={numToPurchase} editable={false} onPaid={callback} />
+            </>
           )}
         </Container>
       </Layout>

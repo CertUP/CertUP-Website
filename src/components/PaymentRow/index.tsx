@@ -20,6 +20,7 @@ import CUSelectButton from '../CUSelectButton';
 import styles from './styles.module.scss';
 import CUSpinner from '../CUSpinner';
 import { useIssuer } from '../../contexts/IssuerContext';
+import { Prices } from '../../interfaces/common/common.inteface';
 
 export interface Confirmation {
   string: string;
@@ -32,18 +33,38 @@ interface PRProps {
   onPaid?: (confirmation: Confirmation) => void;
 }
 
+const getPriceUsd = (priceList: Prices[], numCerts: number) => {
+  return Math.min(
+    ...priceList.filter((prices) => prices.minCerts <= numCerts).map((o) => o.priceUsd),
+  );
+};
+
+const getPriceScrt = (priceList: Prices[], numCerts: number) => {
+  // return Math.min(
+  //   ...priceList.filter((prices) => prices.minCerts <= numCerts).map((o) => o.priceuScrt),
+  // );
+  const availablePrices = priceList.filter((prices) => prices.minCerts <= numCerts);
+  const bestPrice = availablePrices.reduce((max, price) =>
+    max.priceuScrt < price.priceuScrt ? max : price,
+  );
+  return bestPrice;
+};
+
 export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: PRProps) {
   const { Address, LoginToken } = useWallet();
 
   const [numCerts, setNumCerts] = useState<number>(num_certs);
 
-  const [certPriceSCRT, setCertPriceSCRT] = useState(0);
+  //const [certPriceSCRT, setCertPriceSCRT] = useState(0);
   const [totaluSCRT, setTotaluSCRT] = useState<number>(0);
   const [sScrtBalance, setSScrtBalance] = useState(0);
   const [scrtBalance, setScrtBalance] = useState(0);
   const [payWithSSCRT, setPayWithSSCRT] = useState(false);
 
-  const [certPriceUSD, setCertPriceUSD] = useState(0);
+  const [coupon, setCoupon] = useState<string>();
+
+  //const [certPriceUSD, setCertPriceUSD] = useState(0);
+  const [priceList, setPriceList] = useState();
   const [totalUSD, setTotalUSD] = useState<number>(0);
   const [chargeId, setChargeId] = useState<string>();
 
@@ -65,46 +86,46 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
   }, [num_certs]);
 
   useEffect(() => {
-    if (!numCerts) return;
+    if (!numCerts || !priceList) return;
     calculateTotalUSD(numCerts);
-  }, [numCerts, certPriceUSD]);
-
-  useEffect(() => {
-    if (!numCerts) return;
     calculateTotalSCRT(numCerts);
-  }, [numCerts, certPriceSCRT]);
+  }, [numCerts, priceList]);
 
   useEffect(() => {
     getCharge(numCerts);
   }, [totalUSD]);
 
   const init = async () => {
-    getPriceUSD();
-    getPriceSCRT();
+    getPriceList();
+    // setPriceSCRT();
     checkSSCRT();
   };
 
-  const getPriceUSD = async () => {
+  const getPriceList = async () => {
     const url = new URL('/payment', process.env.REACT_APP_BACKEND).toString();
     const {
-      data: { usd_price_cents },
+      data: { price_list },
     } = await axios.get(url);
-    console.log('USD Price Cents', usd_price_cents);
-    setCertPriceUSD(usd_price_cents);
-    return usd_price_cents;
+    console.log('PriceList', price_list);
+    setPriceList(price_list);
+    return price_list;
   };
 
-  const getPriceSCRT = async () => {
-    const price = await queryCertPrice();
-    console.log('sSCRT Price uSCRT', price);
-    setCertPriceSCRT(price);
-  };
+  // const setPriceSCRT = async () => {
+  //   const price = await queryCertPrice();
+  //   console.log('sSCRT Price uSCRT', price);
+  //   setCertPriceSCRT(price);
+  // };
 
   const calculateTotalSCRT = (_numCerts: number) => {
-    const price = certPriceSCRT; //uscrt
-    const total = price * _numCerts;
+    if (!priceList) return;
+    const price = getPriceScrt(priceList, _numCerts);
+    console.log(price);
+    // const price = certPriceSCRT; //uscrt
+    const total = price.priceuScrt * _numCerts;
     setTotaluSCRT(total);
     setNumCerts(_numCerts);
+    setCoupon(price.coupon);
   };
 
   const checkSSCRT = async () => {
@@ -117,9 +138,11 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
     setScrtBalance(scrtBal);
   };
 
-  const calculateTotalUSD = (_numCerts: number, price?: number) => {
+  const calculateTotalUSD = (_numCerts: number) => {
+    if (!priceList) return;
+    const price = getPriceUsd(priceList, _numCerts);
     //_numCerts = _numCerts.replace(/\D/g, '');
-    if (!price) price = certPriceUSD;
+    //if (!price) price = certPriceUSD;
     const total = price * _numCerts; //cents
     setTotalUSD(total);
     setNumCerts(_numCerts);
@@ -179,9 +202,9 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
 
       let response;
       if (payWithSSCRT) {
-        response = await paySSCRT(numCerts, totaluSCRT.toString(), toastRef);
+        response = await paySSCRT({ numCerts, amount: totaluSCRT.toString(), toastRef, coupon });
       } else {
-        response = await paySCRT(numCerts, totaluSCRT.toString());
+        response = await paySCRT({ numCerts, amount: totaluSCRT.toString(), coupon });
       }
       console.log(response);
 
@@ -220,9 +243,6 @@ export default function PaymentRow({ num_certs = 0, editable = true, onPaid }: P
 
   return (
     <>
-      <Row className="text-center">
-        <h4>Purchasing {numCerts} Certificate Credits</h4>
-      </Row>
       <Row>
         <Col xs={12} sm={6} className="d-flex flex-column">
           <Row className="text-center my-4 justify-content-center">

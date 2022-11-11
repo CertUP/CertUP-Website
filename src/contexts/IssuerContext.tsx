@@ -89,7 +89,7 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
     const interval = setInterval(() => {
       console.log('Checking for credits...', QueryPermit);
       refreshCredits(QueryPermit);
-    }, 10_000);
+    }, 30_000);
     setRefreshInterval(interval);
     return () => clearInterval(interval);
   }, [QueryPermit]);

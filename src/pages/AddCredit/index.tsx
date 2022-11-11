@@ -20,6 +20,7 @@ import { Form } from 'react-bootstrap';
 import { Tx } from 'secretjs';
 import { toast } from 'react-toastify';
 import { ProgressBar } from '../../components';
+import PaymentRow from '../../components/PaymentRow';
 
 export default function AddCredit() {
   const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
@@ -41,7 +42,7 @@ export default function AddCredit() {
     console.log('running effect');
     console.log(location.state);
 
-    calculateTotal(location.state?.num_certificates.toString() || '0');
+    calculateTotal(location.state?.num_certificates.toString() || '10');
     getPaymentAddress();
 
     // if (location.state?.projectId)
@@ -130,26 +131,11 @@ export default function AddCredit() {
 
         <Container>
           <Row>
-            <span className={styles.aboutTitle}>Payment</span>
+            <span className={styles.aboutTitle}>Purchase Certificate Credits</span>
           </Row>
         </Container>
-        <ProgressBar step={2} />
         <Spacer height={50} />
         <Container>
-          <Row className="justify-content-center">
-            <Col xs={'auto'}>
-              <span className={styles.payInFont}>Pay in SCRT</span>
-            </Col>
-          </Row>
-          <Row className="justify-content-center" style={{ marginBottom: '25px' }}>
-            <Col xs={'auto'}>
-              <button className={styles.cancelBtn} onClick={handleCancel}>
-                Cancel
-              </button>
-            </Col>
-          </Row>
-          <hr />
-
           <Row className="justify-content-center">
             <Col xs="6">
               <Form>
@@ -171,35 +157,11 @@ export default function AddCredit() {
                     />
                   </Col>
                 </Form.Group>
-                <Form.Group
-                  as={Row}
-                  className="mb-3 justify-content-center"
-                  controlId="formHorizontalEmail"
-                >
-                  <Form.Label column sm={4}>
-                    Total
-                  </Form.Label>
-                  <Col sm={4}>
-                    <Form.Control
-                      required
-                      value={totalString}
-                      disabled={true}
-                      type="text"
-                      placeholder="123"
-                    />
-                  </Col>
-                </Form.Group>
-
-                <Row className="justify-content-center">
-                  <Col md="7">
-                    <CUButton disabled={false} fill={true} onClick={handlePayment}>
-                      Pay with Keplr Wallet
-                    </CUButton>
-                  </Col>
-                </Row>
               </Form>
             </Col>
           </Row>
+          <hr />
+          <PaymentRow num_certs={parseInt(numCerts || '0', 10)} />
         </Container>
       </Layout>
     </>

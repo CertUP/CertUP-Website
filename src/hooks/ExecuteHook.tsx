@@ -335,7 +335,17 @@ export default function useExecute() {
     return response as ComputeTx;
   };
 
-  const paySSCRT = async (numCerts: number, amount: string, toastRef: any): Promise<ComputeTx> => {
+  const paySSCRT = async ({
+    numCerts,
+    amount,
+    toastRef,
+    coupon,
+  }: {
+    numCerts: number;
+    amount: string;
+    toastRef: any;
+    coupon?: string;
+  }): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -345,6 +355,7 @@ export default function useExecute() {
     const addCertsMsg = {
       add_certs: {
         purchased_certs: numCerts.toString(),
+        coupon_code: coupon,
       },
     };
 
@@ -374,7 +385,15 @@ export default function useExecute() {
     return response as ComputeTx;
   };
 
-  const paySCRT = async (numCerts: number, amount: string): Promise<ComputeTx> => {
+  const paySCRT = async ({
+    numCerts,
+    amount,
+    coupon,
+  }: {
+    numCerts: number;
+    amount: string;
+    coupon?: string;
+  }): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -399,6 +418,7 @@ export default function useExecute() {
     const addCertsMsg = {
       add_certs: {
         purchased_certs: numCerts.toString(),
+        coupon_code: coupon,
       },
     };
 
