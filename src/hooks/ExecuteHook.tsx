@@ -787,7 +787,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(approveMsg, 135000, toastRef);
+    const response = await executeNft(approveMsg, 150_000, toastRef);
     return response;
   };
 
@@ -802,7 +802,7 @@ export default function useExecute() {
       },
     };
 
-    const response = await executeNft(removeMsg, 135000, toastRef);
+    const response = await executeNft(removeMsg, 150_000, toastRef);
     return response;
   };
 
