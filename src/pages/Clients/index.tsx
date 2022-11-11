@@ -53,8 +53,8 @@ export default function Clients() {
                 <Row>
                   <p className={styles.aboutInfoText38}>
                     Upgrade your certificates to keep pace with your rapidly evolving field. The
-                    digital age is making else more convenient, but certification and important
-                    documents systems have remained shackled to the past, creating serious
+                    digital age is making everything else more convenient, but certification and
+                    document systems have remained shackled to the past, creating serious
                     bottlenecks for all of us. Our mission is to break those shackles, bringing
                     these items into the digital age without sacrificing security.
                   </p>
