@@ -3,14 +3,26 @@ import ReactDOM from 'react-dom';
 import './global/index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { CookiesProvider } from "react-cookie";
+import { CookiesProvider } from 'react-cookie';
+import LogRocket from 'logrocket';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-ignore
+import setupLogRocketReact from 'logrocket-react';
 
+LogRocket.init('zo1brw/certup', {
+  shouldCaptureIP: false,
+  dom: {
+    //textSanitizer: true,
+    inputSanitizer: true,
+  },
+});
 
+setupLogRocketReact(LogRocket);
 
 ReactDOM.render(
   <React.StrictMode>
     <CookiesProvider>
-    <App />
+      <App />
     </CookiesProvider>
   </React.StrictMode>,
   document.getElementById('root'),

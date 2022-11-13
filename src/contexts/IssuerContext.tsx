@@ -5,6 +5,7 @@ import { Issuer, IssuerDataResponse } from '../interfaces/manager';
 import { IssuerDataQueryMsg } from '../utils/queries';
 import { queryManagerContract, queryOldManagerContract } from '../utils/queryWrapper';
 import { useWallet } from './WalletContext';
+import LogRocket from 'logrocket';
 
 export interface IssuerContextState {
   RemainingCerts: number;
@@ -174,6 +175,17 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
       setRemainingCerts(result);
       setVerifiedIssuer(true);
       setLoadingRemainingCerts(false);
+
+      // Identify user for LogRocket
+      const fields: any = {};
+      if (response.issuer_data.issuer.name) fields.name = response.issuer_data.issuer.name;
+      if (response.issuer_data.issuer.verified_name)
+        fields.verified_name = response.issuer_data.issuer.verified_name;
+      LogRocket.identify(Address, {
+        ...fields,
+        verified: response.issuer_data.issuer.verified,
+      });
+
       return result;
     } catch (error: any) {
       console.error(error);

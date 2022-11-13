@@ -279,7 +279,10 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
                         style={{ marginBottom: '.15rem' }}
                       >
                         <Col xs={8}>
-                          <span style={{ fontSize: '.9rem', fontFamily: 'Andale Mono, monospace' }}>
+                          <span
+                            style={{ fontSize: '.9rem', fontFamily: 'Andale Mono, monospace' }}
+                            data-private
+                          >
                             {wl.code}
                           </span>
                         </Col>
@@ -321,6 +324,7 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
                         <Col xs={8}>
                           <span
                             style={{ fontSize: '.75rem', fontFamily: 'Andale Mono, monospace' }}
+                            data-private
                           >
                             {wl.address}
                           </span>
@@ -351,7 +355,9 @@ export default function AllowModal({ show, setShow, tokenId, metadata }: props) 
             <h5 className="mb-1 d-inline">Access URL</h5>
             <CopyButton text={accessUrl} />
             <br />
-            <span className={`${styles.accessText} mx-2`}>{accessUrl}</span>
+            <span className={`${styles.accessText} mx-2`} data-private>
+              {accessUrl}
+            </span>
           </Col>
           <Col xs="auto" className="px-0">
             <Button variant="secondary" onClick={handleClose}>

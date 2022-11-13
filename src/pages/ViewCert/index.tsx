@@ -511,7 +511,7 @@ export default function ViewCert() {
                         </h5>
                         <CopyButton text={accessUrl} />
                         <br />
-                        <p className={`${styles.accessText} ${styles.certLink} mx-2`}>
+                        <p className={`${styles.accessText} ${styles.certLink} mx-2`} data-private>
                           {accessUrl}
                         </p>
                       </Col>

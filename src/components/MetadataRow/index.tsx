@@ -23,7 +23,7 @@ export default function MetadataRow({ cert }: MRProps) {
         <Row className="mx-4">
           <Col md={6}>
             <h4>Recipient</h4>
-            <ul>
+            <ul data-private>
               <li>
                 {cert.private_metadata.extension.certified_individual?.first_name}{' '}
                 {cert.private_metadata.extension.certified_individual?.middle_name
@@ -50,7 +50,7 @@ export default function MetadataRow({ cert }: MRProps) {
             <Row>
               {cert.private_metadata.extension.issuing_organizations?.map((item) => {
                 return (
-                  <Col xs="auto" key={item.name}>
+                  <Col xs="auto" key={item.name} data-private>
                     <ul>
                       <li>{item.name}</li>
                       {item.url ? (
@@ -68,7 +68,7 @@ export default function MetadataRow({ cert }: MRProps) {
               })}
               {cert.private_metadata.extension.issuing_individuals?.map((item) => {
                 return (
-                  <Col xs="auto" key={item.name}>
+                  <Col xs="auto" key={item.name} data-private>
                     <ul>
                       <li>{item.name}</li>
                       {item.company ? <li>{item.company}</li> : null}
@@ -84,7 +84,7 @@ export default function MetadataRow({ cert }: MRProps) {
         <Row className="mx-4 mb-4">
           <Col md={6}>
             <h4>Certificate Details</h4>
-            <ul>
+            <ul data-private>
               <li>{cert.private_metadata.extension.certificate.name}</li>
               {cert.private_metadata.extension.certificate.cert_type ? (
                 <li>{cert.private_metadata.extension.certificate.cert_type}</li>
@@ -124,7 +124,7 @@ export default function MetadataRow({ cert }: MRProps) {
               <Row>
                 {cert.private_metadata.extension.additions?.map((item: Addition, index: number) => {
                   return (
-                    <Col xs="auto" key={`${item.addition_type}-${index}`}>
+                    <Col xs="auto" key={`${item.addition_type}-${index}`} data-private>
                       <ul>
                         <li>
                           <b>{item.addition_type}</b>
@@ -168,6 +168,7 @@ export default function MetadataRow({ cert }: MRProps) {
               collapsed={true}
               displayObjectSize={false}
               displayDataTypes={false}
+              data-private
             />
           </Col>
         </Row>
