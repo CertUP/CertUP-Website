@@ -17,8 +17,68 @@ import Profile from './pages/Profile';
 import Contact from './pages/Contact';
 import ProjectReview from './pages/ProjectReview';
 import { IssuerProvider } from './contexts/IssuerContext';
+import { useEffect } from 'react';
+
+const whip003 = `
+[chains.secret-network]
+namespace = "cosmos"
+reference = "${process.env.REACT_APP_CHAIN_ID}"
+label = "Secret Network"
+bech32s = "secret"
+
+[coins.scrt]
+chain = "cosmos:${process.env.REACT_APP_CHAIN_ID}"
+slip44 = 529
+symbol = "SCRT"
+label = "Secret"
+
+[contracts.sSCRT]
+chain = "cosmos:${process.env.REACT_APP_CHAIN_ID}"
+address = "${process.env.REACT_APP_SNIP20_ADDR}"
+label = "Secret SCRT"
+[contracts.sSCRT.interfaces.snip20]
+symbol = "SSCRT"
+
+[contracts.manager]
+chain = "cosmos:${process.env.REACT_APP_CHAIN_ID}"
+address = "${process.env.REACT_APP_MANAGER_ADDR}"
+label = "CertUP Manager"
+
+[contracts.721]
+chain = "cosmos:${process.env.REACT_APP_CHAIN_ID}"
+address = "${process.env.REACT_APP_NFT_ADDR}"
+label = "CertUP Certificates"
+[contracts.sSCRT.interfaces.snip721]
+`;
 
 function App() {
+  useEffect(() => {
+    const script = document.createElement('script');
+
+    script.type = 'application/toml';
+    script.dataset['whip-003'] = '';
+    script.innerHTML = whip003;
+
+    const managerImg = document.createElement('link');
+    managerImg.as = 'image';
+    managerImg.href = '/sscrt.svg';
+    managerImg.dataset['caip-10'] = `cosmos:secret-4:snip20/${process.env.REACT_APP_MANAGER_ADDR}`;
+
+    const contractsImg = document.createElement('link');
+    contractsImg.as = 'image';
+    contractsImg.href = '/sscrt.svg';
+    contractsImg.dataset['caip-10'] = `cosmos:secret-4:snip20/${process.env.REACT_APP_NFT_ADDR}`;
+
+    document.getElementsByTagName('head')[0].appendChild(managerImg);
+    document.getElementsByTagName('head')[0].appendChild(contractsImg);
+    document.getElementsByTagName('head')[0].appendChild(script);
+
+    return () => {
+      document.getElementsByTagName('head')[0].removeChild(managerImg);
+      document.getElementsByTagName('head')[0].removeChild(contractsImg);
+      document.getElementsByTagName('head')[0].removeChild(script);
+    };
+  }, []);
   return (
     <WalletProvider>
       <IssuerProvider>
