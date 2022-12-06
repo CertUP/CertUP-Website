@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useWallet } from '../contexts';
 import { useIssuer } from '../contexts/IssuerContext';
 
-export const RestrictedAccess = () => {
+export const RestrictedAccess = ({ text }: { text?: string }) => {
   const { toggleLoginModal } = useWallet();
   const { VerifiedIssuer } = useIssuer();
   useEffect(() => {
@@ -15,6 +15,19 @@ export const RestrictedAccess = () => {
       toggleLoginModal('register');
     }
   }, []);
+
+  if (text)
+    return (
+      <Container>
+        <Row className="justify-content-center">
+          <Col className="text-center" md={8} xs={12}>
+            <h4>
+              <p>{text}</p>
+            </h4>
+          </Col>
+        </Row>
+      </Container>
+    );
 
   // if (MigrationNeeded) {
   //   return (
@@ -65,8 +78,8 @@ export const RestrictedAccess = () => {
         <Col className="text-center" md={8} xs={12}>
           <h4>
             <p>
-              You are not a verified certificate issuer. Early access is restricted to verified
-              issuers. Please <Link to="/contact">Contact Us</Link> for access.
+              You are not a verified certificate issuer. Early access is restricted to verified issuers. Please{' '}
+              <Link to="/contact">Contact Us</Link> for access.
             </p>
           </h4>
         </Col>

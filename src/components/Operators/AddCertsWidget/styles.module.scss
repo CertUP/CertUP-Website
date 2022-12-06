@@ -1,0 +1,47 @@
+@use '../../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.widgetInputForm {
+  border: 1px solid #bbbbbb;
+  border-radius: 20px;
+  padding: 1vh 3vw;
+  justify-content: center;
+}
+
+.widgetInputForm input {
+  background: #f2f2f2;
+  border-radius: 38px;
+}
+.widgetInputForm input:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.widgetInputForm select {
+  background-color: #f2f2f2;
+  border-radius: 38px;
+}
+.widgetInputForm select:focus {
+  border-color: vars.$certupBtnGradient;
+}
+
+.formLabel {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 36px;
+  color: #000000;
+  margin-bottom: 0;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.noPointer {
+  cursor: default;
+}

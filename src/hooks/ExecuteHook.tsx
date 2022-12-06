@@ -108,9 +108,7 @@ export default function useExecute() {
 
       /** ErrInvalidSequence is used the sequence number (nonce) is incorrect for the signature */
       case TxResultCode.ErrInvalidSequence:
-        throw new Error(
-          'Executed Out of Order. You may have a transaction pending or the system may be overloaded.',
-        );
+        throw new Error('Executed Out of Order. You may have a transaction pending or the system may be overloaded.');
 
       /** ErrUnauthorized is used whenever a request without sufficient authorization is handled. */
       case TxResultCode.ErrUnauthorized:
@@ -280,12 +278,7 @@ export default function useExecute() {
     logo_img_url?: string;
     toastRef?: any;
   }
-  const registerIssuer = async ({
-    name,
-    website,
-    logo_img_url,
-    toastRef,
-  }: RegisterProps): Promise<ComputeTx> => {
+  const registerIssuer = async ({ name, website, logo_img_url, toastRef }: RegisterProps): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -309,12 +302,7 @@ export default function useExecute() {
     return response as ComputeTx;
   };
 
-  const editProfile = async ({
-    name,
-    website,
-    logo_img_url,
-    toastRef,
-  }: RegisterProps): Promise<ComputeTx> => {
+  const editProfile = async ({ name, website, logo_img_url, toastRef }: RegisterProps): Promise<ComputeTx> => {
     if (!Client) throw new Error('Client not available.');
     if (!QueryPermit) throw new Error('QueryPermit not available.');
 
@@ -332,6 +320,63 @@ export default function useExecute() {
     const response = await executeManager(editMsg, 135_000, toastRef);
 
     refreshIssuer();
+    return response as ComputeTx;
+  };
+
+  interface EditIssuerProps extends RegisterProps {
+    issuer: string;
+    verified?: boolean;
+    verified_name?: string;
+  }
+
+  const editIssuer = async ({
+    name,
+    website,
+    logo_img_url,
+    verified,
+    verified_name,
+    toastRef,
+  }: EditIssuerProps): Promise<ComputeTx> => {
+    if (!Client) throw new Error('Client not available.');
+
+    const editMsg = {
+      admin_edit_issuer: {
+        issuer_params: {
+          addr: Address,
+          name,
+          website,
+          logo_img_url,
+          verified,
+          verified_name,
+        },
+      },
+    };
+
+    const response = await executeManager(editMsg, 155_000, toastRef);
+
+    return response as ComputeTx;
+  };
+
+  const addCerts = async ({
+    issuer,
+    num_certs,
+    toastRef,
+  }: {
+    issuer: string;
+    num_certs: number;
+    toastRef?: any;
+  }): Promise<ComputeTx> => {
+    if (!Client) throw new Error('Client not available.');
+
+    const editMsg = {
+      admin_add_certs: {
+        issuer,
+        certs: num_certs.toString(),
+      },
+    };
+
+    const response = await executeManager(editMsg, 155_000, toastRef);
+
     return response as ComputeTx;
   };
 
@@ -595,11 +640,7 @@ export default function useExecute() {
         if (toastRef) {
           toast.update(
             toastRef,
-            new ToastProps(
-              'Transaction Failed: Out of Gas. Trying again with more gas.',
-              'error',
-              10000,
-            ),
+            new ToastProps('Transaction Failed: Out of Gas. Trying again with more gas.', 'error', 10000),
           );
           toastRef = undefined;
         }
@@ -819,5 +860,7 @@ export default function useExecute() {
     claimCert,
     registerIssuer,
     editProfile,
+    editIssuer,
+    addCerts,
   };
 }
