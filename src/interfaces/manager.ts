@@ -13,6 +13,8 @@ export interface NewIssuer {
 export interface Issuer extends NewIssuer {
   /// ID of Issuer
   id: string;
+  /// Wallet address of the issuer
+  addr: string;
   /// If the issuer has been verified by CertUP
   verified: boolean;
   /// Name of the organization verified by CertUP
@@ -122,4 +124,10 @@ interface ProjectOverview {
 export interface MintOverview {
   minted_certs: string;
   pending_certs: string;
+}
+
+export interface ListIssuersResponse extends QueryResponse {
+  list_issuers?: {
+    issuers: Issuer[];
+  };
 }

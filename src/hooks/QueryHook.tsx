@@ -17,8 +17,9 @@ import {
   ProjectToken,
   ProjectDataResponse,
   Issuer,
+  ListIssuersResponse,
 } from '../interfaces/manager';
-import { RemainingCertsQueryMsg } from '../utils/queries';
+import { ListIssuersQueryMsg, RemainingCertsQueryMsg } from '../utils/queries/managerQueries';
 import { checkError, queryManagerContract, queryNFTContract } from '../utils/queryWrapper';
 
 export default function useQuery() {
@@ -188,10 +189,7 @@ export default function useQuery() {
     if (!window.keplr) throw new Error('Keplr not available.');
 
     //get view key
-    const vkey = await window.keplr.getSecret20ViewingKey(
-      process.env.REACT_APP_CHAIN_ID as string,
-      address,
-    );
+    const vkey = await window.keplr.getSecret20ViewingKey(process.env.REACT_APP_CHAIN_ID as string, address);
     return vkey;
   };
 
@@ -265,6 +263,16 @@ export default function useQuery() {
     return response.nft_dossier;
   };
 
+  const queryIssuerList = async (start_page: number): Promise<Issuer[]> => {
+    if (!QueryPermit) throw new Error('QueryPermit not available.');
+
+    const query = new ListIssuersQueryMsg({ start_page, viewer: Address });
+
+    const response: ListIssuersResponse = await queryManagerContract({ query, signature: QueryPermit });
+
+    return response.list_issuers?.issuers || [];
+  };
+
   return {
     queryCredits,
     queryIssuerData,
@@ -280,5 +288,6 @@ export default function useQuery() {
     queryPubIssuerData,
     getCertPub,
     queryCertPrice,
+    queryIssuerList,
   };
 }

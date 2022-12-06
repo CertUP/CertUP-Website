@@ -9,13 +9,7 @@ import { useCookies } from 'react-cookie';
 
 import { SecretNetworkClient, Wallet } from 'secretjs';
 import { useWallet } from '../../contexts/WalletContext';
-import {
-  getErrorMessage,
-  numDaysBetween,
-  reportError,
-  sleep,
-  suggestTestnet,
-} from '../../utils/helpers';
+import { getErrorMessage, numDaysBetween, reportError, sleep, suggestTestnet } from '../../utils/helpers';
 import { getCachedLoginToken, getCachedQueryPermit, isExpired } from '../../utils/loginPermit';
 import Dropdown from 'react-bootstrap/Dropdown';
 import React from 'react';
@@ -70,7 +64,7 @@ interface KeplrButtonProps {
 
 export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactElement {
   const { Address, updateClient, toggleLoginModal } = useWallet();
-  const { IssuerProfile } = useIssuer();
+  const { IssuerProfile, isOperator } = useIssuer();
   const [loading, setLoading] = useState(false);
 
   const [cookies, setCookie, removeCookie] = useCookies(['ConnectedKeplr', 'IssuerLogin']);
@@ -91,20 +85,13 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
 
   useEffect(() => {
     if (!autoConnect) return;
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
-      sleep(100);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
-      sleep(300);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
-      sleep(500);
-    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino)
-      return;
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(100);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(300);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) sleep(500);
+    if (!window.keplr || !window.getOfflineSignerOnlyAmino || !window.getOfflineSignerOnlyAmino) return;
 
     if (cookies.ConnectedKeplr) {
-      if (
-        numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) <
-        15 /* && getCachedQueryPermit(Address) */
-      ) {
+      if (numDaysBetween(new Date(cookies.ConnectedKeplr), new Date()) < 15 /* && getCachedQueryPermit(Address) */) {
         handleConnect();
       }
     }
@@ -124,9 +111,7 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
       if (process.env.REACT_APP_CHAIN_ID.includes('pulsar')) await suggestTestnet();
       await window.keplr.enable(process.env.REACT_APP_CHAIN_ID as string);
 
-      const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(
-        process.env.REACT_APP_CHAIN_ID as string,
-      );
+      const keplrOfflineSigner = window.getOfflineSignerOnlyAmino(process.env.REACT_APP_CHAIN_ID as string);
       const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
 
       const secretjs = await SecretNetworkClient.create({
@@ -202,6 +187,10 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
     navigate('/profile');
   };
 
+  const handleOpsDashboard = () => {
+    navigate('/operator');
+  };
+
   //const { Items } = useItem();
   //console.log(Items);
   // return loading ? (
@@ -236,15 +225,20 @@ export default function KeplrButton({ autoConnect }: KeplrButtonProps): ReactEle
       </Dropdown.Toggle>
 
       <Dropdown.Menu align="end" as={CustomMenu} className="text-center">
-        <Dropdown.Item eventKey="1" onClick={() => handleCopy(Address)}>
+        {isOperator ? (
+          <Dropdown.Item eventKey="1" onClick={() => handleOpsDashboard()}>
+            Operator Dashboard
+          </Dropdown.Item>
+        ) : null}
+        <Dropdown.Item eventKey="2" onClick={() => handleCopy(Address)}>
           Copy Wallet Address
         </Dropdown.Item>
         {IssuerProfile ? (
-          <Dropdown.Item eventKey="2" onClick={() => handleProfile()}>
+          <Dropdown.Item eventKey="3" onClick={() => handleProfile()}>
             Issuer Profile
           </Dropdown.Item>
         ) : null}
-        <Dropdown.Item eventKey="3" onClick={() => handleLogout()}>
+        <Dropdown.Item eventKey="4" onClick={() => handleLogout()}>
           Logout
         </Dropdown.Item>
       </Dropdown.Menu>

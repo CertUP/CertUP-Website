@@ -18,6 +18,7 @@ import Contact from './pages/Contact';
 import ProjectReview from './pages/ProjectReview';
 import { IssuerProvider } from './contexts/IssuerContext';
 import { useEffect } from 'react';
+import Operators from './pages/Operators';
 
 const whip003 = `
 [chains.secret-network]
@@ -60,14 +61,16 @@ function App() {
     script.innerHTML = whip003;
 
     const managerImg = document.createElement('link');
+    managerImg.rel = 'prefetch';
     managerImg.as = 'image';
-    managerImg.href = '/sscrt.svg';
-    managerImg.dataset['caip-10'] = `cosmos:secret-4:snip20/${process.env.REACT_APP_MANAGER_ADDR}`;
+    managerImg.href = 'https://certup.net/apple-touch-icon.png';
+    managerImg.dataset['caip-10'] = `cosmos:${process.env.REACT_APP_CHAIN_ID}:${process.env.REACT_APP_MANAGER_ADDR}`;
 
     const contractsImg = document.createElement('link');
+    contractsImg.rel = 'prefetch';
     contractsImg.as = 'image';
-    contractsImg.href = '/sscrt.svg';
-    contractsImg.dataset['caip-10'] = `cosmos:secret-4:snip20/${process.env.REACT_APP_NFT_ADDR}`;
+    contractsImg.href = 'https://certup.net/apple-touch-icon.png';
+    contractsImg.dataset['caip-10'] = `cosmos:${process.env.REACT_APP_CHAIN_ID}:${process.env.REACT_APP_NFT_ADDR}`;
 
     document.getElementsByTagName('head')[0].appendChild(managerImg);
     document.getElementsByTagName('head')[0].appendChild(contractsImg);
@@ -114,6 +117,7 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="*" element={<Error />} />
+                <Route path="/operator" element={<Operators />} />
               </Routes>
             </BrowserRouter>
           </NftProvider>

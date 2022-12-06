@@ -1,8 +1,9 @@
 import { createContext, useState, useContext, ReactElement, ReactNode, useEffect } from 'react';
+import context from 'react-bootstrap/esm/AccordionContext';
 
 import { toast } from 'react-toastify';
 import { Issuer, IssuerDataResponse } from '../interfaces/manager';
-import { IssuerDataQueryMsg } from '../utils/queries';
+import { IssuerDataQueryMsg } from '../utils/queries/managerQueries';
 import { queryManagerContract, queryOldManagerContract } from '../utils/queryWrapper';
 import { useWallet } from './WalletContext';
 import LogRocket from 'logrocket';
@@ -12,6 +13,7 @@ export interface IssuerContextState {
   IssuerProfile?: Issuer;
   LoadingRemainingCerts: boolean;
   VerifiedIssuer?: boolean;
+  isOperator: boolean;
   refreshIssuer: () => Promise<number | undefined>;
 }
 
@@ -25,6 +27,7 @@ const contextDefaultValues: IssuerContextState = {
   IssuerProfile: undefined,
   LoadingRemainingCerts: false,
   VerifiedIssuer: undefined,
+  isOperator: false,
   refreshIssuer: async function (): Promise<number | undefined> {
     throw new Error('Function not implemented.');
   },
@@ -38,24 +41,23 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
   const [LoadingRemainingCerts, setLoadingRemainingCerts] = useState<boolean>(
     contextDefaultValues.LoadingRemainingCerts,
   );
+  const [LoadingOperator, setLoadingOperator] = useState<boolean>(false);
 
-  const [IssuerProfile, setIssuerProfile] = useState<Issuer | undefined>(
-    contextDefaultValues.IssuerProfile,
-  );
+  const [IssuerProfile, setIssuerProfile] = useState<Issuer | undefined>(contextDefaultValues.IssuerProfile);
 
-  const [VerifiedIssuer, setVerifiedIssuer] = useState<boolean | undefined>(
-    contextDefaultValues.VerifiedIssuer,
-  );
+  const [VerifiedIssuer, setVerifiedIssuer] = useState<boolean | undefined>(contextDefaultValues.VerifiedIssuer);
+  const [isOperator, setIsOperator] = useState<boolean>(contextDefaultValues.isOperator);
 
   const [refreshInterval, setRefreshInterval] = useState<NodeJS.Timer>();
 
-  const { Querier, QueryPermit, Address, refreshQueryPermit } = useWallet();
+  const { Querier, QueryPermit, Address, refreshQueryPermit, DummyWallet } = useWallet();
 
   // query credits as soon as permit and querier are available
   useEffect(() => {
     if (!QueryPermit) return;
     console.log('Permit Updated!', QueryPermit);
     refreshIssuer(undefined, true);
+    refreshOperator(undefined, true);
   }, [QueryPermit]);
 
   useEffect(() => {
@@ -99,7 +101,7 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
     if (!queryPermit) return;
     //setLoadingRemainingCerts(true);
     try {
-      const query = new IssuerDataQueryMsg(Address);
+      const query = new IssuerDataQueryMsg({ viewer: Address });
 
       const response = (await queryManagerContract({
         query,
@@ -126,15 +128,12 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
     }
   };
 
-  const refreshIssuer = async (
-    queryPermit = QueryPermit,
-    force = false,
-  ): Promise<number | undefined> => {
+  const refreshIssuer = async (queryPermit = QueryPermit, force = false): Promise<number | undefined> => {
     if (!force && LoadingRemainingCerts) return;
     setLoadingRemainingCerts(true);
 
     let response: IssuerDataResponse | undefined | string;
-    const query = new IssuerDataQueryMsg(Address);
+    const query = new IssuerDataQueryMsg({ viewer: Address });
     try {
       response = (await queryManagerContract({
         query,
@@ -163,9 +162,7 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
 
         // Throw other errors
         const errorMsg =
-          response?.parse_err?.msg ||
-          response?.generic_err?.msg ||
-          JSON.stringify(response, undefined, 2);
+          response?.parse_err?.msg || response?.generic_err?.msg || JSON.stringify(response, undefined, 2);
         throw new Error(errorMsg);
       }
 
@@ -179,8 +176,7 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
       // Identify user for LogRocket
       const fields: any = {};
       if (response.issuer_data.issuer.name) fields.name = response.issuer_data.issuer.name;
-      if (response.issuer_data.issuer.verified_name)
-        fields.verified_name = response.issuer_data.issuer.verified_name;
+      if (response.issuer_data.issuer.verified_name) fields.verified_name = response.issuer_data.issuer.verified_name;
       LogRocket.identify(Address, {
         ...fields,
         verified: response.issuer_data.issuer.verified,
@@ -195,7 +191,7 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
         error.toString().includes('Response closed without headers')
       ) {
         toast.error(
-          'Failed to load issuer status: Failed to query network. Out nodes may be experiencing issues. Please try again.',
+          'Failed to load issuer status: Failed to query network. Our nodes may be experiencing issues. Please try again.',
         );
       } else {
         toast.error(`Failed to load issuer status: ${error.toString()}`);
@@ -205,12 +201,61 @@ export const IssuerProvider = ({ children }: Props): ReactElement => {
     }
   };
 
+  const refreshOperator = async (queryPermit = QueryPermit, force = false): Promise<boolean | undefined> => {
+    if (!force && LoadingOperator) return;
+    setLoadingOperator(true);
+
+    let response: IssuerDataResponse | undefined | string;
+    const query = new IssuerDataQueryMsg({
+      viewer: Address,
+      issuer: DummyWallet?.address || 'secret13xhm2y4dyn9n3caclt629ddmy0jfgd0djay974',
+    });
+    try {
+      response = (await queryManagerContract({
+        query,
+        signature: queryPermit,
+        checkErrors: false,
+      })) as IssuerDataResponse;
+
+      // This isnt important for most users, refreshIssuer will handle it then operators can just refresh to fix this query
+      if (response.generic_err?.msg.includes('Failed to verify signatures for the given permit')) {
+        return;
+      }
+
+      // Check for Query Errors
+      if (response?.parse_err || response?.generic_err) {
+        // Check if not an operator
+        if (response.generic_err?.msg.includes('operator command')) {
+          setLoadingOperator(false);
+          setIsOperator(false);
+          return false;
+        }
+
+        // Throw other errors
+        const errorMsg =
+          response?.parse_err?.msg || response?.generic_err?.msg || JSON.stringify(response, undefined, 2);
+        throw new Error(errorMsg);
+      }
+
+      // Save results to state if an operator
+      setIsOperator(true);
+      setLoadingOperator(false);
+      console.log('You are a CertUP operator!');
+      return true;
+    } catch (error: any) {
+      console.error('Failed to load operator status:', error);
+    } finally {
+      setLoadingOperator(false);
+    }
+  };
+
   const values = {
     RemainingCerts,
     IssuerProfile,
     LoadingRemainingCerts,
     refreshIssuer,
     VerifiedIssuer,
+    isOperator,
   };
 
   // add values to provider to reach them out from another component

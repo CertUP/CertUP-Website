@@ -1,5 +1,5 @@
-import { PermitSignature } from '../interfaces';
-import { allowedTokens, permissions, permitName } from './loginPermit';
+import { PermitSignature } from '../../interfaces';
+import { allowedTokens, permissions, permitName } from '../loginPermit';
 
 export class PermitQuery {
   with_permit: {
@@ -26,34 +26,6 @@ export class PermitQuery {
         },
         signature,
       },
-    };
-  }
-}
-
-export class RemainingCertsQueryMsg {
-  public remaining_certs: {
-    viewer: string;
-    key?: string;
-  };
-  constructor(viewer: string, key?: string) {
-    this.remaining_certs = {
-      viewer,
-      key,
-    };
-  }
-}
-
-export class IssuerDataQueryMsg {
-  public issuer_data: {
-    viewer: string;
-    key?: string;
-    address?: string;
-  };
-  constructor(viewer: string, key?: string, address?: string) {
-    this.issuer_data = {
-      viewer,
-      key,
-      address,
     };
   }
 }

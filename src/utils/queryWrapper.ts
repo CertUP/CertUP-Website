@@ -1,7 +1,7 @@
 import { SecretNetworkClient } from 'secretjs';
 import { PermitSignature, QueryResponse } from '../interfaces';
 import { IssuerDataResponse } from '../interfaces/manager';
-import { PermitQuery } from './queries';
+import { PermitQuery } from './queries/queries';
 
 let Querier: SecretNetworkClient;
 
