@@ -19,6 +19,7 @@ import ProjectReview from './pages/ProjectReview';
 import { IssuerProvider } from './contexts/IssuerContext';
 import { useEffect } from 'react';
 import Operators from './pages/Operators';
+import Pricing from './pages/Pricing';
 
 const whip003 = `
 [chains.secret-network]
@@ -118,6 +119,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="*" element={<Error />} />
                 <Route path="/operator" element={<Operators />} />
+                <Route path="/pricing" element={<Pricing />} />
               </Routes>
             </BrowserRouter>
           </NftProvider>
