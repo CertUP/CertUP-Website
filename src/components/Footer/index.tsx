@@ -10,13 +10,7 @@ import logo from '../../assets/certup-logo-small.png';
 import secretlogo from '../../assets/secret-logo.svg';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faDiscord,
-  faTwitter,
-  faGithub,
-  faLinkedinIn,
-  faLinkedin,
-} from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faTwitter, faGithub, faLinkedinIn, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 export default function Footer() {
@@ -33,22 +27,12 @@ export default function Footer() {
             </Row>
             <Row className={styles.socialsContainer} style={{ width: '70%', fontSize: '24px' }}>
               <Col xs="auto">
-                <a
-                  href="https://discord.gg/jNZJYBDcZQ"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.socialLink}
-                >
+                <a href="https://discord.gg/jNZJYBDcZQ" target="_blank" rel="noreferrer" className={styles.socialLink}>
                   <FontAwesomeIcon icon={faDiscord as IconProp} />
                 </a>
               </Col>
               <Col xs="auto">
-                <a
-                  href="https://twitter.com/cert_up"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.socialLink}
-                >
+                <a href="https://twitter.com/cert_up" target="_blank" rel="noreferrer" className={styles.socialLink}>
                   <FontAwesomeIcon icon={faTwitter as IconProp} />
                 </a>
               </Col>
@@ -63,12 +47,7 @@ export default function Footer() {
                 </a>
               </Col>
               <Col xs="auto">
-                <a
-                  href="https://github.com/CertUP"
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.socialLink}
-                >
+                <a href="https://github.com/CertUP" target="_blank" rel="noreferrer" className={styles.socialLink}>
                   <FontAwesomeIcon icon={faGithub as IconProp} />
                 </a>
               </Col>
@@ -87,8 +66,8 @@ export default function Footer() {
                 </Link>
                 <div style={{ paddingTop: '30px' }} />
 
-                <Link to="/clients">
-                  <span className={styles.navItem}>Clients</span>
+                <Link to="/pricing">
+                  <span className={styles.navItem}>Pricing</span>
                 </Link>
               </Col>
               <Col sm={5} xs={6}>

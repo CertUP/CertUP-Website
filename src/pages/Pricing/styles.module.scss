@@ -1,0 +1,81 @@
+@use '../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.aboutTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 72px;
+  line-height: 108px;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.aboutSubtitle {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 60px;
+  letter-spacing: 0.02em;
+  padding-bottom: 12px;
+}
+
+.aboutInfoText {
+  font-family: 'Catamaran';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 34px;
+
+  color: #6c6c6c;
+}
+
+.infoBox {
+  //background: linear-gradient(114.11deg, rgba(116, 235, 213, 0.75) -7.36%, rgba(159, 172, 230, 0.75) 101.34%);
+  border: solid 5px transparent;
+  background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), vars.$certupGradient;
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  border-radius: 50px;
+  box-shadow: 2px 1000px 1px #fff inset;
+  padding: 45px;
+}
+
+.infoTitle {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 84px;
+  letter-spacing: 0.02em;
+
+  text-align: center;
+  padding-top: 45px;
+  padding-bottom: 70px;
+}
+
+.productText {
+  font-family: 'Catamaran';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 30px;
+  color: #888a8b;
+}
+
+.teamDiv {
+  // width: 30vw !important;
+  // max-width: 300px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.teamLogo {
+  // width: 15vw;
+  max-width: 175px !important;
+  align-self: center;
+  margin-bottom: 1rem;
+}
