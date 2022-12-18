@@ -3,26 +3,18 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import Image from 'react-bootstrap/Image';
-import dlExcel from '../../assets/dlExcel.svg';
 
 import styles from './styles.module.scss';
-import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faX } from '@fortawesome/free-solid-svg-icons';
 import { useWallet } from '../../../contexts';
 import { useIssuer } from '../../../contexts/IssuerContext';
 import useQuery from '../../../hooks/QueryHook';
 import { useScrollbarWidth } from '../../../hooks/ScroolbarWidthHook';
-import { Issuer, MintOverview, ProjectToken } from '../../../interfaces/manager';
-import CopyButton from '../../CopyButton';
-import CUSpinner from '../../CUSpinner';
-import ImageRow from '../../ImageRow';
-import IssuerInfo from '../../IssuerInfo';
-import MetadataRow from '../../MetadataRow';
-import { devNull } from 'os';
+import { Issuer } from '../../../interfaces/manager';
 import ProfileWidget from '../IssuerProfileWidget';
 import AddCertsWidget from '../AddCertsWidget';
+import TemplateAccessWidget from '../TemplateAccessWidget';
 
 interface ViewerProps {
   issuerList: Issuer[];
@@ -30,14 +22,8 @@ interface ViewerProps {
 }
 
 export default function IssuerViewer({ issuerList, refresh }: ViewerProps) {
-  const { Client, ClientIsSigner, Wallet, Address, LoginToken } = useWallet();
-  const { RemainingCerts, IssuerProfile } = useIssuer();
   const scrollBarWidth = useScrollbarWidth();
-
-  const { queryIssuerData } = useQuery();
-
   const [selectedIssuer, setSelectedIssuer] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
 
   return (
     <>
@@ -130,12 +116,16 @@ export default function IssuerViewer({ issuerList, refresh }: ViewerProps) {
               <ProfileWidget issuerProfile={issuerList[selectedIssuer]} refresh={refresh} />
             </Col>
             <Col md={6} xs={12}>
-              <AddCertsWidget issuerProfile={issuerList[selectedIssuer]} refresh={refresh} />
+              <Row className="mb-4">
+                <AddCertsWidget issuerProfile={issuerList[selectedIssuer]} refresh={refresh} />
+              </Row>
+              <Row>
+                <TemplateAccessWidget issuerProfile={issuerList[selectedIssuer]} refresh={refresh} />
+              </Row>
             </Col>
           </Row>
         )}
       </Container>
-      ;
     </>
   );
 }

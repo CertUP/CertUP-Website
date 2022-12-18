@@ -117,10 +117,7 @@ export const generateMultiple = async ({ id, layoutId = 1, input, upload = false
     layoutId,
   };
 
-  const url = new URL(
-    `/templates/generateMultiple/${id}`,
-    process.env.REACT_APP_BACKEND,
-  ).toString();
+  const url = new URL(`/templates/generateMultiple/${id}`, process.env.REACT_APP_BACKEND).toString();
 
   const { data } = await axios.post(url, temp);
   return data.data;
@@ -151,10 +148,7 @@ export const getTemplates = async (LoginToken: LoginToken): Promise<Template[]> 
   return response.data.data;
 };
 
-export const getTemplatePreview = async (
-  LoginToken: LoginToken,
-  templateId: string,
-): Promise<any> => {
+export const getTemplatePreview = async (LoginToken: LoginToken, templateId: string): Promise<any> => {
   const token = `Permit ${JSON.stringify(LoginToken)}`;
   const url = new URL(`/templates/preview/${templateId}`, process.env.REACT_APP_BACKEND);
   const response = await axios.get(url.toString(), {
@@ -163,4 +157,45 @@ export const getTemplatePreview = async (
     },
   });
   return response.data;
+};
+
+interface Allow {
+  address: string;
+  template_id: string;
+}
+
+// Get a list of restricted templates that an address has access to.
+export const getAllowedTemplates = async (LoginToken: LoginToken, address: string): Promise<Allow[]> => {
+  const token = `Permit ${JSON.stringify(LoginToken)}`;
+  const url = new URL(`/templates/allowed/address/${address}`, process.env.REACT_APP_BACKEND);
+  const response = await axios.get(url.toString(), {
+    headers: {
+      Authorization: token,
+    },
+  });
+  console.log(response.data);
+  return response.data.data;
+};
+
+// Set the list of templates an issuer address has access to
+export const setAllowedTemplates = async (
+  LoginToken: LoginToken,
+  address: string,
+  template_ids: string[],
+): Promise<Template[]> => {
+  const token = `Permit ${JSON.stringify(LoginToken)}`;
+  const request = {
+    address,
+    template_ids,
+  };
+
+  const url = new URL(`/templates/allowed/set`, process.env.REACT_APP_BACKEND);
+  const response = await axios.post(url.toString(), request, {
+    headers: {
+      Authorization: token,
+    },
+  });
+
+  console.log(response.data);
+  return response.data.data;
 };

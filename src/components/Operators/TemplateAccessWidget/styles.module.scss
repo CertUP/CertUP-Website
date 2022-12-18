@@ -1,0 +1,21 @@
+@use '../../../global/_variables.scss' as vars;
+
+$color-bg: #fff;
+$gradient1: #9094ff;
+$gradient2: #55f4c5;
+$gradient3: #a659f3;
+
+.widgetInputForm {
+  border: 1px solid #bbbbbb;
+  border-radius: 20px;
+  padding: 1vh 3vw;
+  justify-content: center;
+}
+
+.widgetInputForm input {
+  background: #f2f2f2;
+  border-radius: 38px;
+}
+.widgetInputForm input:focus {
+  border-color: vars.$certupBtnGradient;
+}
