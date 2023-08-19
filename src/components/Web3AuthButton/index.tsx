@@ -14,8 +14,7 @@ import { useWallet } from '../../contexts/WalletContext';
 import { getErrorMessage, reportError } from '../../utils/helpers';
 import getPermits, { LoginToken } from '../../utils/loginPermit';
 
-const clientId =
-  'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU'; // get from https://dashboard.web3auth.io
+const clientId = 'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU'; // get from https://dashboard.web3auth.io
 // declare interface Date {
 //   addHours(h: number): Date;
 // }
@@ -43,7 +42,7 @@ export default function Web3AuthButton(): ReactElement {
   // const handleConnect = async () => {
   //   try {
   //     setLoading(true);
-  //     if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+  //     if (!window.keplr) {
   //       toast.error('Keplr Extension Not Found');
   //       setLoading(false);
   //       return;
@@ -51,7 +50,7 @@ export default function Web3AuthButton(): ReactElement {
 
   //     await window.keplr.enable(process.env.REACT_APP_CHAIN_ID);
 
-  //     const keplrOfflineSigner: Wallet = window.getOfflineSignerOnlyAmino(
+  //     const keplrOfflineSigner: Wallet = window.keplr.getOfflineSignerOnlyAmino(
   //       process.env.REACT_APP_CHAIN_ID as string,
   //     );
   //     const [{ address: myAddress }] = await keplrOfflineSigner.getAccounts();
@@ -61,7 +60,7 @@ export default function Web3AuthButton(): ReactElement {
   //       chainId: process.env.REACT_APP_CHAIN_ID as string,
   //       wallet: keplrOfflineSigner,
   //       walletAddress: myAddress,
-  //       encryptionUtils: window.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
+  //       encryptionUtils: window.keplr.getEnigmaUtils(process.env.REACT_APP_CHAIN_ID as string),
   //     });
 
   //     const issueDate = new Date();
@@ -93,8 +92,7 @@ export default function Web3AuthButton(): ReactElement {
       const openloginAdapter = new OpenloginAdapter({
         adapterSettings: {
           network: 'testnet',
-          clientId:
-            'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU',
+          clientId: 'BDZVMzdANUiO-oXksHJCXgXxuJLgRhGVSEjoDdVIV4iJ0PiQZwSZuHwJzCHIKJsiN5hrUK_twMPQ6rQ_wgSFcsU',
           uxMode: 'popup',
         },
 
