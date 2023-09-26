@@ -4356,9 +4356,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001272, caniuse-lite@^1.0.30001286, caniuse-lite@^1.0.30001287:
-  version "1.0.30001287"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001287.tgz#5fab6a46ab9e47146d5dd35abfe47beaf8073c71"
-  integrity sha512-4udbs9bc0hfNrcje++AxBuc6PfLNHwh3PO9kbwnfCQWyqtlzg3py0YgFu8jyRTTo85VAz4U+VLxSlID09vNtWA==
+  version "1.0.30001539"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001539.tgz"
+  integrity sha512-hfS5tE8bnNiNvEOEkm8HElUHroYwlqMMENEzELymy77+tJ6m+gA2krtHl5hxJaj71OlpC2cHZbdSMX1/YEqEkA==
 
 case-sensitive-paths-webpack-plugin@^2.4.0:
   version "2.4.0"
@@ -6731,6 +6731,11 @@ globby@^11.0.1, globby@^11.0.4:
     ignore "^5.1.4"
     merge2 "^1.3.0"
     slash "^3.0.0"
+
+google-protobuf@^3.14.0:
+  version "3.21.2"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.2.tgz#4580a2bea8bbb291ee579d1fefb14d6fa3070ea4"
+  integrity sha512-3MSOYFO5U9mPGikIYCzK0SaThypfGgS6bHqrUGXG3DPHCrb+txNqeEcns1W0lkGfk0rCyNXm7xB9rMxnCiZOoA==
 
 graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4, graceful-fs@^4.2.6:
   version "4.2.8"
@@ -10837,6 +10842,31 @@ secp256k1@^4.0.1, secp256k1@^4.0.2:
     node-addon-api "^2.0.0"
     node-gyp-build "^4.2.0"
 
+secretjs@1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.4.7.tgz#4f9120142c4e269a678edc54165807adf30762fe"
+  integrity sha512-9vm/n6ZKvAhqENfqPOAtJCV3e6wLlJLhiRtvKrjyzDzCC76F8kOHak3PONqks29EDgynhscuf2O46V6ljwLgUQ==
+  dependencies:
+    "@cosmjs/encoding" "0.27.1"
+    "@cosmjs/math" "0.27.1"
+    "@improbable-eng/grpc-web" "0.15.0"
+    "@improbable-eng/grpc-web-node-http-transport" "0.15.0"
+    "@noble/hashes" "1.0.0"
+    "@noble/secp256k1" "1.6.3"
+    "@osmonauts/helpers" "0.3.8"
+    bech32 "2.0.0"
+    big-integer "1.6.51"
+    bignumber.js "9.0.2"
+    bip32 "2.0.6"
+    bip39 "3.0.4"
+    curve25519-js "0.0.4"
+    google-protobuf "^3.14.0"
+    is-gzip "2.0.0"
+    miscreant "0.3.2"
+    pako "2.0.4"
+    protobufjs "6.11.3"
+    secure-random "1.1.2"
+
 secretjs@^0.17.0:
   version "0.17.5"
   resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-0.17.5.tgz#5b55e46cfa2719714831fc2019e21c21959fe587"
@@ -10852,30 +10882,6 @@ secretjs@^0.17.0:
     miscreant "0.3.2"
     pako "1.0.11"
     protobufjs "^6.11.2"
-    secure-random "1.1.2"
-
-secretjs@^1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/secretjs/-/secretjs-1.4.1.tgz#a7ec80db3d941d3a92ea215ea48f336388ae5ee9"
-  integrity sha512-/+7GpnI7QczcpATx/REDvbvlhfIPAR06vQvclfawo7B1FSZZ6uz8qd+DhULZJJ1JMlIL419qsLtTuN222tU+ag==
-  dependencies:
-    "@cosmjs/encoding" "0.27.1"
-    "@cosmjs/math" "0.27.1"
-    "@improbable-eng/grpc-web" "0.15.0"
-    "@improbable-eng/grpc-web-node-http-transport" "0.15.0"
-    "@noble/hashes" "1.0.0"
-    "@noble/secp256k1" "1.6.3"
-    "@osmonauts/helpers" "0.3.8"
-    bech32 "2.0.0"
-    big-integer "1.6.51"
-    bignumber.js "9.0.2"
-    bip32 "2.0.6"
-    bip39 "3.0.4"
-    curve25519-js "0.0.4"
-    is-gzip "2.0.0"
-    miscreant "0.3.2"
-    pako "2.0.4"
-    protobufjs "6.11.3"
     secure-random "1.1.2"
 
 secure-random@1.1.2:

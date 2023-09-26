@@ -221,11 +221,9 @@ export const participantsToWorksheet = (participants: Participant[], projectName
   worksheet['!cols'][3] = { wch: 15 };
   worksheet['!cols'][4] = { wch: 75 };
   worksheet['!cols'][5] = { wch: 15 };
-  XLSX.utils.sheet_add_aoa(
-    worksheet,
-    [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code', 'Claimed']],
-    { origin: 'A1' },
-  );
+  XLSX.utils.sheet_add_aoa(worksheet, [['Name', 'Surname', 'Date of Birth', 'Cert Number', 'Claim Code', 'Claimed']], {
+    origin: 'A1',
+  });
 
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Project');
   XLSX.writeFile(workbook, `CertUP Project Review - ${projectName}.xlsx`);
@@ -235,10 +233,10 @@ export async function suggestTestnet() {
   if (!window.keplr) throw new Error('Keplr wallet extension not found.');
 
   await window.keplr.experimentalSuggestChain({
-    chainId: 'pulsar-2',
+    chainId: 'pulsar-3',
     chainName: 'Secret Testnet',
-    rpc: 'https://pulsar-2.api.trivium.network:26657',
-    rest: 'https://pulsar-2.api.trivium.network:1317',
+    rpc: 'https://rpc.pulsar3.scrttestnet.com',
+    rest: 'https://api.pulsar3.scrttestnet.com',
     bip44: {
       coinType: 529,
     },

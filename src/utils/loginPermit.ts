@@ -110,7 +110,7 @@ export async function getLoginToken(
   expDate?: Date,
   refresh = false,
 ): Promise<LoginToken> {
-  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+  if (!window.keplr) {
     throw new Error('Keplr Extension Not Found');
   }
 
@@ -143,26 +143,17 @@ export async function getLoginToken(
     memo: '', // Must be empty
   };
 
-  const { signature } = await window.keplr.signAmino(
-    process.env.REACT_APP_CHAIN_ID as string,
-    address,
-    unsignedToken,
-    {
-      preferNoSetFee: true, // Fee must be 0, so hide it from the user
-      preferNoSetMemo: true, // Memo must be empty, so hide it from the user
-    },
-  );
+  const { signature } = await window.keplr.signAmino(process.env.REACT_APP_CHAIN_ID as string, address, unsignedToken, {
+    preferNoSetFee: true, // Fee must be 0, so hide it from the user
+    preferNoSetMemo: true, // Memo must be empty, so hide it from the user
+  });
   const loginToken = { permit: signature, issued: issueDate, expires: expDate };
   localStorage.setItem(getLoginString(address), JSON.stringify(loginToken));
   return loginToken;
 }
 
-export default async function getPermits(
-  address: string,
-  issueDate: Date,
-  expDate: Date,
-): Promise<GetPermitResponse> {
-  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+export default async function getPermits(address: string, issueDate: Date, expDate: Date): Promise<GetPermitResponse> {
+  if (!window.keplr) {
     throw new Error('Keplr Extension Not Found');
   }
 
@@ -222,11 +213,8 @@ export default async function getPermits(
   };
 }
 
-export const getQueryPermit = async (
-  address: string,
-  refresh = false,
-): Promise<PermitSignature> => {
-  if (!window.keplr || !window.getEnigmaUtils || !window.getOfflineSignerOnlyAmino) {
+export const getQueryPermit = async (address: string, refresh = false): Promise<PermitSignature> => {
+  if (!window.keplr) {
     throw new Error('Keplr Extension Not Found');
   }
 

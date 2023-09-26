@@ -524,10 +524,12 @@ export default function useExecute() {
       },
     };
 
-    const simulationGas = await simulateManager(preloadMsg);
-    console.log('Sim result', simulationGas);
+    // const simulationGas = await simulateManager(preloadMsg);
+    // console.log('Sim result', simulationGas);
 
-    const response = await executeManager(preloadMsg, simulationGas, toast);
+    const gas = 100_000 + 25_000 * data.length;
+
+    const response = await executeManager(preloadMsg, gas, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
     refreshIssuer();
     return response;
@@ -594,7 +596,8 @@ export default function useExecute() {
       return gasLimit;
     } catch (err: any) {
       console.error('TX Simulation Error', err);
-      throw err;
+      // throw err;
+      return 0;
     }
   };
 
