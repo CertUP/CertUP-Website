@@ -527,7 +527,7 @@ export default function useExecute() {
     // const simulationGas = await simulateManager(preloadMsg);
     // console.log('Sim result', simulationGas);
 
-    const gas = 100_000 + 25_000 * data.length;
+    const gas = 100_000 + 35_000 * data.length;
 
     const response = await executeManager(preloadMsg, gas, toast);
     console.log('Preload Used', response.gasUsed, 'gas.');
@@ -545,10 +545,10 @@ export default function useExecute() {
       },
     };
 
-    const simulationGas = await simulateManager(mintMsg);
-    console.log('Sim result', simulationGas);
+    // const simulationGas = await simulateManager(mintMsg);
+    // console.log('Sim result', simulationGas);
 
-    const response = await executeManager(mintMsg, simulationGas, toast);
+    const response = await executeManager(mintMsg, 100_000, toast);
     console.log('Mint used', response.gasUsed, 'gas.');
     refreshDossiers();
     return response;
