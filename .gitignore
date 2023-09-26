@@ -24,4 +24,5 @@ yarn-error.log*
 
 react-image-picker-mod
 .env.devnet
+.env.local
 .env
