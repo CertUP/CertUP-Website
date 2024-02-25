@@ -148,8 +148,8 @@ export default function About() {
                   <Image src={triviumLogo} fluid className={styles.teamLogo} />
                 </Row>
                 <p>
-                  Trivium is a validator for Secret Network, and a software development team focused on decentralized
-                  privacy solutions for companies and individuals.
+                  Trivium is a validator on multiple PoS chains, and a software development team focused on
+                  decentralized privacy solutions for companies and individuals.
                 </p>
               </Row>
               <Row className="text-end">

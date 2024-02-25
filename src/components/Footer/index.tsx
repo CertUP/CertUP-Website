@@ -87,13 +87,7 @@ export default function Footer() {
               </Col>
             </Row>
           </Col>
-          <Col md={3} xs={12} className="d-flex flex-column justify-content-end align-items-center">
-            <div className="d-md-none mt-4 mb-4" />
-            <a href="https://scrt.network" target="_blank" rel="noreferrer">
-              <Image src="/securedby.png" style={{ height: '75px' }} />
-            </a>
-            <div className="d-md-none mt-4" />
-          </Col>
+          <Col md={3} xs={12} className="d-flex flex-column justify-content-end align-items-center" />
         </Row>
       </Container>
     </div>
